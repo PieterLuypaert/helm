@@ -13,11 +13,11 @@ namespace Loupedeck.HerdrPlugin
             HerdrState.Changed += _ => this.ActionImageChanged();
         }
 
-        protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
-            Look(HerdrState.Current).Title;
+        // A tile like an app icon, without a label: the count on it says what it is.
+        protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) => "";
 
         protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize) =>
-            KeyArt.Draw(Look(HerdrState.Current), imageSize);
+            KeyArt.Draw(TileLook(HerdrState.Current), imageSize);
 
         protected override void RunCommand(String actionParameter)
         {
@@ -45,8 +45,17 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
+        // On your page: the number of issues large on a dark tile, over the list, in the same colour.
+        public static KeyLook TileLook(Snapshot snapshot)
+        {
+            var look = Look(snapshot);
+            return snapshot.Offline
+                ? look with { Style = KeyStyle.Tile }
+                : look with { Style = KeyStyle.Tile, Count = snapshot.IssueCount().ToString() };
+        }
+
         // A list in the colour of the most urgent issue, with the count of those that need you in a badge.
-        // The Projects page shows the same key.
+        // The Projects page shows the same key, with its label.
         public static KeyLook Look(Snapshot snapshot)
         {
             if (snapshot.Offline)

@@ -119,10 +119,11 @@ namespace Loupedeck.HerdrPlugin
 
         // The key that opens this folder, in herdr's accent: it opens the herdr menu on the keypad,
         // unlike Open herdr, which opens herdr itself on screen.
-        public override String GetButtonDisplayName(PluginImageSize imageSize) => "Projects";
+        // A tile like an app icon, without a label: the stack says what it opens.
+        public override String GetButtonDisplayName(PluginImageSize imageSize) => "";
 
         public override BitmapImage GetButtonImage(PluginImageSize imageSize) =>
-            KeyArt.Draw(new KeyLook("Projects", Icons.Stack, AgentStatus.Accent), imageSize);
+            KeyArt.Draw(new KeyLook("Projects", Icons.Stack, AgentStatus.Accent, KeyStyle.Tile), imageSize);
 
         public override IEnumerable<String> GetButtonPressActionNames(DeviceType deviceType)
         {
