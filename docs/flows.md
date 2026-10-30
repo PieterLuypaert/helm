@@ -195,7 +195,7 @@ flowchart TD
     gh --> status
 ```
 
-- **Pull requests come from the GitHub CLI.** Per repo, helm asks for your own open pull requests with their checks and review decision, and your own merged ones; two calls a minute, whatever the number of issues. It matches them to an issue by the branch the issue's worktree is on, not by the tab's label, which can be stale. Without `gh`, or for a repo that is not on GitHub, issues simply have no pull request.
+- **Pull requests come from the GitHub CLI.** Per repo, helm asks for your own open pull requests with their checks and review decision, and your own merged ones; two calls a minute, whatever the number of issues. It matches them to an issue by the branch the issue's worktree is on, not by the tab's label, which can be stale. A worktree with no branch checked out, or back on `main`, falls back to the branch the tab is named after. Without `gh`, or for a repo that is not on GitHub, issues simply have no pull request.
 - **A failed call keeps what helm knew,** so one GitHub hiccup does not blank the keys. The same goes for herdr: only a second failed read in a row shows `herdr offline`, and the menu keeps your place for when herdr is back. Logi's arrow closes the menu while herdr is offline.
 - **A key acts on the issue it showed.** Action and answer keys carry their issue, so a press right after the page followed the screen still goes to the issue that key was drawn for.
 - **A closed tab** drops the menu back to the page you came from; a closed workspace back to the projects.
