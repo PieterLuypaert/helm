@@ -2,11 +2,11 @@
 
 How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=5344ed41)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=4f609a85)
 
 ## Your page
 
-The keypad starts on a page you set up yourself in Logi Options+, with your own apps and keys. helm adds three keys to it, each with its own job. They are dark grey tiles without a label, like app icons:
+The keypad starts on a page you set up yourself in Logi Options+, with your own apps and keys. helm adds three keys to it, each with its own job. They are dark grey tiles with a big icon and a short word under it:
 
 | Key | On the key | What it does | Where |
 |---|---|---|---|
@@ -64,7 +64,7 @@ flowchart TD
 
 All issues counts your issues across every project, such as "9 issues", with how many need you in a badge in the colour of the most urgent one. Main tabs are not issues, so they do not count. It sits on your page and first on the projects page; both open the overview, so you can go through every issue in detail.
 
-![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=3bc113d8)
+![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=1672cf07)
 
 The overview sorts by status: waiting, go?, CI failed, changes and done, which need you, then ready, working, review, draft and idle. Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. The order is set when you open the overview and holds while you page through it and visit its issues, so keys do not move under your fingers; a closed tab drops out and a new one joins at the end. Open it again for a fresh order. A main tab, or an issue shown beside other projects' issues, names its project, such as "4 search · project A".
 

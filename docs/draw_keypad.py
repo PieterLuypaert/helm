@@ -41,7 +41,7 @@ class Picture:
 
     def key(self, x, y, label="", icon=None, color=TEXT, style="normal", framed=False, badge=None, empty=False, count=None):
         """A key as the keypad shows it: the icon, and under it the label Logi writes. A tile, on your own
-        page, is a big icon or a count over a small icon on dark grey, with no label."""
+        page, is a big icon or a count over a small icon on dark grey, with a short label under it."""
         p = self.parts
         if empty:
             p.append(f'<rect x="{x}" y="{y}" width="{K}" height="{K}" rx="10" fill="none" stroke="{LABEL}" '
@@ -51,14 +51,15 @@ class Picture:
             p.append(f'<rect x="{x}" y="{y}" width="{K}" height="{K}" rx="10" fill="{TILE}"/>')
             cx = x + K / 2
             if count is None:
-                size = 44
-                p.append(f'<g transform="translate({cx - size / 2} {y + K / 2 - size / 2}) scale({size / 24})" fill="none" stroke="{color}" '
+                size = 34
+                p.append(f'<g transform="translate({cx - size / 2} {y + 29 - size / 2}) scale({size / 24})" fill="none" stroke="{color}" '
                          f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{ICONS[icon]}</g>')
             else:
-                p.append(f'<text x="{cx}" y="{y + 38}" text-anchor="middle" font-size="30" font-weight="400" fill="{color}">{html.escape(count)}</text>')
-                size = 20
-                p.append(f'<g transform="translate({cx - size / 2} {y + 46}) scale({size / 24})" fill="none" stroke="{color}" '
+                p.append(f'<text x="{cx}" y="{y + 30}" text-anchor="middle" font-size="24" font-weight="400" fill="{color}">{html.escape(count)}</text>')
+                size = 16
+                p.append(f'<g transform="translate({cx - size / 2} {y + 36}) scale({size / 24})" fill="none" stroke="{color}" '
                          f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{ICONS[icon]}</g>')
+            p.append(f'<text x="{cx}" y="{y + K - 10}" text-anchor="middle" font-size="9.5" fill="{TEXT}">{html.escape(label)}</text>')
             if badge:
                 p.append(f'<circle cx="{x + K - 13}" cy="{y + 12}" r="8" fill="{color}"/>')
                 p.append(f'<text x="{x + K - 13}" y="{y + 15.5}" text-anchor="middle" font-size="10" font-weight="600" fill="{GROUND}">{html.escape(badge)}</text>')
@@ -157,13 +158,13 @@ def flow():
     pic.grid(x0, top, [
         dict(label="Spotify", icon="Music"),
         dict(label="Claude", icon="Sparkles"),
-        dict(icon="List", color=RED, badge="2", style="tile", count="9"),
+        dict(label="issues", icon="List", color=RED, badge="2", style="tile", count="9"),
         dict(label="ChatGPT", icon="Chatbot"),
-        dict(icon="Terminal", color=SUBTEXT, style="tile"),
-        dict(icon="Stack", color=ACCENT, style="tile"),
+        dict(label="herdr", icon="Terminal", color=SUBTEXT, style="tile"),
+        dict(label="projects", icon="Stack", color=ACCENT, style="tile"),
         EMPTY, EMPTY, EMPTY,
     ])
-    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, dark tiles like app icons:\n" + "The stack, Projects, opens the herdr menu.\n"
+    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, dark tiles with a short word:\n" + "The stack, Projects, opens the herdr menu.\n"
              + "The terminal opens herdr in iTerm.\n" + "The count, All issues, opens every issue at\nonce, most urgent first; the badge counts\nthose that need you.", 11, "400")
 
     px = x0 + step
@@ -249,7 +250,7 @@ def all_issues():
     pic, top = Picture("All your issues at once"), 64
     pic.text(20, 40, "All issues")
     pic.text(20, 56, "on your page", 11, "400")
-    pic.key(30, top + K + G, icon="List", color=RED, badge="2", style="tile", count="9")
+    pic.key(30, top + K + G, "issues", icon="List", color=RED, badge="2", style="tile", count="9")
 
     ox = 150
     pic.text(ox, 40, "The overview")
