@@ -142,10 +142,10 @@ def flow():
         dict(label="2 need you, 1 ready", icon="BellRinging", color=RED, badge="2"),
         dict(label="ChatGPT", icon="Chatbot"),
         dict(label="herdr", icon="Terminal", color=SUBTEXT),
-        dict(label="Issues", icon="Stack", color=ACCENT),
+        dict(label="Projects", icon="Stack", color=ACCENT),
         EMPTY, EMPTY, EMPTY,
     ])
-    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, each with its own job:\n" + "Issues opens the herdr menu on the keypad.\n"
+    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, each with its own job:\n" + "Projects opens the herdr menu on your projects.\n"
              + "The terminal, herdr, opens herdr in iTerm.\n" + "The bell, Herdr status, counts what needs you\nand jumps to the most urgent issue (step 3).", 11, "400")
 
     px = x0 + step
