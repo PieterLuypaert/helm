@@ -22,9 +22,10 @@ In more detail:
 - **The herdr menu** has three levels: your projects, the tabs of one project, and the actions for one issue.
 - **Pull requests** show on the issue keys: failing checks, requested changes, ready to merge. helm reads them with the GitHub CLI.
 - **Actions** such as go, review, babysit and commit go to that issue's agent. The one that fits lights up, and every press is confirmed on the key and in herdr.
+- **Questions** an agent asks, such as a permission prompt, show as one key per choice, exactly as the screen lists them. helm reads the question again just before it answers, and sends nothing when it changed.
 - **The keypad follows the screen.** Switch tabs in herdr and the keypad's issue page moves along.
 
-Every key says in one word how its issue is doing, in herdr's colours:
+Every key says in one word how its issue is doing, and its colour says what you do next: red answer or fix, orange decide, green look at the result, blue merge.
 
 ![What a key can say: waiting, go?, working and done come from the agent; CI failed, changes, review and ready from the pull request](docs/statuses.svg)
 

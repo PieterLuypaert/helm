@@ -66,9 +66,9 @@
 <text x="595.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">main</text>
 <text x="595.0" y="128" text-anchor="middle" font-size="9.5" fill="#5c5c5c">idle</text>
 <rect x="638" y="70" width="70" height="70" rx="8" fill="#24282d"/>
-<rect x="638" y="70" width="70" height="6" rx="3" fill="#66ddcc"/>
+<rect x="638" y="70" width="70" height="6" rx="3" fill="#82aaff"/>
 <text x="673.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">3 sign up</text>
-<text x="673.0" y="128" text-anchor="middle" font-size="9.5" fill="#66ddcc">ready</text>
+<text x="673.0" y="128" text-anchor="middle" font-size="9.5" fill="#82aaff">ready</text>
 <rect x="716" y="70" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="716" y="70" width="70" height="6" rx="3" fill="#ffc799"/>
 <text x="751.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">4 search</text>
@@ -109,24 +109,24 @@
 <text x="943.0" y="100" text-anchor="middle" font-size="11" font-weight="600" fill="#24282d">go</text>
 <rect x="986" y="70" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="986" y="70" width="70" height="6" rx="3" fill="#5c5c5c"/>
-<text x="1021.0" y="100" text-anchor="middle" font-size="11" font-weight="600" fill="#5c5c5c">toestaan</text>
+<text x="1021.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">review</text>
+<text x="1021.0" y="107" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">and fix</text>
 <rect x="830" y="148" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="830" y="148" width="70" height="6" rx="3" fill="#5c5c5c"/>
-<text x="865.0" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">review</text>
-<text x="865.0" y="185" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">and fix</text>
+<text x="865.0" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">babysit</text>
+<text x="865.0" y="185" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">pr</text>
 <rect x="908" y="148" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="908" y="148" width="70" height="6" rx="3" fill="#5c5c5c"/>
-<text x="943.0" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">babysit</text>
-<text x="943.0" y="185" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">pr</text>
+<text x="943.0" y="178" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">commit</text>
 <rect x="986" y="148" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="986" y="148" width="70" height="6" rx="3" fill="#5c5c5c"/>
-<text x="1021.0" y="178" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">commit</text>
+<text x="1021.0" y="178" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">stop</text>
 <rect x="830" y="226" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="830" y="226" width="70" height="6" rx="3" fill="#5c5c5c"/>
-<text x="865.0" y="256" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">stop</text>
+<text x="865.0" y="256" text-anchor="middle" font-size="11" font-weight="600" fill="#5c5c5c">open PR</text>
 <rect x="908" y="226" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="908" y="226" width="70" height="6" rx="3" fill="#5c5c5c"/>
-<text x="943.0" y="256" text-anchor="middle" font-size="11" font-weight="600" fill="#5c5c5c">open PR</text>
+<text x="943.0" y="256" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">editor</text>
 <rect x="986" y="226" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="986" y="226" width="70" height="6" rx="3" fill="#5c5c5c"/>
 <text x="1021.0" y="250" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">terug</text>
@@ -143,15 +143,17 @@
 <line x1="522" y1="183.0" x2="552" y2="183.0" stroke="#8b949e" stroke-width="1.5" marker-end="url(#a)"/>
 <line x1="792" y1="183.0" x2="822" y2="183.0" stroke="#8b949e" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="20" y="440" width="12" height="12" rx="3" fill="#ff8080"/>
-<text x="40" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">needs you</text>
-<rect x="133.4" y="440" width="12" height="12" rx="3" fill="#f36a1b"/>
-<text x="153.4" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">your turn</text>
-<rect x="246.8" y="440" width="12" height="12" rx="3" fill="#66ddcc"/>
-<text x="266.8" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">ready to merge</text>
-<rect x="393.2" y="440" width="12" height="12" rx="3" fill="#ffc799"/>
-<text x="413.2" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">working</text>
-<rect x="493.4" y="440" width="12" height="12" rx="3" fill="#5c5c5c"/>
-<text x="513.4" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">quiet</text>
-<rect x="580.4" y="439" width="14" height="14" rx="3" fill="none" stroke="#8b949e" stroke-width="2.5"/>
-<text x="600.4" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">white frame: what is on screen</text>
+<text x="40" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">answer or fix</text>
+<rect x="159.8" y="440" width="12" height="12" rx="3" fill="#f36a1b"/>
+<text x="179.8" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">decide</text>
+<rect x="253.4" y="440" width="12" height="12" rx="3" fill="#99ffe4"/>
+<text x="273.4" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">look at the result</text>
+<rect x="426.20000000000005" y="440" width="12" height="12" rx="3" fill="#82aaff"/>
+<text x="446.20000000000005" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">merge</text>
+<rect x="513.2" y="440" width="12" height="12" rx="3" fill="#ffc799"/>
+<text x="533.2" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">working</text>
+<rect x="613.4000000000001" y="440" width="12" height="12" rx="3" fill="#5c5c5c"/>
+<text x="633.4000000000001" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">quiet</text>
+<rect x="700.4000000000001" y="439" width="14" height="14" rx="3" fill="none" stroke="#8b949e" stroke-width="2.5"/>
+<text x="720.4000000000001" y="450" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">white frame: on screen</text>
 </svg>

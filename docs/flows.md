@@ -1,6 +1,6 @@
 # Keypad flows
 
-How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own. The keys carry Dutch labels for navigation (`terug`, `meer`, `toestaan`); this page uses them as they appear on the keypad.
+How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own. The keys carry Dutch labels for navigation (`terug`, `meer`); this page uses them as they appear on the keypad.
 
 ![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg)
 
@@ -32,8 +32,8 @@ Every key shows one word for its issue, from its agent and its pull request, in 
 | orange | `go?` | the agent sits still with a plan waiting for your go, and there is no pull request yet |
 | red | `CI failed` | the pull request's checks fail |
 | red | `changes` | a reviewer asked for changes |
-| orange | `done` | the agent finished its turn |
-| teal | `ready` | the pull request is approved and its checks pass: yours to merge |
+| green | `done` | the agent finished its turn: look at the result |
+| blue | `ready` | the pull request is approved and its checks pass: yours to merge |
 | yellow | `working` | the agent is busy |
 | grey | `review`, `draft` | the pull request waits on a review, or is a draft |
 | dark grey | `idle`, `merged`, `closed` | nothing going on, or nothing left to do |
@@ -100,28 +100,36 @@ The page shows the issue with its status, and its pull request number when it ha
 
 | Issue status | Lights up | Greyed out |
 |---|---|---|
-| `go?` | `go` | `toestaan`, and `open PR` without a pull request |
-| `waiting` | `toestaan` | |
-| `CI failed`, `changes` | `babysit pr` | `toestaan` |
-| `done` | `review and fix` | `toestaan` |
-| `ready` | `open PR` | `toestaan` |
-| anything else | | `toestaan` |
-
-`toestaan` presses Enter, so it works only while the agent waits on you; anywhere else Enter would send whatever sits in the agent's input.
+| `go?` | `go` | `open PR` without a pull request |
+| `CI failed`, `changes` | `babysit pr` | |
+| `done` | `review and fix` | |
+| `ready` | `open PR` | |
+| `waiting` | the page shows the agent's question instead, see below | |
 
 | Key | What it does |
 |---|---|
 | the issue | shows its tab again |
 | `go` | sends `go`: approves the plan the agent shows |
-| `toestaan` | presses Enter: picks the selected option of a permission prompt, usually Yes |
 | `review and fix` | runs `/review-and-fix` |
 | `babysit pr` | runs `/babysit-pr`: drives the pull request through its checks and review |
 | `commit` | asks for the work in logical conventional commits |
 | `stop` | presses Esc: interrupts the agent |
 | `open PR` | opens the issue's pull request in your browser |
+| `editor` | opens the issue's worktree with `hopen` |
 | `terug` | back to the project |
 
 The actions, and when they light up or grey out, come from `config/keypad.json`; see [Setup details](setup.md) to change them.
+
+## Answering a question
+
+While an agent waits on you, its page shows the question it asks, such as Claude Code's permission prompt, with one key per choice exactly as the screen lists them.
+
+![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](answer.svg)
+
+- **Each key sends its own choice.** A numbered choice is picked by the number the screen shows, which is not always its position: in Claude Code 2.1, `No` is choice 4, after `Yes, and switch to auto mode`. Choices without numbers, such as the folder-trust question, are reached with the arrow keys from the selected one, then Enter.
+- **Nothing is sent blind.** Just before sending, helm reads the question again; when the choices changed, it sends nothing and the key reads `changed`.
+- **A question helm cannot read** shows only `answer on screen`, which brings the issue's tab to the front so you answer it there.
+- **Yes in green, No in red,** anything else neutral, so the answer reads at a glance.
 
 ## Pressing an action
 
@@ -140,7 +148,7 @@ Each action goes to the agent of the issue on the page, by its pane, never to wh
 ```mermaid
 flowchart LR
     prompt["Prompt actions<br/>go, review and fix, babysit pr, commit"] --> promptCmd["herdr agent prompt<br/>the text plus Enter"]
-    keysAction["Key actions<br/>toestaan, stop"] --> keysCmd["herdr agent send-keys<br/>Enter or Esc"]
+    keysAction["Key actions<br/>stop, and the answers to a question"] --> keysCmd["herdr agent send-keys<br/>Esc, a number, or arrows and Enter"]
     openPr["Open PR"] --> openCmd["open<br/>the pull request in your browser"]
 ```
 

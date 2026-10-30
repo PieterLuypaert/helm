@@ -6,7 +6,7 @@ The example data is consistent across the pictures: the status key counts what t
 import html
 import os
 
-RED, ACCENT, YELLOW, GREEN, TEAL = "#ff8080", "#f36a1b", "#ffc799", "#99ffe4", "#66ddcc"
+RED, ACCENT, YELLOW, GREEN, TEAL, BLUE = "#ff8080", "#f36a1b", "#ffc799", "#99ffe4", "#66ddcc", "#82aaff"
 OVERLAY, SUBTEXT, GROUND, TEXT = "#5c5c5c", "#afb6c2", "#24282d", "#ebf0ec"
 LABEL = "#8b949e"
 K, G = 70, 8          # key size and gap
@@ -121,7 +121,7 @@ def flow():
     pic.text(qx, 56, "main tab, then issues", 11, "400")
     pic.grid(qx, top, [
         dict(title="main", sub="idle", accent=OVERLAY),
-        dict(title="3 sign up", sub="ready", accent=TEAL),
+        dict(title="3 sign up", sub="ready", accent=BLUE),
         dict(title="4 search", sub="working", accent=YELLOW),
         dict(title="5 export", sub="idle", accent=OVERLAY),
         dict(title="6 dark\nmode", sub="waiting", accent=RED),
@@ -138,12 +138,12 @@ def flow():
     pic.grid(tx, top, [
         dict(title="7 checkout", sub="go?", accent=ACCENT),
         dict(title="go", accent=ACCENT, style="highlight"),
-        dict(title="toestaan", accent=RED, style="dim"),
         dict(title="review\nand fix", accent=OVERLAY),
         dict(title="babysit\npr", accent=OVERLAY),
         dict(title="commit", accent=OVERLAY),
         dict(title="stop", accent=OVERLAY),
         dict(title="open PR", accent=OVERLAY, style="dim"),
+        dict(title="editor", accent=OVERLAY),
         dict(title="terug", sub="project A", accent=OVERLAY),
     ])
 
@@ -158,8 +158,8 @@ def flow():
         pic.arrow(x + 3 * K + 2 * G + 6, x + step - 8, mid)
 
     y = pic.legend(20, fy + 12 + K + 34, [
-        [(RED, "needs you"), (ACCENT, "your turn"), (TEAL, "ready to merge"), (YELLOW, "working"), (OVERLAY, "quiet"),
-         (None, "white frame: what is on screen")],
+        [(RED, "answer or fix"), (ACCENT, "decide"), (GREEN, "look at the result"), (BLUE, "merge"), (YELLOW, "working"),
+         (OVERLAY, "quiet"), (None, "white frame: on screen")],
     ])
     pic.save("keypad.svg", tx + 3 * K + 2 * G + 20, y + 4)
 
@@ -173,13 +173,13 @@ def statuses():
             ("waiting", RED, "asks you\nsomething"),
             ("go?", ACCENT, "a plan waits\nfor your go"),
             ("working", YELLOW, "is busy"),
-            ("done", ACCENT, "finished\nits turn"),
+            ("done", GREEN, "finished\nits turn"),
         ]),
         ("The pull request", [
             ("CI failed", RED, "checks fail"),
             ("changes", RED, "changes\nrequested"),
             ("review", SUBTEXT, "waits on\na review"),
-            ("ready", TEAL, "approved,\nyours to merge"),
+            ("ready", BLUE, "approved,\nyours to merge"),
         ]),
     ]
     x0 = 20
@@ -214,6 +214,60 @@ def status_key():
     pic.save("status-key.svg", 40 + 3 * gap + K + 60, top + K + 70)
 
 
+def answer():
+    """A waiting agent's question on screen, and the same choices on the keypad."""
+    pic, top = Picture("Answering a question"), 64
+    # Claude's question as it stands in the terminal.
+    bx, bw, bh = 20, 380, 3 * (K + G) - G
+    pic.parts.append(f'<rect x="{bx}" y="{top}" width="{bw}" height="{bh}" rx="8" fill="#16181c"/>')
+    lines = [
+        ("Bash command", TEXT, "600"),
+        ("npm test", SUBTEXT, "400"),
+        ("Do you want to proceed?", TEXT, "400"),
+        ("\u276f 1. Yes", TEXT, "400"),
+        ("  2. Yes, and don\u2019t ask again for: npm test", TEXT, "400"),
+        ("  3. Yes, and switch to auto mode", TEXT, "400"),
+        ("  4. No", TEXT, "400"),
+        ("Esc to cancel \u00b7 Tab to amend", SUBTEXT, "400"),
+    ]
+    for i, (line, color, weight) in enumerate(lines):
+        pic.parts.append(f'<text x="{bx + 14}" y="{top + 26 + i * 24}" font-size="12" font-weight="{weight}" '
+                         f'font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="{color}" xml:space="preserve">{html.escape(line)}</text>')
+    pic.text(bx, 40, "On your screen")
+    pic.text(bx, 56, "the agent waits on you", 11, "400")
+
+    kx = bx + bw + 70
+    pic.text(kx, 40, "On the keypad")
+    pic.text(kx, 56, "the same choices, one key each", 11, "400")
+    pic.grid(kx, top, [
+        dict(title="6 dark\nmode", sub="npm test", accent=RED),
+        dict(title="1 Yes", accent=GREEN),
+        dict(title="2 Always", accent=GREEN),
+        dict(title="3 Auto\nmode", accent=SUBTEXT),
+        dict(title="4 No", accent=RED),
+        dict(title="answer on\nscreen", accent=SUBTEXT),
+        EMPTY, EMPTY,
+        dict(title="terug", sub="project A", accent=OVERLAY),
+    ])
+    pic.arrow(bx + bw + 12, kx - 12, top + bh / 2)
+
+    ux = kx + 3 * K + 2 * G + 50
+    pic.text(ux, 40, "A question it cannot read")
+    pic.text(ux, 56, "answer it on screen", 11, "400")
+    pic.grid(ux, top, [
+        dict(title="6 dark\nmode", sub="asks you", accent=RED),
+        dict(title="answer on\nscreen", sub="no choices\nfound", accent=SUBTEXT),
+        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+        dict(title="terug", sub="project A", accent=OVERLAY),
+    ])
+
+    note = top + bh + 30
+    pic.text(bx, note, "Each key sends its own choice: the number the screen shows, or the arrow keys and Enter when the choices have no numbers.\n"
+                       "Just before sending, helm reads the question again and sends nothing if it changed; the key then reads changed.", 12, "400")
+    pic.save("answer.svg", ux + 3 * K + 2 * G + 20, note + 30)
+
+
 flow()
 statuses()
 status_key()
+answer()
