@@ -16,6 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Real screens of Claude Code questions, captured from a throwaway session. -->
+    <None Include="fixtures/**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../src/HerdrPlugin.csproj" AdditionalProperties="HelmSkipLink=true" />
   </ItemGroup>
 
