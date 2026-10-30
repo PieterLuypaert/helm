@@ -66,7 +66,7 @@ All issues counts your issues across every project, such as "9 issues", with how
 
 ![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=7df1f5fc)
 
-The overview sorts by status: waiting, go?, CI failed, changes and done, which need you, then ready, working, review, draft and idle. Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. A main tab, or an issue shown beside other projects' issues, names its project, such as "4 search · project A".
+The overview sorts by status: waiting, go?, CI failed, changes and done, which need you, then ready, working, review, draft and idle. Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. The order is set when you open the overview and holds while you page through it and visit its issues, so keys do not move under your fingers; a closed tab drops out and a new one joins at the end. Open it again for a fresh order. A main tab, or an issue shown beside other projects' issues, names its project, such as "4 search · project A".
 
 The key on your page opens the menu through a generic action of the Logi plugin API that is not documented for folders. If the menu does not open, press Projects and then All issues.
 
@@ -139,7 +139,7 @@ While an agent waits on you, its page shows the question it asks, such as Claude
 ![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](answer.svg?v=94af0439)
 
 - **Each key sends its own choice.** A numbered choice is picked by the number the screen shows, which is not always its position: in Claude Code 2.1, `No` is choice 4, after `Yes, and switch to auto mode`. Choices without numbers, such as the folder-trust question, are reached with the arrow keys from the selected one, then Enter.
-- **Nothing is sent blind.** Just before sending, helm reads the question again; when the choices changed, it sends nothing and the key reads `changed`.
+- **Nothing is sent blind.** Just before sending, helm reads the question again; when the choices changed, it sends nothing, the key reads `changed`, and the keys show the new choices on the next read.
 - **A question the keys cannot hold** shows `answer on screen`, which brings the issue's tab to the front so you answer it there: one helm cannot read, such as one that wants typed text, or one with more than seven choices.
 - **Every choice names its issue.** Each choice key carries the issue's name under it, the top-left key shows the issue and what it asks about, and the screen shows that same issue.
 - **Yes in green, No in red,** anything else neutral, so the answer reads at a glance.
@@ -186,7 +186,8 @@ flowchart TD
 ```
 
 - **Pull requests come from the GitHub CLI.** Per repo, helm asks for your own open pull requests with their checks and review decision, and your own merged ones; two calls a minute, whatever the number of issues. It matches them to an issue by the branch the issue's worktree is on, not by the tab's label, which can be stale. Without `gh`, or for a repo that is not on GitHub, issues simply have no pull request.
-- **A failed call keeps what helm knew,** so one GitHub hiccup does not blank the keys.
+- **A failed call keeps what helm knew,** so one GitHub hiccup does not blank the keys. The same goes for herdr: only a second failed read in a row shows `herdr offline`, and the menu keeps your place for when herdr is back. Logi's back key closes the menu while herdr is offline.
+- **A key acts on the issue it showed.** Action and answer keys carry their issue, so a press right after the page followed the screen still goes to the issue that key was drawn for.
 - **A closed tab** drops the menu back to the page you came from; a closed workspace back to the projects.
 - **The folder may close on an app switch.** The Logi Plugin Service can close it when iTerm comes to the front. Pressing the Projects key opens it again, on your projects.
 
