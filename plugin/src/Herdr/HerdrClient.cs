@@ -20,7 +20,8 @@ namespace Loupedeck.HerdrPlugin
         String Cwd,
         String Topic,
         Boolean Focused,
-        Boolean IsMain);
+        Boolean IsMain,
+        Int64 StateSeq = 0);
 
     // One herdr workspace: a project, with its main tab first and then its tickets in the order you opened them.
     public sealed record Project(
@@ -30,10 +31,8 @@ namespace Loupedeck.HerdrPlugin
         Boolean Focused,
         IReadOnlyList<Ticket> Tabs)
     {
-        private static readonly String[] Urgency = { "blocked", "done", "working", "idle", "unknown" };
-
-        // The most urgent status of its tabs: blocked before done before working.
-        public String Status => this.Tabs.Select(t => t.Status).OrderBy(s => Array.IndexOf(Urgency, s) is var i && i < 0 ? Urgency.Length : i).FirstOrDefault() ?? "idle";
+        // The most urgent status of its tabs, in the quarterdeck's order.
+        public String Status => AgentStatus.MostUrgent(this.Tabs.Select(t => t.Status));
 
         public Int32 Count(String status) => this.Tabs.Count(t => t.Status == status);
 
@@ -42,6 +41,18 @@ namespace Loupedeck.HerdrPlugin
             && other.Focused == this.Focused && other.Tabs.SequenceEqual(this.Tabs);
 
         public override Int32 GetHashCode() => HashCode.Combine(this.WorkspaceId, this.Name, this.Tabs.Count);
+    }
+
+    // What a command did: its output, or why it failed in the words herdr or the shell gave.
+    public sealed record CommandResult(Boolean Ok, String Output, String Error)
+    {
+        // The reason in a few words for a key: herdr's error codes, else "failed".
+        public String ShortReason =>
+            this.Ok ? "sent"
+            : this.Error?.Contains("agent_blocked") == true ? "waits on you"
+            : this.Error?.Contains("timed out") == true ? "no answer"
+            : this.Error?.Contains("not_found") == true ? "tab gone"
+            : "failed";
     }
 
     // Talks to the herdr server through its CLI, which reaches the socket API from outside herdr.
@@ -175,16 +186,25 @@ namespace Loupedeck.HerdrPlugin
                 Cwd: agent.HasValue ? Str(agent.Value, "cwd") : null,
                 Topic: agent.HasValue ? Str(agent.Value, "terminal_title_stripped") : null,
                 Focused: Bool(tab, "focused"),
-                IsMain: isMain);
+                IsMain: isMain,
+                StateSeq: agent.HasValue ? Long(agent.Value, "state_change_seq") : 0);
 
         public static void FocusWorkspace(String workspaceId) => Run(HerdrBinary, "workspace", "focus", workspaceId);
 
         public static void FocusTab(String tabId) => Run(HerdrBinary, "tab", "focus", tabId);
 
-        public static void Prompt(String paneId, String text) => Run(HerdrBinary, "agent", "prompt", paneId, text);
+        public static CommandResult Prompt(String paneId, String text) => RunChecked(null, HerdrBinary, "agent", "prompt", paneId, text);
 
-        public static void SendKeys(String paneId, params String[] keys) =>
-            Run(HerdrBinary, new[] { "agent", "send-keys", paneId }.Concat(keys).ToArray());
+        public static CommandResult SendKeys(String paneId, params String[] keys) =>
+            RunChecked(null, HerdrBinary, new[] { "agent", "send-keys", paneId }.Concat(keys).ToArray());
+
+        // The agent's last lines, as the quarterdeck reads them to spot a plan; empty when unreadable.
+        public static String ReadRecent(String paneId, Int32 lines) =>
+            Run(HerdrBinary, "agent", "read", paneId, "--source", "recent", "--lines", lines.ToString()) ?? "";
+
+        // A short notification in herdr itself, so the screen confirms what the keypad did.
+        public static void Notify(String title, String body) =>
+            Run(HerdrBinary, "notification", "show", title, "--body", body, "--sound", "none");
 
         private static DateTime _lastClientLaunch = DateTime.MinValue;
 
@@ -249,13 +269,19 @@ end tell";
             }
         }
 
-        public static void Shell(String command, String cwd) =>
-            RunIn(cwd, "/bin/bash", new[] { "-c", command }, new Dictionary<String, String> { ["TICKET_CWD"] = cwd ?? "" });
+        public static CommandResult Shell(String command, String cwd) =>
+            RunChecked(cwd, "/bin/bash", new[] { "-c", command }, new Dictionary<String, String> { ["TICKET_CWD"] = cwd ?? "" });
 
         // Runs a command and returns its stdout, or null when it fails or takes longer than five seconds.
-        private static String Run(String file, params String[] args) => RunIn(null, file, args);
+        private static String Run(String file, params String[] args)
+        {
+            var result = RunChecked(null, file, args);
+            return result.Ok ? result.Output : null;
+        }
 
-        private static String RunIn(String cwd, String file, String[] args, IDictionary<String, String> env = null)
+        private static CommandResult RunChecked(String cwd, String file, params String[] args) => RunChecked(cwd, file, args, null);
+
+        private static CommandResult RunChecked(String cwd, String file, String[] args, IDictionary<String, String> env)
         {
             try
             {
@@ -286,23 +312,29 @@ end tell";
                 {
                     try { process.Kill(true); } catch { }
                     PluginLog.Warning($"Timed out: {file} {String.Join(' ', args)}");
-                    return null;
+                    return new CommandResult(false, null, "timed out");
                 }
 
                 if (process.ExitCode != 0)
                 {
-                    PluginLog.Warning($"Exit {process.ExitCode}: {file} {String.Join(' ', args)}: {stderr.Result.Trim()}");
-                    return null;
+                    var error = (stderr.Result + " " + stdout.Result).Trim();
+                    PluginLog.Warning($"Exit {process.ExitCode}: {file} {String.Join(' ', args)}: {error}");
+                    return new CommandResult(false, stdout.Result, error);
                 }
 
-                return stdout.Result;
+                return new CommandResult(true, stdout.Result, null);
             }
             catch (Exception ex)
             {
                 PluginLog.Error(ex, $"Could not run {file}");
-                return null;
+                return new CommandResult(false, null, ex.Message);
             }
         }
+
+        private static Int64 Long(JsonElement element, String name) =>
+            element.ValueKind == JsonValueKind.Object && element.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number
+                ? value.GetInt64()
+                : 0;
 
         private static Int32 Int(JsonElement element, String name) =>
             element.ValueKind == JsonValueKind.Object && element.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number

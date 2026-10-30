@@ -25,11 +25,14 @@ namespace Loupedeck.HerdrPlugin
         // This method is called when the plugin is loaded.
         public override void Load()
         {
+            // One reader of herdr for the whole plugin: the folder and the status key share it.
+            HerdrState.Start();
         }
 
         // This method is called when the plugin is unloaded.
         public override void Unload()
         {
+            HerdrState.Stop();
         }
     }
 }
