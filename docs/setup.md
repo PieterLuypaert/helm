@@ -8,14 +8,14 @@ Edit `config/keypad.json`. The plugin reads it again when it changes, so no rebu
 
 | Field | Meaning |
 |---|---|
-| `type: "prompt"` | `value` plus Enter, to the ticket's agent (`herdr agent prompt`) |
-| `type: "keys"` | key presses for the ticket's agent, space separated: `enter`, `esc`, `ctrl+c` |
-| `type: "shell"` | a command run in the ticket's worktree, with `$TICKET_CWD` set |
+| `type: "prompt"` | `value` plus Enter, to the issue's agent (`herdr agent prompt`) |
+| `type: "keys"` | key presses for the issue's agent, space separated: `enter`, `esc`, `ctrl+c` |
+| `type: "shell"` | a command run in the issue's worktree, with `$ISSUE_CWD` set |
 | `color` | the stripe on the key, `#RRGGBB` |
-| `when` | the ticket statuses in which the key lights up, such as `["go?"]` |
+| `when` | the issue statuses in which the key lights up, such as `["go?"]` |
 | `onlyWhen` | the statuses in which the key works at all; it is greyed out in the others |
-| `terminalBundleId` | the app brought to the front when you pick a ticket (iTerm2 by default); `""` leaves focus alone |
-| `openHerdrWhenClosed` | with no herdr window open, picking a ticket opens a new iTerm window and starts herdr in it, on that ticket (iTerm only; `true` by default). macOS asks once whether the Logi Plugin Service may control iTerm |
+| `terminalBundleId` | the app brought to the front when you pick an issue (iTerm2 by default); `""` leaves focus alone |
+| `openHerdrWhenClosed` | with no herdr window open, picking an issue opens a new iTerm window and starts herdr in it, on that issue (iTerm only; `true` by default). macOS asks once whether the Logi Plugin Service may control iTerm |
 
 ## Chords
 
@@ -23,8 +23,8 @@ Edit `config/keypad.json`. The plugin reads it again when it changes, so no rebu
 
 | Chord | Action |
 |---|---|
-| `ctrl+alt+shift+g` | new ticket tab (`hagent`) |
-| `ctrl+alt+shift+k` | clean up the ticket tab (`hcleanup`) |
+| `ctrl+alt+shift+g` | new issue tab (`hagent`) |
+| `ctrl+alt+shift+k` | clean up the issue tab (`hcleanup`) |
 | `ctrl+alt+shift+s` | pick a project workspace (`hproject`) |
 | `ctrl+alt+shift+e` | open the tab's checkout in the editor (`hopen`) |
 | `ctrl+alt+shift+l` | lazygit in the tab's folder |

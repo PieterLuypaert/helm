@@ -4,7 +4,7 @@ namespace Loupedeck.HerdrPlugin
     using System.Collections.Generic;
     using System.Linq;
 
-    // The quarterdeck's status words and herdr's palette, so a ticket reads the same on the keypad,
+    // The quarterdeck's status words and herdr's palette, so an issue reads the same on the keypad,
     // in herdr and in the quarterdeck.
     public static class AgentStatus
     {

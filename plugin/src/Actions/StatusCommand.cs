@@ -4,11 +4,11 @@ namespace Loupedeck.HerdrPlugin
     using System.Threading.Tasks;
 
     // A key for your normal keypad page: what needs you across every herdr project, in the
-    // quarterdeck's words. Pressing it takes herdr and the keypad to the most urgent ticket.
+    // quarterdeck's words. Pressing it takes herdr and the keypad to the most urgent issue.
     public class StatusCommand : PluginDynamicCommand
     {
         public StatusCommand()
-            : base(displayName: "Herdr status", description: "What needs you across all herdr projects; press it for the most urgent ticket", groupName: "Herdr")
+            : base(displayName: "Herdr status", description: "What needs you across all herdr projects; press it for the most urgent issue", groupName: "Herdr")
         {
             HerdrState.Changed += _ => this.ActionImageChanged();
         }
@@ -36,10 +36,10 @@ namespace Loupedeck.HerdrPlugin
         }
 
         // Opens the Herdr folder on the keypad. Logi's generic action API is not documented for
-        // this, so a failure is only logged: the folder still opens on the right ticket by hand.
+        // this, so a failure is only logged: the folder still opens on the right issue by hand.
         private void OpenFolder()
         {
-            var name = TicketsFolder.ActionName;
+            var name = IssuesFolder.ActionName;
             if (name == null)
             {
                 return;

@@ -9,10 +9,10 @@ namespace Loupedeck.HerdrPlugin
         // Dark key with a coloured stripe on top.
         Normal,
 
-        // Filled with its colour: the action that fits the ticket right now.
+        // Filled with its colour: the action that fits the issue right now.
         Highlight,
 
-        // Greyed out: an action that does nothing in the ticket's current state.
+        // Greyed out: an action that does nothing in the issue's current state.
         Dim,
     }
 

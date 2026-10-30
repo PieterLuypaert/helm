@@ -14,7 +14,7 @@ namespace Loupedeck.HerdrPlugin
 
         public Project FindProject(String workspaceId) => this.Projects.FirstOrDefault(p => p.WorkspaceId == workspaceId);
 
-        public (Project Project, Ticket Tab) FindTab(String tabId)
+        public (Project Project, Issue Tab) FindTab(String tabId)
         {
             foreach (var project in this.Projects)
             {
@@ -29,7 +29,7 @@ namespace Loupedeck.HerdrPlugin
         }
 
         // The tab that needs you most: waiting, then go?, then done; the first project and tab win a tie.
-        public (Project Project, Ticket Tab) MostUrgent() =>
+        public (Project Project, Issue Tab) MostUrgent() =>
             this.Projects.SelectMany(p => p.Tabs.Select(t => (Project: p, Tab: t)))
                 .Where(x => AgentStatus.NeedsYou(x.Tab.Status))
                 .OrderBy(x => AgentStatus.Rank(x.Tab.Status))
@@ -162,7 +162,7 @@ namespace Loupedeck.HerdrPlugin
         }
 
         // Reads an idle or finished agent's last lines once per state change, to see whether a plan waits.
-        private static Boolean HasPlan(Ticket tab)
+        private static Boolean HasPlan(Issue tab)
         {
             if (tab.PaneId == null || tab.Status is "blocked" or "working")
             {

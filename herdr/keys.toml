@@ -13,7 +13,7 @@ height = 12
 key = "ctrl+alt+shift+k"
 type = "popup"
 command = "\"$HOME/.local/bin/hcleanup\""
-description = "clean up ticket tab"
+description = "clean up issue tab"
 width = "70%"
 height = 12
 

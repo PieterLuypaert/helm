@@ -8,8 +8,8 @@ namespace Loupedeck.HerdrPlugin
     using System.Text.Json;
     using System.Text.RegularExpressions;
 
-    // One tab with a Claude agent: a ticket tab opened by hagent, or the project's main tab.
-    public sealed record Ticket(
+    // One tab with a Claude agent: an issue tab opened by hagent, or the project's main tab.
+    public sealed record Issue(
         String TabId,
         Int32 Number,
         String WorkspaceId,
@@ -23,13 +23,13 @@ namespace Loupedeck.HerdrPlugin
         Boolean IsMain,
         Int64 StateSeq = 0);
 
-    // One herdr workspace: a project, with its main tab first and then its tickets in the order you opened them.
+    // One herdr workspace: a project, with its main tab first and then its issues in the order you opened them.
     public sealed record Project(
         String WorkspaceId,
         Int32 Number,
         String Name,
         Boolean Focused,
-        IReadOnlyList<Ticket> Tabs)
+        IReadOnlyList<Issue> Tabs)
     {
         // The most urgent status of its tabs, in the quarterdeck's order.
         public String Status => AgentStatus.MostUrgent(this.Tabs.Select(t => t.Status));
@@ -134,21 +134,21 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
-        // The tabs of one workspace that hold an agent or a ticket: main tabs first, then tickets by number.
-        private static List<Ticket> ReadTabs(List<JsonElement> tabs, Dictionary<String, JsonElement> agentsByTab)
+        // The tabs of one workspace that hold an agent or an issue: main tabs first, then issues by number.
+        private static List<Issue> ReadTabs(List<JsonElement> tabs, Dictionary<String, JsonElement> agentsByTab)
         {
             var mains = new List<(JsonElement Tab, JsonElement? Agent)>();
-            var tickets = new List<(JsonElement Tab, JsonElement? Agent, String Branch)>();
+            var issues = new List<(JsonElement Tab, JsonElement? Agent, String Branch)>();
             foreach (var tab in tabs.OrderBy(t => Int(t, "number")))
             {
                 var label = Str(tab, "label") ?? "";
                 var hasAgent = agentsByTab.TryGetValue(Str(tab, "tab_id") ?? "", out var agent);
                 var cwd = hasAgent ? Str(agent, "cwd") ?? "" : "";
 
-                // hagent names a ticket tab after its branch and opens it in a worktree.
+                // hagent names an issue tab after its branch and opens it in a worktree.
                 if (label.Contains('/') || cwd.Contains("/worktrees/"))
                 {
-                    tickets.Add((tab, hasAgent ? agent : null, PortSuffix.Replace(label, "")));
+                    issues.Add((tab, hasAgent ? agent : null, PortSuffix.Replace(label, "")));
                 }
                 else if (hasAgent)
                 {
@@ -156,25 +156,25 @@ namespace Loupedeck.HerdrPlugin
                 }
             }
 
-            var result = new List<Ticket>();
+            var result = new List<Issue>();
             for (var i = 0; i < mains.Count; i++)
             {
                 var (tab, agent) = mains[i];
                 var label = Str(tab, "label") ?? "";
                 var name = Int32.TryParse(label, out _) || label.Length == 0 ? (i == 0 ? "main" : $"main {i + 1}") : label;
-                result.Add(ToTicket(tab, agent, name, name, isMain: true));
+                result.Add(ToIssue(tab, agent, name, name, isMain: true));
             }
 
-            var shortNames = TicketNames.Shorten(tickets.Select(t => t.Branch).ToList());
-            for (var i = 0; i < tickets.Count; i++)
+            var shortNames = IssueNames.Shorten(issues.Select(t => t.Branch).ToList());
+            for (var i = 0; i < issues.Count; i++)
             {
-                result.Add(ToTicket(tickets[i].Tab, tickets[i].Agent, tickets[i].Branch, shortNames[i], isMain: false));
+                result.Add(ToIssue(issues[i].Tab, issues[i].Agent, issues[i].Branch, shortNames[i], isMain: false));
             }
 
             return result;
         }
 
-        private static Ticket ToTicket(JsonElement tab, JsonElement? agent, String branch, String shortName, Boolean isMain) =>
+        private static Issue ToIssue(JsonElement tab, JsonElement? agent, String branch, String shortName, Boolean isMain) =>
             new(
                 TabId: Str(tab, "tab_id"),
                 Number: Int(tab, "number"),
@@ -270,7 +270,7 @@ end tell";
         }
 
         public static CommandResult Shell(String command, String cwd) =>
-            RunChecked(cwd, "/bin/bash", new[] { "-c", command }, new Dictionary<String, String> { ["TICKET_CWD"] = cwd ?? "" });
+            RunChecked(cwd, "/bin/bash", new[] { "-c", command }, new Dictionary<String, String> { ["ISSUE_CWD"] = cwd ?? "" });
 
         // Runs a command and returns its stdout, or null when it fails or takes longer than five seconds.
         private static String Run(String file, params String[] args)

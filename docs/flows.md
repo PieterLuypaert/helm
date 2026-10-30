@@ -2,17 +2,17 @@
 
 How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own. The keys carry Dutch labels for navigation (`terug`, `meer`, `toestaan`); this page uses them as they appear on the keypad.
 
-![The Herdr folder on the keypad: the status key, the projects page, a project, a ticket, and what a key shows after a press](keypad.svg)
+![The Herdr folder on the keypad: the status key, the projects page, a project, an issue, and what a key shows after a press](keypad.svg)
 
-## One rule: the keypad and the screen show the same ticket
+## One rule: the keypad and the screen show the same issue
 
-Whatever you do on one, the other follows. Pressing a tab on the keypad shows it in herdr. Switching tabs in herdr, with the keyboard or the mouse, moves the keypad's ticket page along. So an action always goes to the ticket you are looking at.
+Whatever you do on one, the other follows. Pressing a tab on the keypad shows it in herdr. Switching tabs in herdr, with the keyboard or the mouse, moves the keypad's issue page along. So an action always goes to the issue you are looking at.
 
-You still reach every project and every ticket from the keypad; the rule only concerns the ticket whose page is open.
+You still reach every project and every issue from the keypad; the rule only concerns the issue whose page is open.
 
 ## Statuses
 
-Every key carries the quarterdeck's word for its agent and herdr's colour for it, so a ticket reads the same on the keypad, in herdr and in the quarterdeck.
+Every key carries the quarterdeck's word for its agent and herdr's colour for it, so an issue reads the same on the keypad, in herdr and in the quarterdeck.
 
 | Colour | Status | Meaning |
 |---|---|---|
@@ -28,11 +28,11 @@ A project key shows the most urgent status among its tabs, with up to two counts
 
 ```mermaid
 flowchart TD
-    status["Herdr status key<br/>on your normal page"] -->|"press: the most urgent ticket"| ticket
+    status["Herdr status key<br/>on your normal page"] -->|"press: the most urgent issue"| issue
     key["Herdr folder key"] --> projects["Projects<br/>one key per workspace"]
-    projects -->|"press a project:<br/>herdr shows that workspace"| project["Project<br/>main tab, then tickets"]
-    project -->|"press a tab:<br/>herdr shows that tab"| ticket["Ticket<br/>seven actions and terug"]
-    ticket -->|terug| project
+    projects -->|"press a project:<br/>herdr shows that workspace"| project["Project<br/>main tab, then issues"]
+    project -->|"press a tab:<br/>herdr shows that tab"| issue["Issue<br/>seven actions and terug"]
+    issue -->|terug| project
     project -->|terug| projects
     projects -->|back key| closed(["Folder closed"])
 ```
@@ -48,26 +48,26 @@ sequenceDiagram
     participant Plugin
     participant herdr
     You->>Keypad: press "7 checkout"
-    Keypad->>Plugin: open its ticket page
+    Keypad->>Plugin: open its issue page
     Plugin->>herdr: tab focus
     herdr-->>You: 7 checkout on screen
     Note over Plugin,herdr: the plugin reads herdr every two seconds
     You->>herdr: switch to "3 sign up" with the keyboard
     Plugin->>herdr: read
     herdr-->>Plugin: 3 sign up is on screen
-    Plugin->>Keypad: ticket page of 3 sign up
+    Plugin->>Keypad: issue page of 3 sign up
 ```
 
-- **On a ticket page** the keypad follows the tab herdr shows, across projects too.
+- **On an issue page** the keypad follows the tab herdr shows, across projects too.
 - **On the projects and project pages** it does not jump, because you are browsing there; it frames what is on screen instead.
-- **Opening the folder** lands on the ticket on screen, unless the status key just picked one.
+- **Opening the folder** lands on the issue on screen, unless the status key just picked one.
 - **Only a change on the screen counts.** Right after a key press herdr may still show the previous tab for a moment; the keypad does not jump back to it.
 
 ## Picking a tab
 
 ```mermaid
 flowchart TD
-    press["Press a tab on a project page"] --> keys["Keys switch to that ticket's page"]
+    press["Press a tab on a project page"] --> keys["Keys switch to that issue's page"]
     press --> focus["herdr tab focus"]
     focus --> window{"Is a herdr window open?"}
     window -->|yes| front["Bring iTerm to the front"]
@@ -76,11 +76,11 @@ flowchart TD
 
 The herdr server keeps running after iTerm closes, so statuses and actions work without a window; only showing the tab needs one.
 
-## The ticket page
+## The issue page
 
-The page shows the ticket with its status, seven actions and `terug`. The action that fits the ticket's status lights up, filled with its colour; an action that does nothing in that status is greyed out.
+The page shows the issue with its status, seven actions and `terug`. The action that fits the issue's status lights up, filled with its colour; an action that does nothing in that status is greyed out.
 
-| Ticket status | Lights up | Greyed out |
+| Issue status | Lights up | Greyed out |
 |---|---|---|
 | `go?` | `go` | `toestaan` |
 | `waiting` | `toestaan` | |
@@ -91,14 +91,14 @@ The page shows the ticket with its status, seven actions and `terug`. The action
 
 | Key | What it does |
 |---|---|
-| the ticket | shows its tab again |
+| the issue | shows its tab again |
 | `go` | sends `go`: approves the plan the agent shows |
 | `toestaan` | presses Enter: picks the selected option of a permission prompt, usually Yes |
 | `review and fix` | runs `/review-and-fix` |
 | `code review` | runs `/code-review` |
 | `commit` | asks for the work in logical conventional commits |
 | `stop` | presses Esc: interrupts the agent |
-| `editor` | opens the ticket's worktree with `hopen` |
+| `editor` | opens the issue's worktree with `hopen` |
 | `terug` | back to the project |
 
 The actions, and when they light up or grey out, come from `config/keypad.json`; see [Setup details](setup.md) to change them.
@@ -109,19 +109,19 @@ The actions, and when they light up or grey out, come from `config/keypad.json`;
 flowchart TD
     press["Press an action"] --> dim{"Is it greyed out?"}
     dim -->|yes| notNow["The key flashes: not now<br/>nothing is sent"]
-    dim -->|no| send["Send it to the ticket's agent"]
+    dim -->|no| send["Send it to the issue's agent"]
     send --> taken{"Did herdr take it?"}
     taken -->|yes| sent["The key flashes: sent<br/>herdr shows: go: 7 checkout"]
     taken -->|no| failed["The key flashes the reason, such as waits on you<br/>herdr shows: go not sent"]
 ```
 
-Each action goes to the agent of the ticket on the page, by its pane, never to whatever pane has focus. The page stays open for the next action.
+Each action goes to the agent of the issue on the page, by its pane, never to whatever pane has focus. The page stays open for the next action.
 
 ```mermaid
 flowchart LR
     prompt["Prompt actions<br/>go, review and fix, code review, commit"] --> promptCmd["herdr agent prompt<br/>the text plus Enter"]
     keysAction["Key actions<br/>toestaan, stop"] --> keysCmd["herdr agent send-keys<br/>Enter or Esc"]
-    shell["Shell action<br/>editor"] --> shellCmd["hopen<br/>the ticket's worktree in your editor"]
+    shell["Shell action<br/>editor"] --> shellCmd["hopen<br/>the issue's worktree in your editor"]
 ```
 
 ## The status key
@@ -131,14 +131,14 @@ A key for your normal keypad page, outside the folder: what needs you across eve
 ```mermaid
 flowchart TD
     look["The status key shows what needs you<br/>such as 1 waiting, 1 go?, 1 done"] --> press["Press it"]
-    press --> any{"Does a ticket need you?"}
+    press --> any{"Does an issue need you?"}
     any -->|yes| most["Pick the most urgent:<br/>waiting, then go?, then done"]
     most --> screen["herdr shows that tab"]
-    most --> folder["The folder opens on its ticket page"]
+    most --> folder["The folder opens on its issue page"]
     any -->|no| projects["The folder opens on the projects page"]
 ```
 
-The key opens the folder through a generic action of the Logi plugin API that is not documented for folders. If the folder does not open, press the folder key: it opens on the ticket the status key picked.
+The key opens the folder through a generic action of the Logi plugin API that is not documented for folders. If the folder does not open, press the folder key: it opens on the issue the status key picked.
 
 ## What happens on its own
 
@@ -157,4 +157,4 @@ flowchart TD
 ```
 
 - **A closed tab** drops the folder back to its project; a closed workspace back to the projects.
-- **The folder may close on an app switch.** The Logi Plugin Service can close it when iTerm comes to the front. Pressing the folder key again opens the ticket on screen.
+- **The folder may close on an app switch.** The Logi Plugin Service can close it when iTerm comes to the front. Pressing the folder key again opens the issue on screen.

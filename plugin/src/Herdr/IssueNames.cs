@@ -4,9 +4,9 @@ namespace Loupedeck.HerdrPlugin
     using System.Collections.Generic;
     using System.Linq;
 
-    // Short key labels for ticket branches: drop the type prefix (feat/, fix/) and the
-    // leading words most tickets share, so "feat/shop-slice-3-sign-up" reads "3 sign up".
-    public static class TicketNames
+    // Short key labels for issue branches: drop the type prefix (feat/, fix/) and the
+    // leading words most issues share, so "feat/shop-slice-3-sign-up" reads "3 sign up".
+    public static class IssueNames
     {
         public static List<String> Shorten(IReadOnlyList<String> branches)
         {

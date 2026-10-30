@@ -6,9 +6,9 @@ namespace Loupedeck.HerdrPlugin
     using System.Threading.Tasks;
 
     // The keypad's herdr menu, three levels deep: every project (herdr workspace); a project's main tab
-    // and ticket tabs; and the actions for the tab you picked. The keypad and the screen show the same
-    // ticket: a key press moves herdr, and on a ticket page the keypad follows the tab herdr shows.
-    public class TicketsFolder : PluginDynamicFolder
+    // and issue tabs; and the actions for the tab you picked. The keypad and the screen show the same
+    // issue: a key press moves herdr, and on an issue page the keypad follows the tab herdr shows.
+    public class IssuesFolder : PluginDynamicFolder
     {
         private const String ProjectPrefix = "proj:";
         private const String TabPrefix = "tab:";
@@ -35,10 +35,10 @@ namespace Loupedeck.HerdrPlugin
         private List<String> _shownParams = new();
         private Dictionary<String, KeyLook> _shownLooks = new();
 
-        public TicketsFolder()
+        public IssuesFolder()
         {
             this.DisplayName = "Herdr";
-            this.Description = "Your herdr projects, their tickets, and actions for the one you pick";
+            this.Description = "Your herdr projects, their issues, and actions for the one you pick";
             this.GroupName = "Herdr";
         }
 
@@ -118,7 +118,7 @@ namespace Loupedeck.HerdrPlugin
             }
 
             Project project;
-            Ticket tab;
+            Issue tab;
             lock (this._lock)
             {
                 project = this.SelectedProject();
@@ -173,8 +173,8 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
-        // Sends the action to the ticket's agent and shows how it went: on the key, and in herdr.
-        private void RunAction(String param, TicketAction action, Ticket tab)
+        // Sends the action to the issue's agent and shows how it went: on the key, and in herdr.
+        private void RunAction(String param, IssueAction action, Issue tab)
         {
             var label = (action.Label ?? action.Value ?? "action").Replace('\n', ' ');
             if (StyleFor(action, tab.Status) == KeyStyle.Dim)
@@ -270,7 +270,7 @@ namespace Loupedeck.HerdrPlugin
             {
                 this._snapshot = snapshot;
 
-                // On a ticket page, the keypad follows the tab herdr shows. It reacts to a change on the
+                // On an issue page, the keypad follows the tab herdr shows. It reacts to a change on the
                 // screen only, so a key press is not undone while herdr still shows the previous tab.
                 var focus = snapshot.FocusedTabId;
                 var screenMoved = focus != this._lastSeenFocus;
@@ -344,7 +344,7 @@ namespace Loupedeck.HerdrPlugin
 
         private Project SelectedProject() => this._snapshot.FindProject(this._projectId);
 
-        private Ticket SelectedTab() => this.SelectedProject()?.Tabs.FirstOrDefault(t => t.TabId == this._tabId);
+        private Issue SelectedTab() => this.SelectedProject()?.Tabs.FirstOrDefault(t => t.TabId == this._tabId);
 
         private List<String> CurrentParams()
         {
@@ -446,8 +446,8 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
-        // Greyed out where it does nothing, lit up where it fits the ticket's status.
-        private static KeyStyle StyleFor(TicketAction action, String status)
+        // Greyed out where it does nothing, lit up where it fits the issue's status.
+        private static KeyStyle StyleFor(IssueAction action, String status)
         {
             if (action.OnlyWhen != null && action.OnlyWhen.Count > 0 && !action.OnlyWhen.Contains(status))
             {

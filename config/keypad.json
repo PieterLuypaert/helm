@@ -1,16 +1,16 @@
 {
-  // The app that runs herdr. Picking a ticket brings it to the front; "" leaves focus alone.
+  // The app that runs herdr. Picking an issue brings it to the front; "" leaves focus alone.
   "terminalBundleId": "com.googlecode.iterm2",
 
   // With no herdr window open, picking a tab opens a new iTerm window with herdr in it (iTerm only).
   "openHerdrWhenClosed": true,
 
-  // The ticket page: one key per action, after the ticket itself and before "terug".
-  // type "prompt": the text plus Enter, to the ticket's agent.
-  // type "keys":   key presses for the ticket's agent, space separated (enter, esc, ctrl+c).
-  // type "shell":  a command run in the ticket's worktree, with $TICKET_CWD set.
+  // The issue page: one key per action, after the issue itself and before "terug".
+  // type "prompt": the text plus Enter, to the issue's agent.
+  // type "keys":   key presses for the issue's agent, space separated (enter, esc, ctrl+c).
+  // type "shell":  a command run in the issue's worktree, with $ISSUE_CWD set.
   // color: the stripe on top of the key, as #RRGGBB (herdr's palette: #ff8080 red, #f36a1b accent).
-  // when: the ticket statuses in which the key lights up, so the action that fits stands out.
+  // when: the issue statuses in which the key lights up, so the action that fits stands out.
   // onlyWhen: the statuses in which the key works at all; it is greyed out in the others.
   // Statuses are the quarterdeck's: waiting, go?, done, working, idle.
   "actions": [
@@ -20,6 +20,6 @@
     { "label": "code\nreview", "type": "prompt", "value": "/code-review" },
     { "label": "commit", "type": "prompt", "value": "Commit the work in several logical commits, each with its own conventional-commit message." },
     { "label": "stop", "type": "keys", "value": "esc" },
-    { "label": "editor", "type": "shell", "value": "\"$HOME/.local/bin/hopen\" \"$TICKET_CWD\"" }
+    { "label": "editor", "type": "shell", "value": "\"$HOME/.local/bin/hopen\" \"$ISSUE_CWD\"" }
   ]
 }

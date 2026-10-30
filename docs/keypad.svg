@@ -32,7 +32,7 @@
 <text x="341.0" y="250" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">back</text>
 <text x="341.0" y="284" text-anchor="middle" font-size="9.5" fill="#5c5c5c">closes</text>
 <text x="420" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">2. A project</text>
-<text x="420" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">main tab, then tickets</text>
+<text x="420" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">main tab, then issues</text>
 <rect x="420" y="70" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="420" y="70" width="70" height="6" rx="3" fill="#5c5c5c"/>
 <text x="455.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">main</text>
@@ -71,7 +71,7 @@
 <rect x="576" y="226" width="70" height="6" rx="3" fill="#5c5c5c"/>
 <text x="611.0" y="250" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">terug</text>
 <text x="611.0" y="284" text-anchor="middle" font-size="9.5" fill="#5c5c5c">projecten</text>
-<text x="690" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">3. Ticket: 7 checkout</text>
+<text x="690" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">3. Issue: 7 checkout</text>
 <text x="690" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">the action that fits lights up</text>
 <rect x="690" y="70" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="690" y="70" width="70" height="6" rx="3" fill="#f36a1b"/>

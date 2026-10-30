@@ -12,7 +12,7 @@ name: Herdr
 displayName: Herdr
 
 # Short description of the plugin.
-description: Your herdr ticket tabs on the keypad, with actions such as go, review and commit for the one you pick.
+description: Your herdr issue tabs on the keypad, with actions such as go, review and commit for the one you pick.
 
 # Name of the plugin library file.
 pluginFileName: HerdrPlugin.dll
