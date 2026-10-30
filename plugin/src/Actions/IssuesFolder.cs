@@ -506,7 +506,8 @@ namespace Loupedeck.HerdrPlugin
 
                 if (param.StartsWith(AnswerPrefix) && Int32.TryParse(param[AnswerPrefix.Length..], out var choiceIndex))
                 {
-                    var question = this.SelectedTab()?.Question;
+                    var asking = this.SelectedTab();
+                    var question = asking?.Question;
                     if (question != null && choiceIndex >= 0 && choiceIndex < question.Options.Count)
                     {
                         var option = question.Options[choiceIndex];
@@ -517,7 +518,8 @@ namespace Loupedeck.HerdrPlugin
                         var accent = label.StartsWith("No", StringComparison.OrdinalIgnoreCase) ? AgentStatus.Red
                             : label.StartsWith("Yes", StringComparison.OrdinalIgnoreCase) || label == "Always" ? AgentStatus.Green
                             : AgentStatus.Subtext;
-                        return new KeyLook(title, null, accent);
+                        // The issue's name under every choice, so each key says what it answers and to whom.
+                        return new KeyLook(title, asking.ShortName, accent);
                     }
                 }
 
