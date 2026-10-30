@@ -97,11 +97,11 @@ def flow():
         dict(title="Claude", sub="app", accent=OVERLAY),
         dict(title="2 need you", sub="1 ready", accent=RED, style="highlight"),
         dict(title="ChatGPT", sub="app", accent=OVERLAY),
-        EMPTY,
-        dict(title="Herdr", sub="opens the\nfolder", accent=ACCENT),
+        dict(title="herdr", sub="in iTerm", accent=SUBTEXT),
+        dict(title="Issues", sub="herdr menu", accent=ACCENT),
         EMPTY, EMPTY, EMPTY,
     ])
-    pic.text(x0, top + 3 * (K + G) + 14, "The red key is Herdr status: it jumps\nstraight to the most urgent issue (step 3).", 11, "400")
+    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, each with its own job:\n" + "Issues opens the herdr menu on the keypad.\n" + "herdr opens herdr itself in iTerm.\n" + "The red one, Herdr status, jumps straight\nto the most urgent issue (step 3).", 11, "400")
 
     # 1. Projects.
     px = x0 + step

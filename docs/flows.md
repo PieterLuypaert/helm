@@ -2,7 +2,17 @@
 
 How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own. The keys carry Dutch labels for navigation (`terug`, `meer`, `toestaan`); this page uses them as they appear on the keypad.
 
-![The keypad from your own page, through the Herdr folder's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg)
+
+## Your page
+
+The keypad starts on a page you set up yourself in Logi Options+, with your own apps and keys. helm adds three keys to it, each with its own job:
+
+| Key | Label | What it does | Where |
+|---|---|---|---|
+| Herdr issues | Issues, in herdr's orange | opens the herdr menu below | on the keypad |
+| Herdr status | the count, filled in the colour of what needs you | jumps to the most urgent issue | on the keypad and the screen |
+| Open herdr | herdr, grey like an app key | opens herdr itself in iTerm: in front if it runs, else in a new iTerm window | on the screen |
 
 ## One rule: the keypad and the screen show the same issue
 
@@ -36,8 +46,8 @@ A project key shows the most urgent status among its tabs, with up to two counts
 
 ```mermaid
 flowchart TD
-    status["Herdr status key<br/>on your normal page"] -->|"press: the most urgent issue"| issue
-    key["Herdr folder key"] --> projects["Projects<br/>one key per workspace"]
+    status["Herdr status key<br/>on your page"] -->|"press: the most urgent issue"| issue
+    key["Issues key<br/>on your page"] --> projects["Projects<br/>one key per workspace"]
     projects -->|"press a project:<br/>herdr shows that workspace"| project["Project<br/>main tab, then issues"]
     project -->|"press a tab:<br/>herdr shows that tab"| issue["Issue<br/>seven actions and terug"]
     issue -->|terug| project
@@ -154,7 +164,7 @@ flowchart TD
 
 An issue that no longer needs you drops out of the list, so pressing the key walks you through whatever is left. `ready` does not count as needing you; the key shows it beside the count instead.
 
-The key opens the folder through a generic action of the Logi plugin API that is not documented for folders. If the folder does not open, press the folder key: it opens on the issue the status key picked.
+The key opens the folder through a generic action of the Logi plugin API that is not documented for folders. If the menu does not open, press the Issues key: it opens on the issue the status key picked.
 
 ## What happens on its own
 
@@ -179,5 +189,5 @@ flowchart TD
 - **Pull requests come from the GitHub CLI.** Per repo, helm asks for your own open pull requests with their checks and review decision, and your own merged ones; two calls a minute, whatever the number of issues. It matches them to an issue by the branch the issue's worktree is on, not by the tab's label, which can be stale. Without `gh`, or for a repo that is not on GitHub, issues simply have no pull request.
 - **A failed call keeps what helm knew,** so one GitHub hiccup does not blank the keys.
 - **A closed tab** drops the folder back to its project; a closed workspace back to the projects.
-- **The folder may close on an app switch.** The Logi Plugin Service can close it when iTerm comes to the front. Pressing the folder key again opens the issue on screen.
+- **The folder may close on an app switch.** The Logi Plugin Service can close it when iTerm comes to the front. Pressing the Issues key again opens the issue on screen.
 

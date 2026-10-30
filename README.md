@@ -4,12 +4,22 @@ Turns a Logitech MX Keypad into the helm of [herdr](https://herdr.dev): see whic
 
 An issue here is a herdr tab whose agent works on one branch, the way `hagent` opens them. The plugin reads herdr, not GitHub: it does not fetch GitHub issues.
 
-![The keypad from your own page, through the Herdr folder's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg)
 
 ## What it does
 
-- **A status key** shows how many issues need you across every herdr workspace. Pressing it shows the most urgent issue in herdr and opens the folder on it; pressing it again walks on to the next. That the key opens the folder by itself is not yet confirmed on the keypad; if it does not, the folder key lands on that issue.
-- **A folder** with three levels: your projects, the tabs of one project, and the actions for one issue.
+helm adds three keys you place on your own keypad page, next to your other apps:
+
+| Key | Label | What it does |
+|---|---|---|
+| **Herdr issues** | Issues | opens the herdr menu on the keypad: your projects, their issues, and the actions for one issue |
+| **Herdr status** | 2 need you | counts what needs you, and jumps to the most urgent issue |
+| **Open herdr** | herdr | opens herdr itself in iTerm, like any app key |
+
+In more detail:
+
+- **The status key** shows how many issues need you across every herdr workspace. Pressing it shows the most urgent issue in herdr and opens the folder on it; pressing it again walks on to the next. That the key opens the menu by itself is not yet confirmed on the keypad; if it does not, the Issues key lands on that issue.
+- **The herdr menu** has three levels: your projects, the tabs of one project, and the actions for one issue.
 - **Pull requests** show on the issue keys: failing checks, requested changes, ready to merge. helm reads them with the GitHub CLI.
 - **Actions** such as go, review, babysit and commit go to that issue's agent. The one that fits lights up, and every press is confirmed on the key and in herdr.
 - **The keypad follows the screen.** Switch tabs in herdr and the keypad's issue page moves along.
@@ -26,7 +36,7 @@ A plan counts when the agent's output has a line starting with `Single PR:` or `
 ./install.sh
 ```
 
-It builds the plugin and links it into Logi Options+, links the action config, and adds keypad chords to herdr. It is safe to run again; run it after every pull. Then, once, in Logi Options+: open **Installed Plugins > Herdr** and drag the **Herdr** folder and the **Herdr status** key onto keys of your keypad.
+It builds the plugin and links it into Logi Options+, links the action config, and adds keypad chords to herdr. It is safe to run again; run it after every pull. Then, once, in Logi Options+: open **Installed Plugins > Herdr** and drag **Herdr issues**, **Herdr status** and **Open herdr** onto keys of your keypad.
 
 Needs macOS, Logi Options+ with Logi Plugin Service 6.4 or later, herdr, iTerm2 (configurable), and the GitHub CLI `gh`, logged in, for the pull requests. The script installs the .NET 10 SDK in `~/.dotnet` when it is missing. The editor action and the chords call helper scripts in `~/.local/bin` (`hagent`, `hcleanup`, `hproject`, `hopen`), and the lazygit chord needs `lazygit`; without them, those keys do nothing.
 
