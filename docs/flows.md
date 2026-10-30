@@ -34,7 +34,7 @@ Every key shows one icon per colour for its issue, from its agent and its pull r
 |---|---|---|
 | red | `waiting` | the agent asks you something: a permission or a question |
 | orange | `go?` | the agent sits still with a plan waiting for your go, and there is no pull request yet |
-| red | `CI failed` | the pull request's checks fail |
+| red | `CI failed` | the pull request's checks fail: the newest run of each check, as on GitHub's page; a cancelled run does not count |
 | red | `changes` | a reviewer asked for changes |
 | green | `done` | the agent finished its turn: look at the result |
 | blue | `ready` | the pull request is approved and its checks pass: yours to merge |
