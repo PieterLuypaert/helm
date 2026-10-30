@@ -33,7 +33,6 @@ namespace Loupedeck.HerdrPlugin
         public static readonly BitmapColor Accent = Hex(0xf36a1b);
         public static readonly BitmapColor Yellow = Hex(0xffc799);
         public static readonly BitmapColor Green = Hex(0x99ffe4);
-        public static readonly BitmapColor Teal = Hex(0x66ddcc);
         public static readonly BitmapColor Blue = Hex(0x82aaff);
         public static readonly BitmapColor Overlay = Hex(0x5c5c5c);
         public static readonly BitmapColor Ground = Hex(0x24282d);

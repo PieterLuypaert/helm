@@ -4,7 +4,7 @@ Turns a Logitech MX Keypad into the helm of [herdr](https://herdr.dev): see whic
 
 An issue here is a herdr tab whose agent works on one branch, the way `hagent` opens them. The plugin reads herdr, not GitHub: it does not fetch GitHub issues.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=40a4e13a)
 
 ## What it does
 
@@ -27,9 +27,21 @@ In more detail:
 
 Every key says in one word how its issue is doing, and its colour says what you do next: red answer or fix, orange decide, green look at the result, blue merge.
 
-![What a key can say: waiting, go?, working and done come from the agent; CI failed, changes, review and ready from the pull request](docs/statuses.svg)
+![What a key can say: waiting, go?, working and done come from the agent; CI failed, changes, review and ready from the pull request](docs/statuses.svg?v=6923af9b)
 
 A plan counts when the agent's output has a line starting with `Single PR:` or `PR 1:`; change `planPattern` in the config to match your own format.
+
+## When Claude asks you something
+
+When an agent waits on you, for a permission or a choice, its key turns red with `waiting`. To answer it from the keypad:
+
+1. **Go to the issue:** press the status key, which jumps to the most urgent issue, or open it through Issues, its project and its key.
+2. **Pick your answer:** the issue's page shows the question's choices, one key each, with the numbers your screen shows: `1 Yes`, `2 Always`, `3 Auto mode`, `4 No`. Press the one you want.
+3. **See it land:** the key flashes `sent` and herdr shows a notification. If the question changed in the meantime, nothing is sent and the key reads `changed`.
+
+![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](docs/answer.svg?v=a7bf11fc)
+
+A question helm cannot read, such as one that wants typed text, shows only `answer on screen`: that key brings the issue's tab to the front so you answer it there.
 
 ## Install
 
