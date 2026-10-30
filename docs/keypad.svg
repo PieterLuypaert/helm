@@ -2,23 +2,23 @@
 <title>The Herdr folder on the MX Keypad</title>
 <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#8b949e" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
 <text x="20" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">0. Your page</text>
-<text x="20" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">your own keys in Logi Options+</text>
+<text x="20" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">your own apps and keys in Logi Options+</text>
 <rect x="20" y="70" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="20" y="70" width="70" height="6" rx="3" fill="#5c5c5c"/>
-<text x="55.0" y="100" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">new issue</text>
+<text x="55.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">Spotify</text>
+<text x="55.0" y="128" text-anchor="middle" font-size="9.5" fill="#5c5c5c">app</text>
 <rect x="98" y="70" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="98" y="70" width="70" height="6" rx="3" fill="#5c5c5c"/>
-<text x="133.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">pick</text>
-<text x="133.0" y="107" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">project</text>
+<text x="133.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">Claude</text>
+<text x="133.0" y="128" text-anchor="middle" font-size="9.5" fill="#5c5c5c">app</text>
 <rect x="176" y="70" width="70" height="70" rx="8" fill="#ff8080"/>
 <text x="211.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#24282d">2 need you</text>
 <text x="211.0" y="128" text-anchor="middle" font-size="9.5" fill="#24282d">1 ready</text>
 <rect x="20" y="148" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="20" y="148" width="70" height="6" rx="3" fill="#5c5c5c"/>
-<text x="55.0" y="178" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">lazygit</text>
-<rect x="98" y="148" width="70" height="70" rx="8" fill="#24282d"/>
-<rect x="98" y="148" width="70" height="6" rx="3" fill="#5c5c5c"/>
-<text x="133.0" y="178" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">editor</text>
+<text x="55.0" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">ChatGPT</text>
+<text x="55.0" y="206" text-anchor="middle" font-size="9.5" fill="#5c5c5c">app</text>
+<rect x="98" y="148" width="70" height="70" rx="8" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="176" y="148" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="176" y="148" width="70" height="6" rx="3" fill="#f36a1b"/>
 <text x="211.0" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">Herdr</text>

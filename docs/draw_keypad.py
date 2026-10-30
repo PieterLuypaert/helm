@@ -91,13 +91,13 @@ def flow():
     # 0. Your own page in Logi Options+: the Herdr folder key opens the folder.
     x0 = 20
     pic.text(x0, 40, "0. Your page")
-    pic.text(x0, 56, "your own keys in Logi Options+", 11, "400")
+    pic.text(x0, 56, "your own apps and keys in Logi Options+", 11, "400")
     pic.grid(x0, top, [
-        dict(title="new issue", accent=OVERLAY),
-        dict(title="pick\nproject", accent=OVERLAY),
+        dict(title="Spotify", sub="app", accent=OVERLAY),
+        dict(title="Claude", sub="app", accent=OVERLAY),
         dict(title="2 need you", sub="1 ready", accent=RED, style="highlight"),
-        dict(title="lazygit", accent=OVERLAY),
-        dict(title="editor", accent=OVERLAY),
+        dict(title="ChatGPT", sub="app", accent=OVERLAY),
+        EMPTY,
         dict(title="Herdr", sub="opens the\nfolder", accent=ACCENT),
         EMPTY, EMPTY, EMPTY,
     ])
