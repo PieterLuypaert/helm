@@ -11,10 +11,12 @@ Edit `config/keypad.json`. The plugin reads it again when it changes, so no rebu
 | `type: "prompt"` | `value` plus Enter, to the issue's agent (`herdr agent prompt`) |
 | `type: "keys"` | key presses for the issue's agent, space separated: `enter`, `esc`, `ctrl+c` |
 | `type: "shell"` | a command run in the issue's worktree, with `$ISSUE_CWD` set |
+| `type: "open-pr"` | opens the issue's pull request in the browser; greyed out while the issue has none |
 | `color` | the stripe on the key, `#RRGGBB` |
-| `when` | the issue statuses in which the key lights up, such as `["go?"]` |
+| `when` | the issue statuses in which the key lights up, such as `["go?"]`; the statuses are in [How it works](flows.md#statuses) |
 | `onlyWhen` | the statuses in which the key works at all; it is greyed out in the others |
 | `terminalBundleId` | the app brought to the front when you pick an issue (iTerm2 by default); `""` leaves focus alone |
+| `planPattern` | a regular expression for a line in an idle agent's output that marks a plan waiting for your go; by default `^\s*(Single PR:|PR 1:)` |
 | `openHerdrWhenClosed` | with no herdr window open, picking an issue opens a new iTerm window and starts herdr in it, on that issue (iTerm only; `true` by default). macOS asks once whether the Logi Plugin Service may control iTerm |
 
 ## Chords
@@ -46,7 +48,21 @@ cd plugin/src
 DOTNET_ROOT="$HOME/.dotnet" PATH="$HOME/.dotnet:$PATH" dotnet watch build
 ```
 
-Each build relinks the plugin and asks the Logi Plugin Service to reload it. The plugin logs to `~/Library/Application Support/Logi/LogiPluginService/Logs/plugin_logs/Herdr.log`. After moving the repo, the service may refuse the new path with "plugin 'Herdr' is already loaded": use **Restart Logi Plugin Service** in the Options+ settings.
+Each build relinks the plugin and asks the Logi Plugin Service to reload it.
+
+The rules that need no keypad (the status words, reading GitHub's checks, the status key's order, shortening branch names, wrapping labels) have tests; they build the plugin without touching the Logi Plugin Service:
+
+```bash
+cd plugin/tests
+DOTNET_ROOT="$HOME/.dotnet" PATH="$HOME/.dotnet:$PATH" dotnet test
+```
+
+The picture in the README is drawn by a script; run it after changing what the keys show:
+
+```bash
+python3 docs/draw_keypad.py
+```
+ The plugin logs to `~/Library/Application Support/Logi/LogiPluginService/Logs/plugin_logs/Herdr.log`. After moving the repo, the service may refuse the new path with "plugin 'Herdr' is already loaded": use **Restart Logi Plugin Service** in the Options+ settings.
 
 ## Uninstall
 

@@ -4,41 +4,102 @@ namespace Loupedeck.HerdrPlugin
     using System.Collections.Generic;
     using System.Linq;
 
-    // The quarterdeck's status words and herdr's palette, so an issue reads the same on the keypad,
-    // in herdr and in the quarterdeck.
+    // helm's status words for an issue, from its agent and its pull request, in herdr's palette.
     public static class AgentStatus
     {
         public const String Waiting = "waiting";
         public const String Go = "go?";
+        public const String CiFailed = "CI failed";
+        public const String Changes = "changes";
         public const String Done = "done";
+        public const String Ready = "ready";
         public const String Working = "working";
+        public const String Review = "review";
+        public const String Draft = "draft";
         public const String Idle = "idle";
+        public const String Merged = "merged";
+        public const String Closed = "closed";
         public const String Unknown = "unknown";
 
-        // Most urgent first: what waits on you, then a plan waiting for go, then finished work.
-        private static readonly String[] Urgency = { Waiting, Go, Done, Working, Idle, Unknown };
+        // Most urgent first: what waits on you, then what is ready to merge, then the rest.
+        private static readonly String[] Urgency = { Waiting, Go, CiFailed, Changes, Done, Ready, Working, Review, Draft, Idle, Merged, Closed, Unknown };
 
-        // herdr's palette, as the quarterdeck uses it.
+        // What needs you now, in the order the status key walks through it.
+        private static readonly String[] Yours = { Waiting, Go, CiFailed, Changes, Done };
+
+        // herdr's palette.
         public static readonly BitmapColor Red = Hex(0xff8080);
         public static readonly BitmapColor Accent = Hex(0xf36a1b);
         public static readonly BitmapColor Yellow = Hex(0xffc799);
         public static readonly BitmapColor Green = Hex(0x99ffe4);
+        public static readonly BitmapColor Teal = Hex(0x66ddcc);
         public static readonly BitmapColor Overlay = Hex(0x5c5c5c);
         public static readonly BitmapColor Ground = Hex(0x24282d);
         public static readonly BitmapColor Text = Hex(0xebf0ec);
         public static readonly BitmapColor Subtext = Hex(0xafb6c2);
 
-        // herdr's raw agent status plus whether the agent's last output holds a plan.
-        // A plan counts only while the agent sits still, as in the quarterdeck.
-        public static String From(String raw, Boolean hasPlan) => raw switch
+        // The agent wins while it asks or works; then a plan waiting for go (only before there is a pull
+        // request); then the pull request: failing checks and requested changes before finished work,
+        // and finished work before a pull request that only waits on a review or a merge.
+        public static String From(String raw, Boolean hasPlan, PrInfo pr)
         {
-            "blocked" => Waiting,
-            "working" => Working,
-            _ when hasPlan => Go,
-            "done" => Done,
-            "idle" => Idle,
-            _ => Unknown,
-        };
+            if (raw == "blocked")
+            {
+                return Waiting;
+            }
+
+            if (raw == "working")
+            {
+                return Working;
+            }
+
+            if (hasPlan && pr == null)
+            {
+                return Go;
+            }
+
+            if (pr != null)
+            {
+                if (pr.State == "MERGED")
+                {
+                    return Merged;
+                }
+
+                if (pr.State == "CLOSED")
+                {
+                    return Closed;
+                }
+
+                if (pr.Checks == "failing")
+                {
+                    return CiFailed;
+                }
+
+                if (pr.ReviewDecision == "CHANGES_REQUESTED")
+                {
+                    return Changes;
+                }
+
+                if (raw == "done")
+                {
+                    return Done;
+                }
+
+                if (pr.IsDraft)
+                {
+                    return Draft;
+                }
+
+                return pr.ReviewDecision == "APPROVED" && pr.Checks is "passing" or "none" ? Ready : Review;
+            }
+
+            return raw switch
+            {
+                "done" => Done,
+                "idle" => Idle,
+                _ => Unknown,
+            };
+        }
 
         public static Int32 Rank(String status)
         {
@@ -49,14 +110,15 @@ namespace Loupedeck.HerdrPlugin
         public static String MostUrgent(IEnumerable<String> statuses) =>
             statuses.OrderBy(Rank).FirstOrDefault() ?? Idle;
 
-        public static Boolean NeedsYou(String status) => status is Waiting or Go or Done;
+        public static Boolean NeedsYou(String status) => Yours.Contains(status);
 
         public static BitmapColor Color(String status) => status switch
         {
-            Waiting => Red,
-            Go => Accent,
-            Done => Accent,
+            Waiting or CiFailed or Changes => Red,
+            Go or Done => Accent,
+            Ready => Teal,
             Working => Yellow,
+            Review or Draft => Subtext,
             _ => Overlay,
         };
 

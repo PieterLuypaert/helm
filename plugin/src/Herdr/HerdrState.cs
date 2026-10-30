@@ -6,8 +6,8 @@ namespace Loupedeck.HerdrPlugin
     using System.Text.RegularExpressions;
     using System.Threading;
 
-    // What herdr looks like right now: every project with its tabs in the quarterdeck's status words,
-    // and the tab that is on screen.
+    // What herdr looks like right now: every project with its tabs in helm's status words, and the tab
+    // that is on screen.
     public sealed record Snapshot(IReadOnlyList<Project> Projects, Boolean Offline, String FocusedTabId)
     {
         public static readonly Snapshot Empty = new(Array.Empty<Project>(), true, null);
@@ -28,14 +28,16 @@ namespace Loupedeck.HerdrPlugin
             return (null, null);
         }
 
-        // The tab that needs you most: waiting, then go?, then done; the first project and tab win a tie.
-        public (Project Project, Issue Tab) MostUrgent() =>
+        // Every tab that needs you, most urgent first; the first project and tab win a tie.
+        public List<(Project Project, Issue Tab)> NeedsYou() =>
             this.Projects.SelectMany(p => p.Tabs.Select(t => (Project: p, Tab: t)))
                 .Where(x => AgentStatus.NeedsYou(x.Tab.Status))
                 .OrderBy(x => AgentStatus.Rank(x.Tab.Status))
                 .ThenBy(x => x.Project.Number)
                 .ThenBy(x => x.Tab.Number)
-                .FirstOrDefault();
+                .ToList();
+
+        public (Project Project, Issue Tab) MostUrgent() => this.NeedsYou().FirstOrDefault();
 
         public Int32 Count(String status) => this.Projects.Sum(p => p.Count(status));
 
@@ -50,8 +52,8 @@ namespace Loupedeck.HerdrPlugin
     // agree, and tells them when anything changed.
     public static class HerdrState
     {
-        // The plan format the global CLAUDE.md asks for, as the quarterdeck matches it.
-        private static readonly Regex PlanLine = new(@"^\s*(Single PR:|PR 1:)", RegexOptions.Multiline | RegexOptions.Compiled);
+        private static Regex _planLine;
+        private static String _planPattern;
 
         private static readonly Object Gate = new();
         private static readonly Dictionary<String, (Int64 Seq, Boolean HasPlan)> Plans = new();
@@ -138,6 +140,9 @@ namespace Loupedeck.HerdrPlugin
                 return Snapshot.Empty;
             }
 
+            UsePlanPattern(KeypadConfig.Current.PlanPattern);
+            PullRequests.Track(projects.SelectMany(p => p.Tabs).Where(t => !t.IsMain).Select(t => t.Cwd));
+
             var seen = new HashSet<String>();
             var withStatus = projects.Select(p => p with
             {
@@ -148,7 +153,8 @@ namespace Loupedeck.HerdrPlugin
                         seen.Add(t.PaneId);
                     }
 
-                    return t with { Status = AgentStatus.From(t.Status, HasPlan(t)) };
+                    var pr = t.IsMain ? null : PullRequests.Lookup(t.Cwd);
+                    return t with { Status = AgentStatus.From(t.Status, HasPlan(t), pr), Pr = pr };
                 }).ToList(),
             }).ToList();
 
@@ -159,6 +165,29 @@ namespace Loupedeck.HerdrPlugin
 
             var focused = withStatus.SelectMany(p => p.Tabs).FirstOrDefault(t => t.Focused)?.TabId;
             return new Snapshot(withStatus, false, focused);
+        }
+
+        // Compiles the configured plan pattern once; a pattern that does not compile falls back to the default.
+        private static void UsePlanPattern(String pattern)
+        {
+            pattern = String.IsNullOrWhiteSpace(pattern) ? new KeypadConfig().PlanPattern : pattern;
+            if (pattern == _planPattern)
+            {
+                return;
+            }
+
+            try
+            {
+                _planLine = new Regex(pattern, RegexOptions.Multiline);
+            }
+            catch (ArgumentException ex)
+            {
+                PluginLog.Warning(ex, $"planPattern does not compile, using the default: {pattern}");
+                _planLine = new Regex(new KeypadConfig().PlanPattern, RegexOptions.Multiline);
+            }
+
+            _planPattern = pattern;
+            Plans.Clear();
         }
 
         // Reads an idle or finished agent's last lines once per state change, to see whether a plan waits.
@@ -174,7 +203,7 @@ namespace Loupedeck.HerdrPlugin
                 return cached.HasPlan;
             }
 
-            var hasPlan = PlanLine.IsMatch(HerdrClient.ReadRecent(tab.PaneId, 30));
+            var hasPlan = _planLine.IsMatch(HerdrClient.ReadRecent(tab.PaneId, 30));
             Plans[tab.PaneId] = (tab.StateSeq, hasPlan);
             return hasPlan;
         }

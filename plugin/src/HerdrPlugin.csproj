@@ -35,7 +35,8 @@
     <Message Text="✅ Package files copied to $(OutputPath)..\" Importance="High" />
   </Target>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <!-- Tests build the plugin with HelmSkipLink=true, so they leave the Logi Plugin Service alone. -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(HelmSkipLink)' != 'true'">
     <Exec Condition="$(OS) == 'Windows_NT'" Command="echo $(BaseOutputPath)$(Configuration)\ &gt; &quot;$(PluginDir)$(ProjectName).link&quot;" />
     <Exec Condition="$(OS) != 'Windows_NT'" Command="echo $(BaseOutputPath)$(Configuration)\ &gt; $(PluginDir)$(ProjectName).link" />
     <Message Text="🔨 Created plugin link at: $(PluginDir)$(ProjectName).link" Importance="High" />

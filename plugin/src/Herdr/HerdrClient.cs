@@ -21,7 +21,8 @@ namespace Loupedeck.HerdrPlugin
         String Topic,
         Boolean Focused,
         Boolean IsMain,
-        Int64 StateSeq = 0);
+        Int64 StateSeq = 0,
+        PrInfo Pr = null);
 
     // One herdr workspace: a project, with its main tab first and then its issues in the order you opened them.
     public sealed record Project(
@@ -31,7 +32,7 @@ namespace Loupedeck.HerdrPlugin
         Boolean Focused,
         IReadOnlyList<Issue> Tabs)
     {
-        // The most urgent status of its tabs, in the quarterdeck's order.
+        // The most urgent status of its tabs.
         public String Status => AgentStatus.MostUrgent(this.Tabs.Select(t => t.Status));
 
         public Int32 Count(String status) => this.Tabs.Count(t => t.Status == status);
@@ -198,7 +199,7 @@ namespace Loupedeck.HerdrPlugin
         public static CommandResult SendKeys(String paneId, params String[] keys) =>
             RunChecked(null, HerdrBinary, new[] { "agent", "send-keys", paneId }.Concat(keys).ToArray());
 
-        // The agent's last lines, as the quarterdeck reads them to spot a plan; empty when unreadable.
+        // The agent's last lines, to spot a plan waiting for go; empty when unreadable.
         public static String ReadRecent(String paneId, Int32 lines) =>
             Run(HerdrBinary, "agent", "read", paneId, "--source", "recent", "--lines", lines.ToString()) ?? "";
 
@@ -280,6 +281,9 @@ end tell";
         }
 
         private static CommandResult RunChecked(String cwd, String file, params String[] args) => RunChecked(cwd, file, args, null);
+
+        // Runs any tool with the plugin's PATH, such as git or gh, and reports how it went.
+        public static CommandResult RunTool(String cwd, String file, params String[] args) => RunChecked(cwd, file, args, null);
 
         private static CommandResult RunChecked(String cwd, String file, String[] args, IDictionary<String, String> env)
         {
