@@ -12,9 +12,6 @@ namespace Loupedeck.HerdrPlugin
         // A filled circle in its colour behind a dark icon: the action that fits right now.
         Highlight,
 
-        // Greyed out: an action that does nothing in the issue's current state.
-        Dim,
-
         // A key on your own page, beside your app keys: a big icon, or a count over a small icon, in its
         // colour on a black tile. Logi writes the key's short label under it.
         Tile,
@@ -57,7 +54,7 @@ namespace Loupedeck.HerdrPlugin
                 }
             }
 
-            var color = highlight ? AgentStatus.Ground : look.Style == KeyStyle.Dim ? AgentStatus.Overlay : look.Accent;
+            var color = highlight ? AgentStatus.Ground : look.Accent;
             var size = (Int32)(w * (highlight || look.Framed ? 0.5f : 0.64f));
             var icon = Icons.Render(look.Icon ?? Icons.Dot, color, size);
             if (icon != null)

@@ -9,10 +9,10 @@ namespace Loupedeck.HerdrPlugin
     // One action on the issue page. Type is "prompt" (text plus Enter to the issue's agent),
     // "keys" (key presses, space separated, such as "esc" or "enter") or "shell" (a command run
     // in the issue's folder, with $ISSUE_CWD set). When lists the issue statuses in which the key
-    // lights up; OnlyWhen, when set, the statuses in which it works at all (it is greyed out otherwise).
+    // lights up; OnlyWhen, when set, the statuses in which it shows on the issue's page at all.
     // Statuses are helm's: waiting, go?, CI failed, changes, done, ready, working, review, draft, idle,
-    // merged, closed. Type "open-pr" opens the issue's pull request in the browser; it is greyed out
-    // while the issue has none.
+    // merged, closed. Type "open-pr" opens the issue's pull request in the browser; it shows only while
+    // the issue has one.
     public sealed class IssueAction
     {
         public String Label { get; set; }
@@ -43,11 +43,11 @@ namespace Loupedeck.HerdrPlugin
 
         public List<IssueAction> Actions { get; set; } = new()
         {
-            new() { Label = "go", Type = "prompt", Value = "go", Color = "#f36a1b", Icon = "play", When = new() { "go?" } },
-            new() { Label = "review\nand fix", Type = "prompt", Value = "/review-and-fix", Icon = "tool", When = new() { "done" } },
-            new() { Label = "babysit\npr", Type = "prompt", Value = "/babysit-pr", Icon = "lifebuoy", When = new() { "CI failed", "changes" } },
-            new() { Label = "commit", Type = "prompt", Value = "Commit the work in several logical commits, each with its own conventional-commit message.", Icon = "commit" },
-            new() { Label = "stop", Type = "keys", Value = "esc", Icon = "stop" },
+            new() { Label = "go", Type = "prompt", Value = "go", Color = "#f36a1b", Icon = "play", When = new() { "go?" }, OnlyWhen = new() { "go?" } },
+            new() { Label = "review\nand fix", Type = "prompt", Value = "/review-and-fix", Icon = "tool", When = new() { "done" }, OnlyWhen = new() { "done", "idle" } },
+            new() { Label = "babysit\npr", Type = "prompt", Value = "/babysit-pr", Icon = "lifebuoy", When = new() { "CI failed", "changes" }, OnlyWhen = new() { "CI failed", "changes", "review", "draft" } },
+            new() { Label = "commit", Type = "prompt", Value = "Commit the work in several logical commits, each with its own conventional-commit message.", Icon = "commit", OnlyWhen = new() { "done", "idle" } },
+            new() { Label = "stop", Type = "keys", Value = "esc", Icon = "stop", OnlyWhen = new() { "working" } },
             new() { Label = "open PR", Type = "open-pr", Icon = "pull-request", When = new() { "ready" } },
             new() { Label = "editor", Type = "shell", Value = "\"$HOME/.local/bin/hopen\" \"$ISSUE_CWD\"", Icon = "code" },
         };
