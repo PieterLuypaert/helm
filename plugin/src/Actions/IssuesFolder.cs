@@ -19,6 +19,7 @@ namespace Loupedeck.HerdrPlugin
         private const String AllParam = "all";
         private const String BackToProjectParam = "back:project";
         private const String BackToProjectsParam = "back:projects";
+        private const String CloseParam = "back:close";
         private const String OfflineParam = "offline";
         private const String MoreParam = "more";
         private const String AnswerPrefix = "ans:";
@@ -128,16 +129,9 @@ namespace Loupedeck.HerdrPlugin
         {
             lock (this._lock)
             {
-                var names = this.CurrentParams().Select(p => this.CreateCommandName(p)).ToList();
-
-                // Only the projects close the menu, with Logi's own back key; every other page has ours. With
-                // herdr offline there is only the offline key, so the menu needs Logi's back key to close.
-                if (this.Level() == 0 || this._snapshot.Offline)
-                {
-                    names.Add(PluginDynamicFolder.NavigateUpActionName);
-                }
-
-                return names;
+                // Every page has our own back key, the projects page's closes the menu. Logi's own back key
+                // showed up twice on the keypad, so the folder never uses it.
+                return this.CurrentParams().Select(p => this.CreateCommandName(p)).ToList();
             }
         }
 
@@ -249,6 +243,10 @@ namespace Loupedeck.HerdrPlugin
             else if (actionParameter == HeaderParam && tab != null)
             {
                 Task.Run(() => Screen.ShowTab(tab.TabId));
+            }
+            else if (actionParameter == CloseParam)
+            {
+                this.Close();
             }
             else if (actionParameter == OfflineParam)
             {
@@ -507,7 +505,7 @@ namespace Loupedeck.HerdrPlugin
         {
             if (this._snapshot.Offline)
             {
-                return new List<String> { OfflineParam };
+                return new List<String> { OfflineParam, CloseParam };
             }
 
             switch (this.Level())
@@ -542,7 +540,7 @@ namespace Loupedeck.HerdrPlugin
                     var tabs = this.SelectedProject()?.Tabs ?? Array.Empty<Issue>();
                     return this.Paged(tabs.Select(t => TabPrefix + t.TabId).ToList()).Append(BackToProjectsParam).ToList();
                 default:
-                    return this.Paged(this._snapshot.Projects.Select(p => ProjectPrefix + p.WorkspaceId).Prepend(AllParam).ToList());
+                    return this.Paged(this._snapshot.Projects.Select(p => ProjectPrefix + p.WorkspaceId).Prepend(AllParam).ToList()).Append(CloseParam).ToList();
             }
         }
 
@@ -590,6 +588,7 @@ namespace Loupedeck.HerdrPlugin
                         return StatusCommand.Look(this._snapshot);
                     case BackToProjectsParam:
                     case BackToProjectParam:
+                    case CloseParam:
                         return new KeyLook("back", Icons.Back, nav);
                     case MoreParam:
                         var count = this._all ? this.OverviewOrder().Count : this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count + 1;
