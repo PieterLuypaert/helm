@@ -5,15 +5,18 @@ namespace Loupedeck.HerdrPlugin
     using System.Linq;
     using System.Threading.Tasks;
 
-    // The keypad's herdr menu, three levels deep: every project (herdr workspace); a project's main tab
-    // and issue tabs; and the actions for the tab you picked. The keypad and the screen show the same
-    // issue: a key press moves herdr, and on an issue page the keypad follows the tab herdr shows.
+    // The keypad's herdr menu, three levels deep: every project (herdr workspace), with the overview of
+    // all issues first; a project's main tab and issue tabs, or every issue at once; and the actions for
+    // the tab you picked. Each terug goes one level up, so the projects are never more than two presses
+    // away. The keypad and the screen show the same issue: a key press moves herdr, and on an issue page
+    // the keypad follows the tab herdr shows.
     public class IssuesFolder : PluginDynamicFolder
     {
         private const String ProjectPrefix = "proj:";
         private const String TabPrefix = "tab:";
         private const String ActionPrefix = "act:";
         private const String HeaderParam = "header";
+        private const String AllParam = "all";
         private const String BackToProjectParam = "back:project";
         private const String BackToProjectsParam = "back:projects";
         private const String OfflineParam = "offline";
@@ -112,8 +115,8 @@ namespace Loupedeck.HerdrPlugin
             {
                 var names = this.CurrentParams().Select(p => this.CreateCommandName(p)).ToList();
 
-                // The projects and the overview of all issues close the menu with Logi's back key.
-                if (this.Level() == 0 || (this._all && this._tabId == null))
+                // Only the projects close the menu, with Logi's back key; every other page has terug.
+                if (this.Level() == 0)
                 {
                     names.Add(PluginDynamicFolder.NavigateUpActionName);
                 }
@@ -153,6 +156,15 @@ namespace Loupedeck.HerdrPlugin
 
                 this.Navigate(id, null);
                 Task.Run(() => HerdrClient.FocusWorkspace(id));
+            }
+            else if (actionParameter == AllParam)
+            {
+                lock (this._lock)
+                {
+                    this._all = true;
+                }
+
+                this.Navigate(null, null);
             }
             else if (actionParameter.StartsWith(TabPrefix))
             {
@@ -464,11 +476,11 @@ namespace Loupedeck.HerdrPlugin
                     names.Add(BackToProjectParam);
                     return names;
                 case 1 when this._all:
-                    return this.Paged(this._snapshot.AllTabs().Select(x => TabPrefix + x.Tab.TabId).ToList());
+                    return this.Paged(this._snapshot.AllTabs().Select(x => TabPrefix + x.Tab.TabId).ToList()).Append(BackToProjectsParam).ToList();
                 case 1:
                     return this.Paged(this.SelectedProject().Tabs.Select(t => TabPrefix + t.TabId).ToList()).Append(BackToProjectsParam).ToList();
                 default:
-                    return this.Paged(this._snapshot.Projects.Select(p => ProjectPrefix + p.WorkspaceId).ToList());
+                    return this.Paged(this._snapshot.Projects.Select(p => ProjectPrefix + p.WorkspaceId).Prepend(AllParam).ToList());
             }
         }
 
@@ -505,12 +517,14 @@ namespace Loupedeck.HerdrPlugin
                         return new KeyLook("", Icons.Dot, AgentStatus.Overlay);
                     case OfflineParam:
                         return new KeyLook("herdr offline", Icons.Offline, AgentStatus.Red);
+                    case AllParam:
+                        return StatusCommand.Look(this._snapshot);
                     case BackToProjectsParam:
                         return new KeyLook("terug", Icons.Back, nav);
                     case BackToProjectParam:
                         return new KeyLook("terug", Icons.Back, nav);
                     case MoreParam:
-                        var count = this._all ? this._snapshot.AllTabs().Count : this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count;
+                        var count = this._all ? this._snapshot.AllTabs().Count : this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count + 1;
                         return new KeyLook($"meer {this._page + 1}/{PageCount(count)}", Icons.Dots, nav);
                     case OnScreenParam:
                         return new KeyLook("answer on screen", Icons.Screen, nav);
