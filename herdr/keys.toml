@@ -1,0 +1,39 @@
+# Direct chords for the keypad on the herdr-ticketflow scripts. install.sh writes this
+# block into herdr's config.toml between "helm: keypad chords" markers and rewrites it on
+# every run, outside the ticketflow block, which ticketflow's own install.sh rewrites.
+[[keys.command]]
+key = "ctrl+alt+shift+g"
+type = "popup"
+command = "\"$HOME/.local/bin/hagent\""
+description = "new branch tab with Claude"
+width = "60%"
+height = 12
+
+[[keys.command]]
+key = "ctrl+alt+shift+k"
+type = "popup"
+command = "\"$HOME/.local/bin/hcleanup\""
+description = "clean up ticket tab"
+width = "70%"
+height = 12
+
+[[keys.command]]
+key = "ctrl+alt+shift+s"
+type = "popup"
+command = "\"$HOME/.local/bin/hproject\""
+description = "pick project workspace"
+width = 70
+height = 14
+
+[[keys.command]]
+key = "ctrl+alt+shift+e"
+type = "shell"
+command = "\"$HOME/.local/bin/hopen\""
+description = "open tab in your editor"
+
+[[keys.command]]
+key = "ctrl+alt+shift+l"
+type = "popup"
+command = 'cd "${HERDR_ACTIVE_PANE_CWD:-$PWD}" && exec lazygit'
+width = "90%"
+height = "90%"
