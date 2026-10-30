@@ -13,8 +13,9 @@ namespace Loupedeck.HerdrPlugin
             HerdrState.Changed += _ => this.ActionImageChanged();
         }
 
-        // A tile like an app icon, without a label: the count on it says what it is.
-        protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) => KeyArt.NoLabel;
+        // Logi keeps a label strip under every plugin key; a short word fills it, like a macro's label.
+        protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
+            HerdrState.HasRead && HerdrState.Current.Offline ? "offline" : "issues";
 
         protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize) =>
             KeyArt.Draw(TileLook(HerdrState.Current), imageSize);

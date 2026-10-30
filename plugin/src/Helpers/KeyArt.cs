@@ -16,7 +16,7 @@ namespace Loupedeck.HerdrPlugin
         Dim,
 
         // A key on your own page, beside your app keys: a big icon, or a count over a small icon, in its
-        // colour on a dark grey tile that fills the key, with no label.
+        // colour on a dark grey tile. Logi writes the key's short label under it.
         Tile,
     }
 
@@ -29,10 +29,6 @@ namespace Loupedeck.HerdrPlugin
     // image, because Logi already writes the label under it. On your own page: a tile, like an app icon.
     public static class KeyArt
     {
-        // A title that shows nothing. Logi writes a command key's action name under it when its title is
-        // empty, so a tile without a label gets this zero-width space instead.
-        public const String NoLabel = "\u200B";
-
         public static BitmapImage Draw(KeyLook look, PluginImageSize imageSize)
         {
             using var builder = new BitmapBuilder(imageSize);
