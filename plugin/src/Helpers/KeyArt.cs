@@ -14,14 +14,19 @@ namespace Loupedeck.HerdrPlugin
 
         // Greyed out: an action that does nothing in the issue's current state.
         Dim,
+
+        // A key on your own page, beside your app keys: a big icon, or a count over a small icon, in its
+        // colour on a black tile. Logi writes the key's short label under it.
+        Tile,
     }
 
     // How one key looks. Logi Options+ shows Title as the key's label under its image, so the image
-    // itself is the icon alone. Framed marks the project or tab on screen; Badge is a count at the top right.
-    public readonly record struct KeyLook(String Title, String Icon, BitmapColor Accent, KeyStyle Style = KeyStyle.Normal, Boolean Framed = false, String Badge = null);
+    // itself is the icon alone. Framed marks the project or tab on screen; Badge is a count at the top right;
+    // Count, on a tile, is a number drawn large over a small icon.
+    public readonly record struct KeyLook(String Title, String Icon, BitmapColor Accent, KeyStyle Style = KeyStyle.Normal, Boolean Framed = false, String Badge = null, String Count = null);
 
-    // Draws every key the plugin shows, in one style: an icon on a clear background, like an app icon,
-    // with no text in the image, because Logi already writes the label under it.
+    // Draws every key the plugin shows. In the menu: an icon on a clear background, with no text in the
+    // image, because Logi already writes the label under it. On your own page: a tile, like an app icon.
     public static class KeyArt
     {
         public static BitmapImage Draw(KeyLook look, PluginImageSize imageSize)
@@ -29,7 +34,12 @@ namespace Loupedeck.HerdrPlugin
             using var builder = new BitmapBuilder(imageSize);
             var w = builder.Width;
             var h = builder.Height;
-            builder.Clear(BitmapColor.Transparent);
+            builder.Clear(look.Style == KeyStyle.Tile ? TileGround : BitmapColor.Transparent);
+            if (look.Style == KeyStyle.Tile)
+            {
+                DrawTile(builder, look, w, h);
+                return builder.ToImage();
+            }
 
             var cx = w / 2f;
             var cy = h / 2f;
@@ -55,18 +65,54 @@ namespace Loupedeck.HerdrPlugin
                 builder.DrawImage(icon, (w - size) / 2, (h - size) / 2, size, size, BitmapRotation.None);
             }
 
-            if (look.Badge != null)
-            {
-                var radius = Math.Max(9, h / 7);
-                var bx = w - radius - 1;
-                var by = radius + 1;
-                builder.FillCircle(bx, by, radius, look.Accent);
+            DrawBadge(builder, look, w, h);
+            return builder.ToImage();
+        }
 
-                // The default font is too big for the badge, so the count gets a size of its own.
-                builder.DrawText(look.Badge, bx - radius, by - radius + radius / 4, radius * 2, radius * 2, AgentStatus.Ground, fontSize: radius * 5 / 4);
+        // Black, like the keypad around it.
+        private static readonly BitmapColor TileGround = AgentStatus.Hex(0x000000);
+
+        private static void DrawTile(BitmapBuilder builder, KeyLook look, Int32 w, Int32 h)
+        {
+            if (look.Count == null)
+            {
+                var size = (Int32)(w * 0.62f);
+                var icon = Icons.Render(look.Icon ?? Icons.Dot, look.Accent, size);
+                if (icon != null)
+                {
+                    builder.DrawImage(icon, (w - size) / 2, (h - size) / 2, size, size, BitmapRotation.None);
+                }
+            }
+            else
+            {
+                // The count large in the upper part, the icon small under it.
+                var fontSize = (Int32)(h * 0.46f);
+                builder.DrawText(look.Count, 0, (Int32)(h * 0.13f), w, (Int32)(h * 0.5f), look.Accent, fontSize: fontSize);
+                var size = (Int32)(w * 0.28f);
+                var icon = Icons.Render(look.Icon ?? Icons.Dot, look.Accent, size);
+                if (icon != null)
+                {
+                    builder.DrawImage(icon, (w - size) / 2, (Int32)(h * 0.64f), size, size, BitmapRotation.None);
+                }
             }
 
-            return builder.ToImage();
+            DrawBadge(builder, look, w, h);
+        }
+
+        private static void DrawBadge(BitmapBuilder builder, KeyLook look, Int32 w, Int32 h)
+        {
+            if (look.Badge == null)
+            {
+                return;
+            }
+
+            var radius = Math.Max(9, h / 7);
+            var bx = w - radius - 1;
+            var by = radius + 1;
+            builder.FillCircle(bx, by, radius, look.Accent);
+
+            // The default font is too big for the badge, so the count gets a size of its own.
+            builder.DrawText(look.Badge, bx - radius, by - radius + radius / 4, radius * 2, radius * 2, AgentStatus.Ground, fontSize: radius * 5 / 4);
         }
 
         // Breaks a label into a few short lines so it fits a key; plain ASCII so every key font has it.

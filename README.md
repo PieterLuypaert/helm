@@ -8,17 +8,17 @@ An issue here is a herdr tab whose agent works on one branch, the way `hagent` o
 
 **Status:** tested against herdr, GitHub and real Claude Code questions.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=f8422494)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=73addbcf)
 
 ## What it does
 
-helm adds three keys you place on your own keypad page, next to your other apps:
+helm adds three keys you place on your own keypad page, next to your other apps: black tiles with a big icon and a short word under it, like your own macros.
 
 | Key | On the key | What it does |
 |---|---|---|
-| **Herdr projects** | an orange stack, Projects | opens the herdr menu on the keypad, on your projects |
-| **Herdr all issues** | a list, "7 issues", with how many need you in a badge | opens the herdr menu on every issue at once, most urgent first |
-| **Open herdr** | a grey terminal, herdr | opens herdr itself in iTerm, like any app key |
+| **Herdr projects** | an orange stack | opens the herdr menu on the keypad, on your projects |
+| **Herdr all issues** | the number of issues over a list, with how many need you in a badge | opens the herdr menu on every issue at once, most urgent first |
+| **Open herdr** | a grey terminal | opens herdr itself in iTerm, like any app key |
 
 - **The herdr menu** goes from your projects, with All issues first, to a project's tabs or every issue at once, to the actions for one issue. `back` always goes one level up. That the All issues key opens the menu by itself is not yet confirmed on the keypad; if it does not, press Projects and then All issues.
 - **Pull requests** show on the issue keys: failing checks, requested changes, ready to merge. helm reads them with the GitHub CLI.

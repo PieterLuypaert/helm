@@ -13,11 +13,12 @@ namespace Loupedeck.HerdrPlugin
             HerdrState.Changed += _ => this.ActionImageChanged();
         }
 
+        // Logi keeps a label strip under every plugin key; a short word fills it, like a macro's label.
         protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
-            Look(HerdrState.Current).Title;
+            HerdrState.HasRead && HerdrState.Current.Offline ? "offline" : "issues";
 
         protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize) =>
-            KeyArt.Draw(Look(HerdrState.Current), imageSize);
+            KeyArt.Draw(TileLook(HerdrState.Current), imageSize);
 
         protected override void RunCommand(String actionParameter)
         {
@@ -45,8 +46,24 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
+        // On your page: the number of issues large on a black tile, over the list, in the same colour.
+        public static KeyLook TileLook(Snapshot snapshot)
+        {
+            // Right after the plugin loads herdr has not been read yet: the list alone, not "offline", because
+            // Logi may draw the key once then and not ask again until something changes.
+            if (!HerdrState.HasRead)
+            {
+                return new KeyLook("issues", Icons.List, AgentStatus.Subtext, KeyStyle.Tile);
+            }
+
+            var look = Look(snapshot);
+            return snapshot.Offline
+                ? look with { Style = KeyStyle.Tile }
+                : look with { Style = KeyStyle.Tile, Count = snapshot.IssueCount().ToString() };
+        }
+
         // A list in the colour of the most urgent issue, with the count of those that need you in a badge.
-        // The Projects page shows the same key.
+        // The Projects page shows the same key, with its label.
         public static KeyLook Look(Snapshot snapshot)
         {
             if (snapshot.Offline)

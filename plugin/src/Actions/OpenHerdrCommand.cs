@@ -12,11 +12,12 @@ namespace Loupedeck.HerdrPlugin
         {
         }
 
+        // Logi keeps a label strip under every plugin key; a short word fills it, like a macro's label.
         protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) => "herdr";
 
-        // Drawn like an app key, a grey terminal rather than herdr's orange, so it does not look like the Projects key.
+        // A grey terminal rather than herdr's orange, so it does not look like the Projects key.
         protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize) =>
-            KeyArt.Draw(new KeyLook("herdr", Icons.Terminal, AgentStatus.Subtext), imageSize);
+            KeyArt.Draw(new KeyLook("herdr", Icons.Terminal, AgentStatus.Subtext, KeyStyle.Tile), imageSize);
 
         protected override void RunCommand(String actionParameter) => Task.Run(Screen.OpenHerdr);
     }
