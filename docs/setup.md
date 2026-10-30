@@ -4,18 +4,18 @@ Everything the README keeps short: every field of the action config, the herdr c
 
 ## Actions
 
-Edit `config/keypad.json`. The plugin reads it again when it changes, so no rebuild is needed. The issue page holds seven actions; any after the seventh do not show. A file that does not parse is reported once in the plugin log, and the defaults apply until you save it again.
+Edit `config/keypad.json`. The plugin reads it again when it changes, so no rebuild is needed. The issue page holds at most seven actions at once; any after the seventh that fit do not show. A file that does not parse is reported once in the plugin log, and the defaults apply until you save it again.
 
 | Field | Meaning |
 |---|---|
 | `type: "prompt"` | `value` plus Enter, to the issue's agent (`herdr agent prompt`) |
 | `type: "keys"` | key presses for the issue's agent, space separated: `enter`, `esc`, `ctrl+c` |
 | `type: "shell"` | a command run in the issue's worktree, with `$ISSUE_CWD` set |
-| `type: "open-pr"` | opens the issue's pull request in the browser; greyed out while the issue has none |
+| `type: "open-pr"` | opens the issue's pull request in the browser; shown only while the issue has one |
 | `icon` | the key's icon by name, such as `play`, `tool` or `commit`; the names are the constants in `plugin/src/Helpers/Icons.cs`. Without one, the key gets an icon that fits its type |
 | `color` | the circle behind the icon when the key lights up, `#RRGGBB` |
 | `when` | the issue statuses in which the key lights up, such as `["go?"]`; the statuses are in [How it works](flows.md#statuses) |
-| `onlyWhen` | the statuses in which the key works at all; it is greyed out in the others |
+| `onlyWhen` | the statuses in which the key shows on the issue's page; it is left off in the others. Without it, the key always shows |
 | `terminalBundleId` | the app brought to the front when you pick an issue (iTerm2 by default); `""` leaves focus alone |
 | `planPattern` | a regular expression for a line in an idle agent's output that marks a plan waiting for your go; by default `^\s*(Single PR:|PR 1:)` |
 | `openHerdrWhenClosed` | with no herdr window open, picking an issue opens a new iTerm window and starts herdr in it, on that issue (iTerm only; `true` by default). macOS asks once whether the Logi Plugin Service may control iTerm |

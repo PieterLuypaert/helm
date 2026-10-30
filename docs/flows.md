@@ -2,7 +2,7 @@
 
 How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=73addbcf)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=e9e13577)
 
 ## Your page
 
@@ -20,11 +20,15 @@ Whatever you do on one, the other follows. Pressing a tab on the keypad shows it
 
 You still reach every project and every issue from the keypad; the rule only concerns the issue whose page is open.
 
+## Issue names
+
+A key names an issue after its branch, kept short: the type prefix such as `feat/` and the words most issues share go, and what is left keeps its number and at most two words that carry meaning. `feat/shop-slice-3-invite-and-accept-members` reads `3 invite accept`.
+
 ## Statuses
 
-Every key shows an icon and a word for its issue, from its agent and its pull request, in herdr's colours. The agent wins while it asks or works; after that the pull request speaks.
+Every key shows one icon per colour for its issue, from its agent and its pull request, in herdr's colours. The agent wins while it asks or works; after that the pull request speaks. The issue's own page names the exact status, such as `7 checkout · CI failed`.
 
-![What a key can say](statuses.svg?v=d17463f6)
+![What a key can say](statuses.svg?v=f0cd7745)
 
 | Colour | Status | Meaning |
 |---|---|---|
@@ -35,12 +39,11 @@ Every key shows an icon and a word for its issue, from its agent and its pull re
 | green | `done` | the agent finished its turn: look at the result |
 | blue | `ready` | the pull request is approved and its checks pass: yours to merge |
 | yellow | `working` | the agent is busy |
-| grey | `review`, `draft` | the pull request waits on a review, or is a draft |
-| dark grey | `idle`, `merged`, `closed` | nothing going on, or nothing left to do |
+| grey | `review`, `draft`, `idle`, `merged`, `closed` | nothing for you: a review or a draft, nothing going on, or nothing left to do |
 
 A plan is a line in the agent's last output that matches `planPattern` in `config/keypad.json`; by default a line starting with `Single PR:` or `PR 1:`.
 
-A project key takes the colour of its most urgent tab, with how many of its tabs need you in a badge. A white ring marks the project and the tab that are on screen.
+A project key takes the colour of its most urgent tab, with how many of its tabs need you in a badge.
 
 ## Navigation
 
@@ -50,7 +53,7 @@ flowchart TD
     allIssues["All issues key<br/>on your page"] --> overview
     projects <-->|"press All issues · back"| overview["All issues<br/>every issue, most urgent first"]
     projects <-->|"press a project · back"| project["Project<br/>main tab, then issues"]
-    overview <-->|"press an issue · back"| issue["Issue<br/>seven actions and back"]
+    overview <-->|"press an issue · back"| issue["Issue<br/>the actions that fit, and back"]
     project <-->|"press a tab · back"| issue
     projects -->|"Logi's back key"| closed(["Menu closed"])
 ```
@@ -64,9 +67,9 @@ flowchart TD
 
 All issues counts your issues across every project, such as "9 issues", with how many need you in a badge in the colour of the most urgent one. Main tabs are not issues, so they do not count. It sits on your page and first on the projects page; both open the overview, so you can go through every issue in detail.
 
-![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=17b6934c)
+![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=c1337b21)
 
-The overview sorts by status: waiting, go?, CI failed, changes and done, which need you, then ready, working, review, draft and idle. Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. The order is set when you open the overview and holds while you page through it and visit its issues, so keys do not move under your fingers; a closed tab drops out and a new one joins at the end. Open it again for a fresh order. A main tab, or an issue shown beside other projects' issues, names its project, such as "4 search · project A".
+The overview sorts by status: waiting, go?, CI failed, changes and done, which need you, then ready, working, review, draft and idle. Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. The order is set when you open the overview and holds while you page through it and visit its issues, so keys do not move under your fingers; a closed tab drops out and a new one joins at the end. Open it again for a fresh order. A main tab goes by its project's name, and an issue shown beside other projects' issues names its project, such as "4 search · project A".
 
 The key on your page opens the menu through a generic action of the Logi plugin API that is not documented for folders. If the menu does not open, press Projects and then All issues.
 
@@ -90,7 +93,7 @@ sequenceDiagram
 ```
 
 - **On an issue page** the keypad follows the tab herdr shows, across projects too.
-- **On the projects, project and overview pages** it does not jump, because you are browsing there; it marks what is on screen with a white ring instead.
+- **On the projects, project and overview pages** it does not jump, because you are browsing there.
 - **Only a change on the screen counts.** Right after a key press herdr may still show the previous tab for a moment; the keypad does not jump back to it.
 
 ## Picking a tab
@@ -108,15 +111,21 @@ The herdr server keeps running after iTerm closes, so statuses and actions work 
 
 ## The issue page
 
-The page shows the issue with its status, and its pull request number when it has one, seven actions and `back`. The action that fits the issue's status lights up as a filled circle in its colour; an action that does nothing in that status is greyed out.
+The page shows the issue with its exact status, the actions that fit it now, and `back`. The one that fits best lights up as a filled circle in its colour. Actions that do nothing in that status are left off, so the page holds two to four keys.
 
-| Issue status | Lights up | Greyed out |
+| Issue status | Shows | Lights up |
 |---|---|---|
-| `go?` | `go` | `open PR` without a pull request |
-| `CI failed`, `changes` | `babysit pr` | |
-| `done` | `review and fix` | |
-| `ready` | `open PR` | |
-| `waiting` | the page shows the agent's question instead, see below | |
+| `go?` | `go`, `editor` | `go` |
+| `working` | `stop`, `editor` | |
+| `done` | `review and fix`, `commit`, `editor` | `review and fix` |
+| `idle` | `review and fix`, `commit`, `editor` | |
+| `CI failed`, `changes` | `babysit pr`, `open PR`, `editor` | `babysit pr` |
+| `review`, `draft` | `babysit pr`, `open PR`, `editor` | |
+| `ready` | `open PR`, `editor` | `open PR` |
+| `merged`, `closed` | `open PR`, `editor` | |
+| `waiting` | the agent's question instead, see below | |
+
+`open PR` shows whenever the issue has a pull request.
 
 | Key | What it does |
 |---|---|
@@ -130,13 +139,13 @@ The page shows the issue with its status, and its pull request number when it ha
 | `editor` | opens the issue's worktree with `hopen` |
 | `back` | back to the project, or to the overview when you came from there |
 
-The actions, and when they light up or grey out, come from `config/keypad.json`; see [Setup details](setup.md) to change them.
+The actions, and when they show or light up, come from `config/keypad.json`; see [Setup details](setup.md) to change them.
 
 ## Answering a question
 
 While an agent waits on you, its page shows the question it asks, such as Claude Code's permission prompt, with one key per choice exactly as the screen lists them.
 
-![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](answer.svg?v=94af0439)
+![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](answer.svg?v=016fb737)
 
 - **Each key sends its own choice.** A numbered choice is picked by the number the screen shows, which is not always its position: in Claude Code 2.1, `No` is choice 4, after `Yes, and switch to auto mode`. Choices without numbers, such as the folder-trust question, are reached with the arrow keys from the selected one, then Enter.
 - **Nothing is sent blind.** Just before sending, helm reads the question again; when the choices changed, it sends nothing, the key reads `changed`, and the keys show the new choices on the next read.
@@ -148,9 +157,9 @@ While an agent waits on you, its page shows the question it asks, such as Claude
 
 ```mermaid
 flowchart TD
-    press["Press an action"] --> dim{"Is it greyed out?"}
-    dim -->|yes| notNow["The key flashes: not now<br/>nothing is sent"]
-    dim -->|no| send["Send it to the issue's agent"]
+    press["Press an action"] --> fits{"Does it still fit the issue?<br/>its status may have just changed"}
+    fits -->|no| notNow["The key flashes: not now<br/>nothing is sent"]
+    fits -->|yes| send["Send it to the issue's agent"]
     send --> taken{"Did herdr take it?"}
     taken -->|yes| sent["The key flashes: sent<br/>herdr shows: go: 7 checkout"]
     taken -->|no| failed["The key flashes the reason, such as waits on you<br/>herdr shows: go not sent"]

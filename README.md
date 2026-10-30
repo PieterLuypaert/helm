@@ -8,7 +8,7 @@ An issue here is a herdr tab whose agent works on one branch, the way `hagent` o
 
 **Status:** tested against herdr, GitHub and real Claude Code questions.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=73addbcf)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=e9e13577)
 
 ## What it does
 
@@ -22,13 +22,13 @@ helm adds three keys you place on your own keypad page, next to your other apps:
 
 - **The herdr menu** goes from your projects, with All issues first, to a project's tabs or every issue at once, to the actions for one issue. `back` always goes one level up. That the All issues key opens the menu by itself is not yet confirmed on the keypad; if it does not, press Projects and then All issues.
 - **Pull requests** show on the issue keys: failing checks, requested changes, ready to merge. helm reads them with the GitHub CLI.
-- **Actions** such as go, review, babysit and commit go to that issue's agent. The one that fits lights up, and every press is confirmed on the key and in herdr.
+- **Actions** such as go, review, babysit and commit go to that issue's agent. The issue's page shows only the ones that fit it now, the best one lit up, and every press is confirmed on the key and in herdr.
 - **Questions** an agent asks, such as a permission prompt, show as one key per choice, exactly as the screen lists them. helm reads the question again just before it answers, and sends nothing when it changed.
 - **The keypad follows the screen.** Switch tabs in herdr and the keypad's issue page moves along.
 
-Every key shows how its issue is doing with an icon and a word, and its colour says what you do next: red answer or fix, orange decide, green look at the result, blue merge.
+Every key shows how its issue is doing with one icon per colour, and the colour says what you do next: red answer or fix, orange decide, green look at the result, blue merge, yellow wait, grey nothing for you. The issue's own page names the exact status.
 
-![What a key can say: waiting, go?, working and done come from the agent; CI failed, changes, review and ready from the pull request](docs/statuses.svg?v=d17463f6)
+![What a key can say: one icon per colour, with the statuses behind each](docs/statuses.svg?v=f0cd7745)
 
 A plan counts when the agent's output has a line starting with `Single PR:` or `PR 1:`; change `planPattern` in the config to match your own format.
 
@@ -40,7 +40,7 @@ When an agent waits on you, for a permission or a choice, its key turns red with
 2. **Pick your answer:** the issue's page shows the question's choices, one key each, with the numbers your screen shows: `1 Yes`, `2 Always`, `3 Auto mode`, `4 No`. Each choice carries the issue's name under it, and your screen shows that same issue, so you always know whose question you answer. Press the one you want.
 3. **See it land:** the key flashes `sent` and herdr shows a notification. If the question changed in the meantime, nothing is sent and the key reads `changed`.
 
-![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](docs/answer.svg?v=94af0439)
+![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](docs/answer.svg?v=016fb737)
 
 A question the keys cannot hold, such as one that wants typed text, shows `answer on screen`: that key brings the issue's tab to the front so you answer it there.
 

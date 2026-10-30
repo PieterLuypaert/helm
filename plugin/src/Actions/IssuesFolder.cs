@@ -276,7 +276,7 @@ namespace Loupedeck.HerdrPlugin
         private void RunAction(String param, IssueAction action, Issue tab)
         {
             var label = (action.Label ?? action.Value ?? "action").Replace('\n', ' ');
-            if (StyleFor(action, tab) == KeyStyle.Dim)
+            if (!Fits(action, tab))
             {
                 this.Flash(param, new KeyLook("not now", Icons.Ban, AgentStatus.Overlay, KeyStyle.Highlight));
                 return;
@@ -532,8 +532,9 @@ namespace Loupedeck.HerdrPlugin
                     }
                     else if (tab != null)
                     {
-                        // Seven keys between the issue and the way back: actions past the seventh do not fit.
-                        names.AddRange(Enumerable.Range(0, Math.Min(KeypadConfig.Current.Actions.Count, Keys - 2)).Select(i => FolderKeys.Keyed(ActionPrefix, i, tab.TabId)));
+                        // Only the actions that fit the issue now, at most seven between the issue and the way back.
+                        var actions = KeypadConfig.Current.Actions;
+                        names.AddRange(Enumerable.Range(0, actions.Count).Where(i => Fits(actions[i], tab)).Take(Keys - 2).Select(i => FolderKeys.Keyed(ActionPrefix, i, tab.TabId)));
                     }
 
                     names.Add(BackToProjectParam);
@@ -580,7 +581,6 @@ namespace Loupedeck.HerdrPlugin
                     return flash.Look;
                 }
 
-                var focus = this._snapshot.FocusedTabId;
                 var nav = AgentStatus.Subtext;
                 switch (param)
                 {
@@ -605,11 +605,12 @@ namespace Loupedeck.HerdrPlugin
                             return new KeyLook("", Icons.Dot, AgentStatus.Overlay);
                         }
 
-                        // The issue, and what it waits on: the command it asks about, or its pull request.
+                        // The issue and its exact status, which its icon groups with others: "7 checkout · CI
+                        // failed". While it waits on you, what it asks about instead, such as the command.
                         var about = selected.Status == AgentStatus.Waiting
-                            ? selected.Question?.Detail ?? selected.Question?.Title
-                            : selected.Pr != null ? $"PR {selected.Pr.Number}" : null;
-                        return new KeyLook(about == null ? selected.ShortName : $"{selected.ShortName} · {about}", AgentStatus.Icon(selected.Status), AgentStatus.Color(selected.Status));
+                            ? selected.Question?.Detail ?? selected.Question?.Title ?? selected.Status
+                            : selected.Status;
+                        return new KeyLook($"{selected.ShortName} · {about}", AgentStatus.Icon(selected.Status), AgentStatus.Color(selected.Status));
                 }
 
                 if (param.StartsWith(ProjectPrefix))
@@ -621,9 +622,7 @@ namespace Loupedeck.HerdrPlugin
                     }
 
                     var needsYou = project.Tabs.Count(t => AgentStatus.NeedsYou(t.Status));
-                    return new KeyLook(project.Name, Icons.Folder, AgentStatus.Color(project.Status),
-                        Framed: focus != null && project.Tabs.Any(t => t.TabId == focus),
-                        Badge: needsYou > 0 ? needsYou.ToString() : null);
+                    return new KeyLook(project.Name, Icons.Folder, AgentStatus.Color(project.Status), Badge: needsYou > 0 ? needsYou.ToString() : null);
                 }
 
                 if (param.StartsWith(TabPrefix))
@@ -637,10 +636,11 @@ namespace Loupedeck.HerdrPlugin
                     // The main tab keeps its house while it rests; any other state shows like an issue's.
                     var icon = tab.IsMain && tab.Status == AgentStatus.Idle ? Icons.Home : AgentStatus.Icon(tab.Status);
 
-                    // In the overview of all issues, a main tab or a tab beside other projects' says whose it is.
+                    // In the overview of all issues, a main tab goes by its project's name, and an issue beside
+                    // other projects' issues says whose it is.
                     var several = this._snapshot.Projects.Count(p => p.Tabs.Any(t => !t.IsMain)) > 1;
-                    var label = this._all && (tab.IsMain || several) ? $"{tab.ShortName} · {owner.Name}" : tab.ShortName;
-                    return new KeyLook(label, icon, AgentStatus.Color(tab.Status), Framed: tab.TabId == focus);
+                    var label = !this._all ? tab.ShortName : tab.IsMain ? owner.Name : several ? $"{tab.ShortName} · {owner.Name}" : tab.ShortName;
+                    return new KeyLook(label, icon, AgentStatus.Color(tab.Status));
                 }
 
                 if (FolderKeys.TryParseKeyed(param, AnswerPrefix, out var choiceIndex, out var askingId))
@@ -693,22 +693,22 @@ namespace Loupedeck.HerdrPlugin
                 _ => Icons.Play,
             };
 
-        // Greyed out where it does nothing, lit up where it fits the issue's status.
-        private static KeyStyle StyleFor(IssueAction action, Issue tab)
+        // Whether an action belongs on the issue's page now: open PR only with a pull request, and an action
+        // with onlyWhen only in those statuses. The page shows nothing else, so nothing is greyed out.
+        private static Boolean Fits(IssueAction action, Issue tab)
         {
             var status = tab?.Status ?? AgentStatus.Unknown;
             if (action.Type == "open-pr" && tab?.Pr == null)
             {
-                return KeyStyle.Dim;
+                return false;
             }
 
-            if (action.OnlyWhen != null && action.OnlyWhen.Count > 0 && !action.OnlyWhen.Contains(status))
-            {
-                return KeyStyle.Dim;
-            }
-
-            return action.When != null && action.When.Contains(status) ? KeyStyle.Highlight : KeyStyle.Normal;
+            return action.OnlyWhen == null || action.OnlyWhen.Count == 0 || action.OnlyWhen.Contains(status);
         }
+
+        // Lit up where it is the step that fits the issue's status.
+        private static KeyStyle StyleFor(IssueAction action, Issue tab) =>
+            action.When != null && action.When.Contains(tab?.Status ?? AgentStatus.Unknown) ? KeyStyle.Highlight : KeyStyle.Normal;
 
         private static BitmapColor? ParseHex(String hex)
         {

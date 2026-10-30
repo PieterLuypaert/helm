@@ -39,7 +39,7 @@ class Picture:
     def __init__(self, title):
         self.title, self.parts = title, []
 
-    def key(self, x, y, label="", icon=None, color=TEXT, style="normal", framed=False, badge=None, empty=False, count=None):
+    def key(self, x, y, label="", icon=None, color=TEXT, style="normal", badge=None, empty=False, count=None):
         """A key as the keypad shows it: the icon, and under it the label Logi writes. A tile, on your own
         page, is a big icon or a count over a small icon on black, with a short label under it."""
         p = self.parts
@@ -72,9 +72,7 @@ class Picture:
             ink = GROUND
         elif style == "dim":
             ink = OVERLAY
-        if framed:
-            p.append(f'<circle cx="{cx}" cy="{cy}" r="19" fill="none" stroke="{TEXT}" stroke-width="2"/>')
-        size = 20 if style == "highlight" or framed else 26
+        size = 20 if style == "highlight" else 26
         if icon:
             p.append(f'<g transform="translate({cx - size / 2} {cy - size / 2}) scale({size / 24})" fill="none" stroke="{ink}" '
                      f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{ICONS[icon]}</g>')
@@ -104,10 +102,7 @@ class Picture:
         for row in rows:
             cx = x
             for color, text in row:
-                if color:
-                    self.parts.append(f'<rect x="{cx}" y="{y - 10}" width="12" height="12" rx="3" fill="{color}"/>')
-                else:
-                    self.parts.append(f'<circle cx="{cx + 7}" cy="{y - 4}" r="6" fill="none" stroke="{LABEL}" stroke-width="2"/>')
+                self.parts.append(f'<rect x="{cx}" y="{y - 10}" width="12" height="12" rx="3" fill="{color}"/>')
                 self.text(cx + 20, y, text, 12, "400")
                 cx += 20 + len(text) * 6.6 + 34
             y += 22
@@ -135,10 +130,11 @@ def wrap(label, width=14):
 
 
 EMPTY = dict(empty=True)
+# One icon per colour, as the plugin draws them (AgentStatus.Icon).
 STATUS = {
-    "waiting": ("Question", RED), "go?": ("Plan", ACCENT), "CI failed": ("Alert", RED), "changes": ("Report", RED),
-    "done": ("Check", GREEN), "ready": ("Merge", BLUE), "working": ("Working", YELLOW), "review": ("Eye", SUBTEXT),
-    "idle": ("Sleep", OVERLAY),
+    "waiting": ("Alert", RED), "CI failed": ("Alert", RED), "changes": ("Alert", RED), "go?": ("Plan", ACCENT),
+    "done": ("Check", GREEN), "ready": ("Merge", BLUE), "working": ("Working", YELLOW),
+    "review": ("Sleep", OVERLAY), "draft": ("Sleep", OVERLAY), "idle": ("Sleep", OVERLAY),
 }
 
 
@@ -172,7 +168,7 @@ def flow():
     pic.text(px, 56, "all issues, then one key per workspace", 11, "400")
     pic.grid(px, top, [
         dict(label="9 issues", icon="List", color=RED, badge="2"),
-        dict(label="project A", icon="Folder", color=RED, framed=True, badge="2"),
+        dict(label="project A", icon="Folder", color=RED, badge="2"),
         dict(label="project B", icon="Folder", color=YELLOW),
         dict(label="project C", icon="Folder", color=OVERLAY),
         EMPTY, EMPTY, EMPTY, EMPTY,
@@ -188,7 +184,7 @@ def flow():
         issue("4 search", "working"),
         issue("5 export", "idle"),
         issue("6 dark mode", "waiting"),
-        issue("7 checkout", "go?", framed=True),
+        issue("7 checkout", "go?"),
         issue("8 settings", "idle"),
         dict(label="more 1/2", icon="Dots", color=SUBTEXT),
         dict(label="back", icon="Back", color=SUBTEXT),
@@ -196,17 +192,13 @@ def flow():
 
     tx = qx + step
     pic.text(tx, 40, "3. Issue: 7 checkout")
-    pic.text(tx, 56, "the action that fits lights up", 11, "400")
+    pic.text(tx, 56, "only the actions that fit", 11, "400")
     pic.grid(tx, top, [
-        issue("7 checkout", "go?"),
+        issue("7 checkout · go?", "go?"),
         dict(label="go", icon="Play", color=ACCENT, style="highlight"),
-        dict(label="review and fix", icon="Tool"),
-        dict(label="babysit pr", icon="Lifebuoy"),
-        dict(label="commit", icon="Commit"),
-        dict(label="stop", icon="Stop"),
-        dict(label="open PR", icon="PullRequest", style="dim"),
         dict(label="editor", icon="Code"),
         dict(label="back", icon="Back", color=SUBTEXT),
+        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
     ])
 
     fy = top + 3 * (K + G) + 30
@@ -220,29 +212,29 @@ def flow():
 
     y = pic.legend(20, fy + 12 + K + 34, [
         [(RED, "answer or fix"), (ACCENT, "decide"), (GREEN, "look at the result"), (BLUE, "merge"), (YELLOW, "working"),
-         (OVERLAY, "quiet"), (None, "white ring: on screen")],
+         (OVERLAY, "quiet")],
     ])
     pic.save("keypad.svg", tx + 3 * K + 2 * G + 20, y + 4)
 
 
 def statuses():
-    """Every word a key can show, with what it means."""
-    pic, top = Picture("What a key can say"), 64
+    """One icon per colour, and the statuses behind each."""
+    pic, top = Picture("What a key can say"), 40
     slot = 112
     groups = [
-        ("The agent", [("waiting", "asks you\nsomething"), ("go?", "a plan waits\nfor your go"), ("working", "is busy"), ("done", "finished\nits turn")]),
-        ("The pull request", [("CI failed", "checks fail"), ("changes", "changes\nrequested"), ("review", "waits on\na review"), ("ready", "approved,\nyours to merge")]),
+        ("waiting", "answer or fix", "waiting, CI failed,\nchanges"),
+        ("go?", "decide", "go?: a plan waits\nfor your go"),
+        ("done", "look at result", "done: finished\nits turn"),
+        ("ready", "merge", "ready: approved,\nchecks pass"),
+        ("working", "working", "working"),
+        ("idle", "quiet", "review, draft, idle,\nmerged, closed"),
     ]
-    x0 = 20
-    for name, keys in groups:
-        pic.text(x0, 34, name)
-        for i, (word, meaning) in enumerate(keys):
-            x = x0 + i * slot
-            pic.key(x, top, **issue(word, word))
-            pic.text(x + K / 2, top + K + 20, meaning, 11, "400", "middle")
-        x0 += 4 * slot + 30
-    pic.text(20, top + K + 70, "Each status has its own icon and colour. The agent wins while it asks or works; after that the pull request speaks.", 12, "400")
-    pic.save("statuses.svg", 4 * slot * 2 + 50, top + K + 84)
+    for i, (status, word, statuses) in enumerate(groups):
+        x = 20 + i * slot
+        pic.key(x, top, **issue(word, status))
+        pic.text(x + K / 2, top + K + 20, statuses, 11, "400", "middle")
+    pic.text(20, top + K + 70, "One icon per colour. The issue's own page names its exact status, such as 7 checkout · CI failed.", 12, "400")
+    pic.save("statuses.svg", 6 * slot + 10, top + K + 84)
 
 
 def all_issues():
