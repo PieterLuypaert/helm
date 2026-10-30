@@ -124,11 +124,12 @@ The actions, and when they light up or grey out, come from `config/keypad.json`;
 
 While an agent waits on you, its page shows the question it asks, such as Claude Code's permission prompt, with one key per choice exactly as the screen lists them.
 
-![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](answer.svg?v=a7bf11fc)
+![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](answer.svg?v=23aa5a7c)
 
 - **Each key sends its own choice.** A numbered choice is picked by the number the screen shows, which is not always its position: in Claude Code 2.1, `No` is choice 4, after `Yes, and switch to auto mode`. Choices without numbers, such as the folder-trust question, are reached with the arrow keys from the selected one, then Enter.
 - **Nothing is sent blind.** Just before sending, helm reads the question again; when the choices changed, it sends nothing and the key reads `changed`.
 - **A question helm cannot read** shows only `answer on screen`, which brings the issue's tab to the front so you answer it there.
+- **Every choice names its issue.** Each choice key carries the issue's name under it, the top-left key shows the issue and what it asks about, and the screen shows that same issue.
 - **Yes in green, No in red,** anything else neutral, so the answer reads at a glance.
 
 ## Pressing an action

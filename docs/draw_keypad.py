@@ -246,10 +246,10 @@ def answer():
     pic.text(kx, 56, "the same choices, one key each", 11, "400")
     pic.grid(kx, top, [
         dict(title="6 dark\nmode", sub="npm test", accent=RED),
-        dict(title="1 Yes", accent=GREEN),
-        dict(title="2 Always", accent=GREEN),
-        dict(title="3 Auto\nmode", accent=SUBTEXT),
-        dict(title="4 No", accent=RED),
+        dict(title="1 Yes", sub="6 dark mode", accent=GREEN),
+        dict(title="2 Always", sub="6 dark mode", accent=GREEN),
+        dict(title="3 Auto\nmode", sub="6 dark mode", accent=SUBTEXT),
+        dict(title="4 No", sub="6 dark mode", accent=RED),
         dict(title="answer on\nscreen", accent=SUBTEXT),
         EMPTY, EMPTY,
         dict(title="terug", sub="project A", accent=OVERLAY),

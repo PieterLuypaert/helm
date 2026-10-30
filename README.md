@@ -36,10 +36,10 @@ A plan counts when the agent's output has a line starting with `Single PR:` or `
 When an agent waits on you, for a permission or a choice, its key turns red with `waiting`. To answer it from the keypad:
 
 1. **Go to the issue:** press the status key, which jumps to the most urgent issue, or open it through Issues, its project and its key.
-2. **Pick your answer:** the issue's page shows the question's choices, one key each, with the numbers your screen shows: `1 Yes`, `2 Always`, `3 Auto mode`, `4 No`. Press the one you want.
+2. **Pick your answer:** the issue's page shows the question's choices, one key each, with the numbers your screen shows: `1 Yes`, `2 Always`, `3 Auto mode`, `4 No`. Each choice carries the issue's name under it, and your screen shows that same issue, so you always know whose question you answer. Press the one you want.
 3. **See it land:** the key flashes `sent` and herdr shows a notification. If the question changed in the meantime, nothing is sent and the key reads `changed`.
 
-![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](docs/answer.svg?v=a7bf11fc)
+![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](docs/answer.svg?v=23aa5a7c)
 
 A question helm cannot read, such as one that wants typed text, shows only `answer on screen`: that key brings the issue's tab to the front so you answer it there.
 
