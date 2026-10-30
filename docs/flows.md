@@ -101,7 +101,7 @@ The page shows the ticket with its status, seven actions and `terug`. The action
 | `editor` | opens the ticket's worktree with `hopen` |
 | `terug` | back to the project |
 
-The actions, and when they light up or grey out, come from `config/keypad.json`; see the README to change them.
+The actions, and when they light up or grey out, come from `config/keypad.json`; see [Setup details](setup.md) to change them.
 
 ## Pressing an action
 
