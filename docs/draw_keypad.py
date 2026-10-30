@@ -16,6 +16,7 @@ import re
 RED, ACCENT, YELLOW, GREEN, BLUE = "#ff8080", "#f36a1b", "#ffc799", "#99ffe4", "#82aaff"
 OVERLAY, SUBTEXT, GROUND, TEXT = "#5c5c5c", "#afb6c2", "#24282d", "#ebf0ec"
 KEY = "#2b2d30"       # a keypad key
+TILE = "#1c1f23"      # a herdr key on your own page
 LABEL = "#8b949e"
 K, G = 76, 8          # key size and gap
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -38,12 +39,29 @@ class Picture:
     def __init__(self, title):
         self.title, self.parts = title, []
 
-    def key(self, x, y, label="", icon=None, color=TEXT, style="normal", framed=False, badge=None, empty=False):
-        """A key as the keypad shows it: the icon, and under it the label Logi writes."""
+    def key(self, x, y, label="", icon=None, color=TEXT, style="normal", framed=False, badge=None, empty=False, count=None):
+        """A key as the keypad shows it: the icon, and under it the label Logi writes. A tile, on your own
+        page, is a big icon or a count over a small icon on dark grey, with no label."""
         p = self.parts
         if empty:
             p.append(f'<rect x="{x}" y="{y}" width="{K}" height="{K}" rx="10" fill="none" stroke="{LABEL}" '
                      f'stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>')
+            return
+        if style == "tile":
+            p.append(f'<rect x="{x}" y="{y}" width="{K}" height="{K}" rx="10" fill="{TILE}"/>')
+            cx = x + K / 2
+            if count is None:
+                size = 44
+                p.append(f'<g transform="translate({cx - size / 2} {y + K / 2 - size / 2}) scale({size / 24})" fill="none" stroke="{color}" '
+                         f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{ICONS[icon]}</g>')
+            else:
+                p.append(f'<text x="{cx}" y="{y + 38}" text-anchor="middle" font-size="30" font-weight="400" fill="{color}">{html.escape(count)}</text>')
+                size = 20
+                p.append(f'<g transform="translate({cx - size / 2} {y + 46}) scale({size / 24})" fill="none" stroke="{color}" '
+                         f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{ICONS[icon]}</g>')
+            if badge:
+                p.append(f'<circle cx="{x + K - 13}" cy="{y + 12}" r="8" fill="{color}"/>')
+                p.append(f'<text x="{x + K - 13}" y="{y + 15.5}" text-anchor="middle" font-size="10" font-weight="600" fill="{GROUND}">{html.escape(badge)}</text>')
             return
         p.append(f'<rect x="{x}" y="{y}" width="{K}" height="{K}" rx="10" fill="{KEY}"/>')
         cx, cy = x + K / 2, y + 27
@@ -139,14 +157,14 @@ def flow():
     pic.grid(x0, top, [
         dict(label="Spotify", icon="Music"),
         dict(label="Claude", icon="Sparkles"),
-        dict(label="9 issues", icon="List", color=RED, badge="2"),
+        dict(icon="List", color=RED, badge="2", style="tile", count="9"),
         dict(label="ChatGPT", icon="Chatbot"),
-        dict(label="herdr", icon="Terminal", color=SUBTEXT),
-        dict(label="Projects", icon="Stack", color=ACCENT),
+        dict(icon="Terminal", color=SUBTEXT, style="tile"),
+        dict(icon="Stack", color=ACCENT, style="tile"),
         EMPTY, EMPTY, EMPTY,
     ])
-    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, each with its own job:\n" + "Projects opens the herdr menu on your projects.\n"
-             + "The terminal, herdr, opens herdr in iTerm.\n" + "The list, All issues, opens every issue at\nonce, most urgent first; the badge counts\nthose that need you.", 11, "400")
+    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, dark tiles like app icons:\n" + "The stack, Projects, opens the herdr menu.\n"
+             + "The terminal opens herdr in iTerm.\n" + "The count, All issues, opens every issue at\nonce, most urgent first; the badge counts\nthose that need you.", 11, "400")
 
     px = x0 + step
     pic.text(px, 40, "1. Projects")
@@ -231,7 +249,7 @@ def all_issues():
     pic, top = Picture("All your issues at once"), 64
     pic.text(20, 40, "All issues")
     pic.text(20, 56, "on your page", 11, "400")
-    pic.key(30, top + K + G, "9 issues", "List", RED, badge="2")
+    pic.key(30, top + K + G, icon="List", color=RED, badge="2", style="tile", count="9")
 
     ox = 150
     pic.text(ox, 40, "The overview")
