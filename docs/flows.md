@@ -41,7 +41,7 @@ Every key shows one icon per colour for its issue, from its agent and its pull r
 | yellow | `working` | the agent is busy |
 | grey | `review`, `draft`, `idle`, `merged`, `closed` | nothing for you: a review or a draft, nothing going on, or nothing left to do |
 
-A plan is a line in the agent's last output that matches `planPattern` in `config/keypad.json`; by default a line starting with `Single PR:` or `PR 1:`.
+A plan is a line in the agent's last 60 lines of output that matches `planPattern` in `config/keypad.json`; by default a line starting with `Single PR:` or `PR 1:`.
 
 A project key is a white folder with how many issues the project has, such as `project A · 7 issues`. A badge says how many of its tabs need you, in the colour of the most urgent one.
 
@@ -118,15 +118,15 @@ The page shows the issue with its exact status, the actions that fit it now, and
 |---|---|---|
 | `go?` | `go`, `editor` | `go` |
 | `working` | `stop`, `editor` | |
-| `done` | `review and fix`, `commit`, `editor` | `review and fix` |
-| `idle` | `review and fix`, `commit`, `editor` | |
+| `done` | `go`, `review and fix`, `commit`, `editor` | `review and fix` |
+| `idle` | `go`, `review and fix`, `commit`, `editor` | |
 | `CI failed`, `changes` | `babysit pr`, `open PR`, `editor` | `babysit pr` |
 | `review`, `draft` | `babysit pr`, `open PR`, `editor` | |
 | `ready` | `open PR`, `editor` | `open PR` |
 | `merged`, `closed` | `open PR`, `editor` | |
 | `waiting` | the agent's question instead, see below | |
 
-`open PR` shows whenever the issue has a pull request.
+`open PR` shows whenever the issue has a pull request. `go` also shows on a quiet issue, so you can give the go when helm did not recognise the plan; it lights up only on `go?`.
 
 | Key | What it does |
 |---|---|
@@ -184,7 +184,7 @@ flowchart TD
     tick["Every two seconds"] --> read["Read workspaces, tabs and agents from herdr"]
     read --> reachable{"Is herdr reachable?"}
     reachable -->|no| offline["The folder shows herdr offline<br/>press it to retry"]
-    reachable -->|yes| plan["For an idle or done agent whose state changed:<br/>read its last 30 lines for a plan"]
+    reachable -->|yes| plan["For an idle or done agent whose state changed:<br/>read its last 60 lines for a plan"]
     plan --> status["Combine the agent with its pull request<br/>into one status word"]
     status --> changed{"Did anything change?"}
     changed -->|no| quiet["Nothing to redraw"]

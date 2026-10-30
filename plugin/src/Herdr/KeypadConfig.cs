@@ -43,7 +43,7 @@ namespace Loupedeck.HerdrPlugin
 
         public List<IssueAction> Actions { get; set; } = new()
         {
-            new() { Label = "go", Type = "prompt", Value = "go", Color = "#f36a1b", Icon = "play", When = new() { "go?" }, OnlyWhen = new() { "go?" } },
+            new() { Label = "go", Type = "prompt", Value = "go", Color = "#f36a1b", Icon = "play", When = new() { "go?" }, OnlyWhen = new() { "go?", "idle", "done" } },
             new() { Label = "review\nand fix", Type = "prompt", Value = "/review-and-fix", Icon = "tool", When = new() { "done" }, OnlyWhen = new() { "done", "idle" } },
             new() { Label = "babysit\npr", Type = "prompt", Value = "/babysit-pr", Icon = "lifebuoy", When = new() { "CI failed", "changes" }, OnlyWhen = new() { "CI failed", "changes", "review", "draft" } },
             new() { Label = "commit", Type = "prompt", Value = "Commit the work in several logical commits, each with its own conventional-commit message.", Icon = "commit", OnlyWhen = new() { "done", "idle" } },

@@ -276,6 +276,9 @@ namespace Loupedeck.HerdrPlugin
             Plans.Clear();
         }
 
+        // How far back a plan's first line may sit: a long plan, or the prompt box under it, pushes it up.
+        private const Int32 PlanLines = 60;
+
         // Reads an idle or finished agent's last lines once per state change, to see whether a plan waits.
         private static Boolean HasPlan(Issue tab)
         {
@@ -289,7 +292,7 @@ namespace Loupedeck.HerdrPlugin
                 return cached.HasPlan;
             }
 
-            var hasPlan = _planLine.IsMatch(HerdrClient.ReadRecent(tab.PaneId, 30));
+            var hasPlan = _planLine.IsMatch(HerdrClient.ReadRecent(tab.PaneId, PlanLines));
             Plans[tab.PaneId] = (tab.StateSeq, hasPlan);
             return hasPlan;
         }
