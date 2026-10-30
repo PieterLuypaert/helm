@@ -76,6 +76,7 @@ namespace Loupedeck.HerdrPlugin
         private static Timer _timer;
         private static Int32 _refreshing;
         private static Int32 _failedReads;
+        private static Boolean _hasRead;
         private static Int32 _configVersion;
         private static (String WorkspaceId, String TabId, DateTime At)? _requested;
 
@@ -89,6 +90,9 @@ namespace Loupedeck.HerdrPlugin
         public static event Action NavigationRequested;
 
         public static Snapshot Current => Volatile.Read(ref _current);
+
+        // False until the first read of herdr finished, whatever it found.
+        public static Boolean HasRead => Volatile.Read(ref _hasRead);
 
         public static void Start()
         {
@@ -145,6 +149,8 @@ namespace Loupedeck.HerdrPlugin
             try
             {
                 var fresh = Read();
+                var first = !_hasRead;
+                Volatile.Write(ref _hasRead, true);
 
                 // One failed or slow herdr call is not herdr going away: keep what the keys show until the
                 // next read fails too.
@@ -160,7 +166,7 @@ namespace Loupedeck.HerdrPlugin
                 var configVersion = KeypadConfig.Version;
                 var configChanged = configVersion != _configVersion;
                 _configVersion = configVersion;
-                if (!fresh.Equals(previous) || configChanged)
+                if (!fresh.Equals(previous) || configChanged || first)
                 {
                     Changed?.Invoke(fresh);
                 }

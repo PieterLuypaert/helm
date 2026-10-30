@@ -13,7 +13,7 @@ namespace Loupedeck.HerdrPlugin
         }
 
         // A tile like an app icon, without a label.
-        protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) => "";
+        protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) => KeyArt.NoLabel;
 
         // A grey terminal rather than herdr's orange, so it does not look like the Projects key.
         protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize) =>

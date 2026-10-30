@@ -14,7 +14,7 @@ namespace Loupedeck.HerdrPlugin
         }
 
         // A tile like an app icon, without a label: the count on it says what it is.
-        protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) => "";
+        protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) => KeyArt.NoLabel;
 
         protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize) =>
             KeyArt.Draw(TileLook(HerdrState.Current), imageSize);
@@ -48,6 +48,13 @@ namespace Loupedeck.HerdrPlugin
         // On your page: the number of issues large on a dark tile, over the list, in the same colour.
         public static KeyLook TileLook(Snapshot snapshot)
         {
+            // Right after the plugin loads herdr has not been read yet: the list alone, not "offline", because
+            // Logi may draw the key once then and not ask again until something changes.
+            if (!HerdrState.HasRead)
+            {
+                return new KeyLook("issues", Icons.List, AgentStatus.Subtext, KeyStyle.Tile);
+            }
+
             var look = Look(snapshot);
             return snapshot.Offline
                 ? look with { Style = KeyStyle.Tile }
