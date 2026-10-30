@@ -39,10 +39,15 @@ namespace Loupedeck.HerdrPlugin
 
         public (Project Project, Issue Tab) MostUrgent() => this.NeedsYou().FirstOrDefault();
 
-        // Every tab with an agent, across all projects, most urgent first; the first project and tab win a tie.
+        // How many issue tabs there are across all projects; main tabs are not issues.
+        public Int32 IssueCount() => this.Projects.Sum(p => p.Tabs.Count(t => !t.IsMain));
+
+        // Every tab across all projects, most urgent first; the first project and tab win a tie. Main tabs
+        // come last, unless they need you: they are not issues, but you can still go to them.
         public List<(Project Project, Issue Tab)> AllTabs() =>
             this.Projects.SelectMany(p => p.Tabs.Select(t => (Project: p, Tab: t)))
-                .OrderBy(x => AgentStatus.Rank(x.Tab.Status))
+                .OrderBy(x => x.Tab.IsMain && !AgentStatus.NeedsYou(x.Tab.Status))
+                .ThenBy(x => AgentStatus.Rank(x.Tab.Status))
                 .ThenBy(x => x.Project.Number)
                 .ThenBy(x => x.Tab.Number)
                 .ToList();
