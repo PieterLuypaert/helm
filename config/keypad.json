@@ -2,6 +2,9 @@
   // The app that runs herdr. Picking a ticket brings it to the front; "" leaves focus alone.
   "terminalBundleId": "com.googlecode.iterm2",
 
+  // With no herdr window open, picking a tab opens a new iTerm window with herdr in it (iTerm only).
+  "openHerdrWhenClosed": true,
+
   // The ticket page: one key per action, after the ticket itself and before "terug".
   // type "prompt": the text plus Enter, to the ticket's agent.
   // type "keys":   key presses for the ticket's agent, space separated (enter, esc, ctrl+c).

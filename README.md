@@ -58,6 +58,7 @@ Edit `config/keypad.json`. The plugin reads it again when it changes, so no rebu
 | `type: "shell"` | a command run in the ticket's worktree, with `$TICKET_CWD` set |
 | `color` | the stripe on the key, `#RRGGBB` |
 | `terminalBundleId` | the app brought to the front when you pick a ticket (iTerm2 by default); `""` leaves focus alone |
+| `openHerdrWhenClosed` | with no herdr window open, picking a ticket opens a new iTerm window and starts herdr in it, on that ticket (iTerm only; `true` by default). macOS asks once whether the Logi Plugin Service may control iTerm |
 
 ## Chords
 
