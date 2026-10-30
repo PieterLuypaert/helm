@@ -150,12 +150,13 @@ def flow():
 
     px = x0 + step
     pic.text(px, 40, "1. Projects")
-    pic.text(px, 56, "one key per workspace", 11, "400")
+    pic.text(px, 56, "all issues, then one key per workspace", 11, "400")
     pic.grid(px, top, [
+        dict(label="9 issues", icon="List", color=RED, badge="2"),
         dict(label="project A", icon="Folder", color=RED, framed=True, badge="2"),
         dict(label="project B", icon="Folder", color=YELLOW),
         dict(label="project C", icon="Folder", color=OVERLAY),
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+        EMPTY, EMPTY, EMPTY, EMPTY,
         dict(label="back", icon="Back", color=SUBTEXT),
     ])
 
@@ -236,15 +237,15 @@ def all_issues():
     pic.text(ox, 40, "The overview")
     pic.text(ox, 56, "every issue, most urgent first", 11, "400")
     pic.grid(ox, top, [
-        issue("6 dark mode", "waiting"),
-        issue("7 checkout", "go?"),
-        issue("3 sign up", "ready"),
-        issue("4 search", "working"),
-        issue("main · project B", "working"),
-        dict(label="main · project A", icon="Home", color=OVERLAY),
-        issue("5 export", "idle"),
+        issue("6 dark mode · project A", "waiting"),
+        issue("7 checkout · project A", "go?"),
+        issue("3 sign up · project A", "ready"),
+        issue("4 search · project A", "working"),
+        issue("2 api docs · project B", "working"),
+        issue("5 export · project A", "idle"),
+        issue("8 settings · project A", "idle"),
         dict(label="meer 1/2", icon="Dots", color=SUBTEXT),
-        dict(label="back", icon="Back", color=SUBTEXT),
+        dict(label="terug", icon="Back", color=SUBTEXT),
     ])
 
     ix = ox + 3 * K + 2 * G + 44
@@ -265,8 +266,8 @@ def all_issues():
     pic.arrow(30 + K + 10, ox - 10, mid, "press")
     pic.arrow(ox + 3 * K + 2 * G + 6, ix - 8, mid, "pick one")
     note = top + 3 * (K + G) + 24
-    pic.text(20, note, "A main tab, or an issue beside other projects' issues, says whose it is. The badge on the key counts the issues that need you:\n"
-                       "waiting, go?, CI failed, changes and done. Logi's back key closes the overview.", 12, "400")
+    pic.text(20, note, "The key counts issue tabs, not main tabs; the badge counts what needs you: waiting, go?, CI failed, changes and done.\n"
+                       "Main tabs come last, on the next page, unless they need you. terug on the overview goes to your projects.", 12, "400")
     pic.save("all-issues.svg", ix + 3 * K + 2 * G + 20, note + 30)
 
 

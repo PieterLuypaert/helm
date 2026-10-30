@@ -2,7 +2,7 @@
 
 How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own. The keys carry Dutch labels for navigation (`terug`, `meer`); this page uses them as they appear on the keypad.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=7ae7c521)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=e9ce80f7)
 
 ## Your page
 
@@ -48,7 +48,9 @@ A project key shows the most urgent status among its tabs, with up to two counts
 flowchart TD
     allIssues["Herdr all issues key<br/>on your page"] -->|"press"| overview["All issues<br/>most urgent first"]
     overview -->|"press an issue"| issue
-    key["Projects key<br/>on your page"] --> projects["Projects<br/>one key per workspace"]
+    overview -->|terug| projects
+    key["Projects key<br/>on your page"] --> projects["Projects<br/>All issues, then one key per workspace"]
+    projects -->|"press All issues"| overview
     projects -->|"press a project:<br/>herdr shows that workspace"| project["Project<br/>main tab, then issues"]
     project -->|"press a tab:<br/>herdr shows that tab"| issue["Issue<br/>seven actions and terug"]
     issue -->|"terug, from the overview"| overview
@@ -81,6 +83,7 @@ sequenceDiagram
 - **On an issue page** the keypad follows the tab herdr shows, across projects too.
 - **On the projects, project and overview pages** it does not jump, because you are browsing there; it marks what is on screen with a white ring instead.
 - **The Projects key always opens on your projects,** wherever you were before. Only the All issues key opens it elsewhere: on the overview.
+- **`terug` always goes one level up:** from an issue to the overview or the project you came from, and from there to your projects. Only the projects page closes the menu, with Logi's back key.
 - **Only a change on the screen counts.** Right after a key press herdr may still show the previous tab for a moment; the keypad does not jump back to it.
 
 ## Picking a tab
@@ -118,7 +121,7 @@ The page shows the issue with its status, and its pull request number when it ha
 | `stop` | presses Esc: interrupts the agent |
 | `open PR` | opens the issue's pull request in your browser |
 | `editor` | opens the issue's worktree with `hopen` |
-| `terug` | back to the project |
+| `terug` | back to the project, or to the overview when you came from there |
 
 The actions, and when they light up or grey out, come from `config/keypad.json`; see [Setup details](setup.md) to change them.
 
@@ -157,9 +160,9 @@ flowchart LR
 
 ## All issues
 
-A key for your normal keypad page, outside the folder. It reads how many issues you have across every project, such as "9 issues", with how many need you in a badge, in the colour of the most urgent one. Pressing it opens the menu on one overview of every issue, most urgent first, so you can look at each of them in detail.
+A key for your normal keypad page, outside the folder, and the first key on the projects page. It reads how many issues you have across every project, such as "9 issues", with how many need you in a badge, in the colour of the most urgent one. Main tabs are not issues, so they do not count. Pressing it opens the menu on one overview of every issue, most urgent first, so you can look at each of them in detail.
 
-![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=5cda820b)
+![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=3fe9d892)
 
 ```mermaid
 flowchart TD
@@ -167,10 +170,10 @@ flowchart TD
     press --> overview["The overview: every issue of every project<br/>waiting, go?, CI failed, changes, done,<br/>then ready, working, review, draft, idle"]
     overview -->|"press an issue"| issue["Its page, and herdr shows it"]
     issue -->|"terug"| overview
-    overview -->|"Logi's back key"| closed["The menu closes"]
+    overview -->|"terug"| projects["Your projects"]
 ```
 
-Within a status, issues keep the order of their projects and tabs. A main tab, or an issue shown beside other projects' issues, names its project, such as "main · project B". `ready` does not count as needing you; it sorts right after the issues that do.
+Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. A main tab, or an issue shown beside other projects' issues, names its project, such as "main · project B". `ready` does not count as needing you; it sorts right after the issues that do.
 
 The key opens the folder through a generic action of the Logi plugin API that is not documented for folders. If the menu does not open, the Projects key takes you to every issue through its project.
 
