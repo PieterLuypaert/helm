@@ -111,7 +111,7 @@ namespace Loupedeck.HerdrPlugin
 
             if (ready > 0)
             {
-                return new KeyLook($"{ready} ready", "to merge", AgentStatus.Teal);
+                return new KeyLook($"{ready} ready", "to merge", AgentStatus.Blue);
             }
 
             var working = snapshot.Count(AgentStatus.Working);
