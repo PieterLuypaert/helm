@@ -18,6 +18,15 @@ K, G = 70, 8          # key size and gap
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
+def load_icons():
+    """The icons the plugin draws on its keys, read from plugin/src/Helpers/Icons.cs: one source for both."""
+    source = open(os.path.join(os.path.dirname(HERE), "plugin", "src", "Helpers", "Icons.cs")).read()
+    return {m.group(1): m.group(2).replace('\\"', '"') for m in re.finditer(r'public const String (\w+) = "(.*?)";\n', source)}
+
+
+ICONS = load_icons()
+
+
 class Picture:
     def __init__(self, title):
         self.title, self.parts = title, []
@@ -46,9 +55,25 @@ class Picture:
             sy = y + K - 12 - (len(subs) - 1 - i) * 12
             p.append(f'<text x="{x + K / 2}" y="{sy}" text-anchor="middle" font-size="9.5" fill="{subink}">{html.escape(line)}</text>')
 
+    def icon_key(self, x, y, icon, color, label, badge=None):
+        """A key drawn the way the plugin draws its own keys: a line icon, a label, an optional count."""
+        p = self.parts
+        p.append(f'<rect x="{x}" y="{y}" width="{K}" height="{K}" rx="8" fill="{GROUND}"/>')
+        size = 28
+        p.append(f'<g transform="translate({x + (K - size) / 2} {y + 11}) scale({size / 24})" fill="none" stroke="{color}" '
+                 f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{ICONS[icon]}</g>')
+        p.append(f'<text x="{x + K / 2}" y="{y + K - 13}" text-anchor="middle" font-size="10.5" fill="{TEXT}">{html.escape(label)}</text>')
+        if badge:
+            p.append(f'<circle cx="{x + K - 15}" cy="{y + 14}" r="8" fill="{color}"/>')
+            p.append(f'<text x="{x + K - 15}" y="{y + 17.5}" text-anchor="middle" font-size="10" font-weight="600" fill="{GROUND}">{html.escape(badge)}</text>')
+
     def grid(self, gx, gy, keys):
         for i, k in enumerate(keys):
-            self.key(gx + (i % 3) * (K + G), gy + (i // 3) * (K + G), **k)
+            x, y = gx + (i % 3) * (K + G), gy + (i // 3) * (K + G)
+            if "icon" in k:
+                self.icon_key(x, y, **k)
+            else:
+                self.key(x, y, **k)
 
     def text(self, x, y, text, size=13, weight="600", anchor="start", color=LABEL):
         for i, line in enumerate(text.split("\n")):
@@ -100,13 +125,13 @@ def flow():
     pic.grid(x0, top, [
         dict(title="Spotify", sub="app", accent=OVERLAY),
         dict(title="Claude", sub="app", accent=OVERLAY),
-        dict(title="2 need you", sub="1 ready", accent=RED, style="highlight"),
+        dict(icon="BellRinging", color=RED, label="1 ready", badge="2"),
         dict(title="ChatGPT", sub="app", accent=OVERLAY),
-        dict(title="herdr", sub="in iTerm", accent=SUBTEXT),
-        dict(title="Issues", sub="herdr menu", accent=ACCENT),
+        dict(icon="Terminal", color=SUBTEXT, label="herdr"),
+        dict(icon="Stack", color=ACCENT, label="Issues"),
         EMPTY, EMPTY, EMPTY,
     ])
-    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, each with its own job:\n" + "Issues opens the herdr menu on the keypad.\n" + "herdr opens herdr itself in iTerm.\n" + "The red one, Herdr status, jumps straight\nto the most urgent issue (step 3).", 11, "400")
+    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, each with its own job:\n" + "Issues opens the herdr menu on the keypad.\n" + "The terminal, herdr, opens herdr in iTerm.\n" + "The bell, Herdr status, counts what needs you\nand jumps to the most urgent issue (step 3).", 11, "400")
 
     # 1. Projects.
     px = x0 + step

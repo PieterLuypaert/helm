@@ -19,9 +19,45 @@ namespace Loupedeck.HerdrPlugin
     // How one key looks. Framed marks the project or tab that is on screen.
     public readonly record struct KeyLook(String Title, String Subtitle, BitmapColor Accent, KeyStyle Style = KeyStyle.Normal, Boolean Framed = false);
 
+    // A key drawn around an icon, for the keys you place on your own page: a line icon in its colour,
+    // a label under it, and an optional count in a coloured badge at the top right.
+    public readonly record struct IconKey(String Icon, BitmapColor Color, String Label, String Badge = null, BitmapColor BadgeColor = default);
+
     // Draws every key the plugin shows, in one style.
     public static class KeyArt
     {
+        public static BitmapImage Draw(IconKey key, PluginImageSize imageSize)
+        {
+            using var builder = new BitmapBuilder(imageSize);
+            var w = builder.Width;
+            var h = builder.Height;
+            builder.Clear(AgentStatus.Ground);
+
+            var iconSize = h * 2 / 5;
+            var iconTop = h / 6;
+            var icon = Icons.Render(key.Icon, key.Color, iconSize);
+            if (icon != null)
+            {
+                builder.DrawImage(icon, (w - iconSize) / 2, iconTop, iconSize, iconSize, BitmapRotation.None);
+            }
+
+            var labelTop = iconTop + iconSize + h / 20;
+            builder.DrawText(Wrap(key.Label, 12, 2), 2, labelTop, w - 4, h - labelTop - 2, AgentStatus.Text);
+
+            if (key.Badge != null)
+            {
+                var radius = Math.Max(9, h / 8);
+                var cx = w - radius - h / 12;
+                var cy = radius + h / 14;
+                builder.FillCircle(cx, cy, radius, key.BadgeColor);
+
+                // The default font is too big for the badge, so the count gets a size of its own.
+                builder.DrawText(key.Badge, cx - radius, cy - radius + radius / 4, radius * 2, radius * 2, AgentStatus.Ground, fontSize: radius * 5 / 4);
+            }
+
+            return builder.ToImage();
+        }
+
         public static BitmapImage Draw(KeyLook look, PluginImageSize imageSize)
         {
             using var builder = new BitmapBuilder(imageSize);

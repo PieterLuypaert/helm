@@ -8,17 +8,17 @@ An issue here is a herdr tab whose agent works on one branch, the way `hagent` o
 
 **Status:** tested against herdr, GitHub and real Claude Code questions.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=40a4e13a)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=0d03498b)
 
 ## What it does
 
 helm adds three keys you place on your own keypad page, next to your other apps:
 
-| Key | Label | What it does |
+| Key | On the key | What it does |
 |---|---|---|
-| **Herdr issues** | Issues | opens the herdr menu on the keypad: your projects, their issues, and the actions for one issue |
-| **Herdr status** | 2 need you | counts what needs you, and jumps to the most urgent issue |
-| **Open herdr** | herdr | opens herdr itself in iTerm, like any app key |
+| **Herdr issues** | an orange stack, Issues | opens the herdr menu on the keypad: your projects, their issues, and the actions for one issue |
+| **Herdr status** | a bell, with how many issues need you in a badge | counts what needs you, and jumps to the most urgent issue |
+| **Open herdr** | a grey terminal, herdr | opens herdr itself in iTerm, like any app key |
 
 In more detail:
 
