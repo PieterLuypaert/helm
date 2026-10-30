@@ -95,7 +95,7 @@ namespace Loupedeck.HerdrPlugin
         public override String GetButtonDisplayName(PluginImageSize imageSize) => "Issues";
 
         public override BitmapImage GetButtonImage(PluginImageSize imageSize) =>
-            KeyArt.Draw(new IconKey(Icons.Stack, AgentStatus.Accent, "Issues"), imageSize);
+            KeyArt.Draw(new KeyLook("Issues", Icons.Stack, AgentStatus.Accent), imageSize);
 
         public override IEnumerable<String> GetButtonPressActionNames(DeviceType deviceType)
         {
@@ -112,7 +112,7 @@ namespace Loupedeck.HerdrPlugin
         }
 
         public override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
-            this.Look(actionParameter).Title?.Replace('\n', ' ') ?? "";
+            this.Look(actionParameter).Title ?? "";
 
         public override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize) =>
             KeyArt.Draw(this.Look(actionParameter), imageSize);
@@ -195,7 +195,7 @@ namespace Loupedeck.HerdrPlugin
             var label = (action.Label ?? action.Value ?? "action").Replace('\n', ' ');
             if (StyleFor(action, tab) == KeyStyle.Dim)
             {
-                this.Flash(param, new KeyLook("not now", tab.Status, AgentStatus.Overlay, KeyStyle.Highlight));
+                this.Flash(param, new KeyLook("not now", Icons.Ban, AgentStatus.Overlay, KeyStyle.Highlight));
                 return;
             }
 
@@ -212,8 +212,8 @@ namespace Loupedeck.HerdrPlugin
                 };
 
                 this.Flash(param, result.Ok
-                    ? new KeyLook("sent", null, AgentStatus.Green, KeyStyle.Highlight)
-                    : new KeyLook(result.ShortReason, null, AgentStatus.Red, KeyStyle.Highlight));
+                    ? new KeyLook("sent", Icons.Check, AgentStatus.Green, KeyStyle.Highlight)
+                    : new KeyLook(result.ShortReason, Icons.X, AgentStatus.Red, KeyStyle.Highlight));
                 HerdrClient.Notify(
                     result.Ok ? $"{label}: {tab.ShortName}" : $"{label} not sent: {tab.ShortName}",
                     result.Ok ? "Sent from the keypad" : $"Not sent: {result.ShortReason}");
@@ -237,7 +237,7 @@ namespace Loupedeck.HerdrPlugin
                 var now = Questions.Parse(HerdrClient.ReadRecent(tab.PaneId, 40));
                 if (now == null || now.Signature != shown.Signature)
                 {
-                    this.Flash(param, new KeyLook("changed", "look again", AgentStatus.Overlay, KeyStyle.Highlight));
+                    this.Flash(param, new KeyLook("changed, look again", Icons.Refresh, AgentStatus.Overlay, KeyStyle.Highlight));
                     HerdrState.Refresh();
                     return;
                 }
@@ -245,8 +245,8 @@ namespace Loupedeck.HerdrPlugin
                 PluginLog.Info($"Answer {label} on {tab.Branch}");
                 var result = HerdrClient.SendKeys(tab.PaneId, now.KeysFor(choice).ToArray());
                 this.Flash(param, result.Ok
-                    ? new KeyLook("sent", null, AgentStatus.Green, KeyStyle.Highlight)
-                    : new KeyLook(result.ShortReason, null, AgentStatus.Red, KeyStyle.Highlight));
+                    ? new KeyLook("sent", Icons.Check, AgentStatus.Green, KeyStyle.Highlight)
+                    : new KeyLook(result.ShortReason, Icons.X, AgentStatus.Red, KeyStyle.Highlight));
                 HerdrClient.Notify(
                     result.Ok ? $"{label}: {tab.ShortName}" : $"{label} not sent: {tab.ShortName}",
                     result.Ok ? "Answered from the keypad" : $"Not sent: {result.ShortReason}");
@@ -444,6 +444,7 @@ namespace Loupedeck.HerdrPlugin
 
         private static Int32 PageCount(Int32 items) => items <= Keys - 1 ? 1 : (items + Keys - 3) / (Keys - 2);
 
+        // How each key looks: its icon, and in Title the label Logi writes under it.
         private KeyLook Look(String param)
         {
             lock (this._lock)
@@ -454,54 +455,61 @@ namespace Loupedeck.HerdrPlugin
                 }
 
                 var focus = this._snapshot.FocusedTabId;
+                var nav = AgentStatus.Subtext;
                 switch (param)
                 {
                     case null:
-                        return new KeyLook("", null, AgentStatus.Overlay);
+                        return new KeyLook("", Icons.Dot, AgentStatus.Overlay);
                     case OfflineParam:
-                        return new KeyLook("herdr offline", "press to retry", AgentStatus.Red);
+                        return new KeyLook("herdr offline", Icons.Offline, AgentStatus.Red);
                     case BackToProjectsParam:
-                        return new KeyLook("terug", "projecten", AgentStatus.Overlay);
+                        return new KeyLook("terug", Icons.Back, nav);
                     case BackToProjectParam:
-                        return new KeyLook("terug", this.SelectedProject()?.Name, AgentStatus.Overlay);
+                        return new KeyLook("terug", Icons.Back, nav);
                     case MoreParam:
                         var count = this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count;
-                        return new KeyLook("meer", $"{this._page + 1}/{PageCount(count)}", AgentStatus.Overlay);
+                        return new KeyLook($"meer {this._page + 1}/{PageCount(count)}", Icons.Dots, nav);
+                    case OnScreenParam:
+                        return new KeyLook("answer on screen", Icons.Screen, nav);
                     case HeaderParam:
                         var selected = this.SelectedTab();
                         if (selected == null)
                         {
-                            return new KeyLook("", null, AgentStatus.Overlay);
+                            return new KeyLook("", Icons.Dot, AgentStatus.Overlay);
                         }
 
-                        if (selected.Status == AgentStatus.Waiting)
-                        {
-                            // What the agent asks about, such as the command it wants to run.
-                            var about = selected.Question?.Detail ?? selected.Question?.Title ?? "asks you";
-                            return new KeyLook(selected.ShortName, about, AgentStatus.Red);
-                        }
-
-                        return new KeyLook(selected.ShortName, selected.Pr == null ? selected.Status : $"{selected.Status}\nPR {selected.Pr.Number}", AgentStatus.Color(selected.Status));
-                    case OnScreenParam:
-                        var hasChoices = this.SelectedTab()?.Question != null;
-                        return new KeyLook("answer on\nscreen", hasChoices ? null : "no choices\nfound", AgentStatus.Subtext);
+                        // The issue, and what it waits on: the command it asks about, or its pull request.
+                        var about = selected.Status == AgentStatus.Waiting
+                            ? selected.Question?.Detail ?? selected.Question?.Title
+                            : selected.Pr != null ? $"PR {selected.Pr.Number}" : null;
+                        return new KeyLook(about == null ? selected.ShortName : $"{selected.ShortName} · {about}", AgentStatus.Icon(selected.Status), AgentStatus.Color(selected.Status));
                 }
 
                 if (param.StartsWith(ProjectPrefix))
                 {
                     var project = this._snapshot.FindProject(param[ProjectPrefix.Length..]);
-                    return project == null
-                        ? new KeyLook("", null, AgentStatus.Overlay)
-                        : new KeyLook(project.Name, Summary(project), AgentStatus.Color(project.Status),
-                            Framed: focus != null && project.Tabs.Any(t => t.TabId == focus));
+                    if (project == null)
+                    {
+                        return new KeyLook("", Icons.Dot, AgentStatus.Overlay);
+                    }
+
+                    var needsYou = project.Tabs.Count(t => AgentStatus.NeedsYou(t.Status));
+                    return new KeyLook(project.Name, Icons.Folder, AgentStatus.Color(project.Status),
+                        Framed: focus != null && project.Tabs.Any(t => t.TabId == focus),
+                        Badge: needsYou > 0 ? needsYou.ToString() : null);
                 }
 
                 if (param.StartsWith(TabPrefix))
                 {
                     var tab = this.SelectedProject()?.Tabs.FirstOrDefault(t => t.TabId == param[TabPrefix.Length..]);
-                    return tab == null
-                        ? new KeyLook("", null, AgentStatus.Overlay)
-                        : new KeyLook(tab.ShortName, tab.Status, AgentStatus.Color(tab.Status), Framed: tab.TabId == focus);
+                    if (tab == null)
+                    {
+                        return new KeyLook("", Icons.Dot, AgentStatus.Overlay);
+                    }
+
+                    // The main tab keeps its house while it rests; any other state shows like an issue's.
+                    var icon = tab.IsMain && tab.Status == AgentStatus.Idle ? Icons.Home : AgentStatus.Icon(tab.Status);
+                    return new KeyLook(tab.ShortName, icon, AgentStatus.Color(tab.Status), Framed: tab.TabId == focus);
                 }
 
                 if (param.StartsWith(AnswerPrefix) && Int32.TryParse(param[AnswerPrefix.Length..], out var choiceIndex))
@@ -512,14 +520,17 @@ namespace Loupedeck.HerdrPlugin
                     {
                         var option = question.Options[choiceIndex];
                         var label = Question.ShortLabel(option);
-                        var title = option.Number != null ? $"{option.Number} {label}" : label;
+                        var choice = option.Number != null ? $"{option.Number} {label}" : label;
 
-                        // Yes in green, No in red, anything else neutral, so the answer reads at a glance.
-                        var accent = label.StartsWith("No", StringComparison.OrdinalIgnoreCase) ? AgentStatus.Red
-                            : label.StartsWith("Yes", StringComparison.OrdinalIgnoreCase) || label == "Always" ? AgentStatus.Green
-                            : AgentStatus.Subtext;
-                        // The issue's name under every choice, so each key says what it answers and to whom.
-                        return new KeyLook(title, asking.ShortName, accent);
+                        // Yes in green, No in red, anything else neutral; the label names the issue too, so
+                        // each key says what it answers and to whom.
+                        var (answerIcon, answerColor) =
+                            label.StartsWith("No", StringComparison.OrdinalIgnoreCase) ? (Icons.X, AgentStatus.Red)
+                            : label == "Always" ? (Icons.Checks, AgentStatus.Green)
+                            : label.StartsWith("Yes", StringComparison.OrdinalIgnoreCase) ? (Icons.Check, AgentStatus.Green)
+                            : label == "Auto mode" ? (Icons.Robot, AgentStatus.Subtext)
+                            : (Icons.Dot, AgentStatus.Subtext);
+                        return new KeyLook($"{choice} · {asking.ShortName}", answerIcon, answerColor);
                     }
                 }
 
@@ -532,14 +543,24 @@ namespace Loupedeck.HerdrPlugin
                     {
                         var action = actions[index];
                         var style = StyleFor(action, selectedTab);
-                        var accent = ParseHex(action.Color) ?? (style == KeyStyle.Highlight ? AgentStatus.Color(status) : AgentStatus.Overlay);
-                        return new KeyLook(action.Label ?? action.Value ?? "?", null, accent, style);
+                        var accent = style == KeyStyle.Highlight ? ParseHex(action.Color) ?? AgentStatus.Color(status) : AgentStatus.Text;
+                        return new KeyLook((action.Label ?? action.Value ?? "?").Replace('\n', ' '), IconFor(action), accent, style);
                     }
                 }
 
-                return new KeyLook("?", null, AgentStatus.Overlay);
+                return new KeyLook("?", Icons.Help, AgentStatus.Overlay);
             }
         }
+
+        // An action's icon: the one its config names, else one that fits its type.
+        private static String IconFor(IssueAction action) =>
+            Icons.Named(action.Icon) ?? action.Type?.ToLowerInvariant() switch
+            {
+                "open-pr" => Icons.PullRequest,
+                "shell" => Icons.Terminal,
+                "keys" => Icons.Stop,
+                _ => Icons.Play,
+            };
 
         // Greyed out where it does nothing, lit up where it fits the issue's status.
         private static KeyStyle StyleFor(IssueAction action, Issue tab)

@@ -124,6 +124,24 @@ namespace Loupedeck.HerdrPlugin
             _ => Overlay,
         };
 
+        // The icon for a status, so a key says it without text.
+        public static String Icon(String status) => status switch
+        {
+            Waiting => Icons.Question,
+            Go => Icons.Plan,
+            CiFailed => Icons.Alert,
+            Changes => Icons.Report,
+            Done => Icons.Check,
+            Ready => Icons.Merge,
+            Working => Icons.Working,
+            Review => Icons.Eye,
+            Draft => Icons.Pencil,
+            Idle => Icons.Sleep,
+            Merged => Icons.Merge,
+            Closed => Icons.CircleX,
+            _ => Icons.Help,
+        };
+
         public static BitmapColor Hex(UInt32 rgb) => new((Int32)(rgb >> 16) & 0xFF, (Int32)(rgb >> 8) & 0xFF, (Int32)rgb & 0xFF);
     }
 }

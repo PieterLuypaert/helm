@@ -6,98 +6,64 @@ namespace Loupedeck.HerdrPlugin
 
     public enum KeyStyle
     {
-        // Dark key with a coloured stripe on top.
+        // The icon in its colour.
         Normal,
 
-        // Filled with its colour: the action that fits the issue right now.
+        // A filled circle in its colour behind a dark icon: the action that fits right now.
         Highlight,
 
         // Greyed out: an action that does nothing in the issue's current state.
         Dim,
     }
 
-    // How one key looks. Framed marks the project or tab that is on screen.
-    public readonly record struct KeyLook(String Title, String Subtitle, BitmapColor Accent, KeyStyle Style = KeyStyle.Normal, Boolean Framed = false);
+    // How one key looks. Logi Options+ shows Title as the key's label under its image, so the image
+    // itself is the icon alone. Framed marks the project or tab on screen; Badge is a count at the top right.
+    public readonly record struct KeyLook(String Title, String Icon, BitmapColor Accent, KeyStyle Style = KeyStyle.Normal, Boolean Framed = false, String Badge = null);
 
-    // A key drawn around an icon, for the keys you place on your own page: a line icon in its colour,
-    // a label under it, and an optional count in a coloured badge at the top right.
-    public readonly record struct IconKey(String Icon, BitmapColor Color, String Label, String Badge = null, BitmapColor BadgeColor = default);
-
-    // Draws every key the plugin shows, in one style.
+    // Draws every key the plugin shows, in one style: an icon on a clear background, like an app icon,
+    // with no text in the image, because Logi already writes the label under it.
     public static class KeyArt
     {
-        public static BitmapImage Draw(IconKey key, PluginImageSize imageSize)
-        {
-            using var builder = new BitmapBuilder(imageSize);
-            var w = builder.Width;
-            var h = builder.Height;
-            builder.Clear(AgentStatus.Ground);
-
-            var iconSize = h * 2 / 5;
-            var iconTop = h / 6;
-            var icon = Icons.Render(key.Icon, key.Color, iconSize);
-            if (icon != null)
-            {
-                builder.DrawImage(icon, (w - iconSize) / 2, iconTop, iconSize, iconSize, BitmapRotation.None);
-            }
-
-            var labelTop = iconTop + iconSize + h / 20;
-            builder.DrawText(Wrap(key.Label, 12, 2), 2, labelTop, w - 4, h - labelTop - 2, AgentStatus.Text);
-
-            if (key.Badge != null)
-            {
-                var radius = Math.Max(9, h / 8);
-                var cx = w - radius - h / 12;
-                var cy = radius + h / 14;
-                builder.FillCircle(cx, cy, radius, key.BadgeColor);
-
-                // The default font is too big for the badge, so the count gets a size of its own.
-                builder.DrawText(key.Badge, cx - radius, cy - radius + radius / 4, radius * 2, radius * 2, AgentStatus.Ground, fontSize: radius * 5 / 4);
-            }
-
-            return builder.ToImage();
-        }
-
         public static BitmapImage Draw(KeyLook look, PluginImageSize imageSize)
         {
             using var builder = new BitmapBuilder(imageSize);
             var w = builder.Width;
             var h = builder.Height;
-            var ground = look.Style == KeyStyle.Highlight ? look.Accent : AgentStatus.Ground;
-            var ink = look.Style switch
-            {
-                KeyStyle.Highlight => AgentStatus.Ground,
-                KeyStyle.Dim => AgentStatus.Overlay,
-                _ => AgentStatus.Text,
-            };
-            var subInk = look.Style switch
-            {
-                KeyStyle.Highlight => AgentStatus.Ground,
-                KeyStyle.Dim => AgentStatus.Overlay,
-                _ => look.Accent,
-            };
+            builder.Clear(BitmapColor.Transparent);
 
-            builder.Clear(ground);
-            var stripe = Math.Max(4, h / 12);
-            if (look.Style != KeyStyle.Highlight)
+            var cx = w / 2f;
+            var cy = h / 2f;
+            var highlight = look.Style == KeyStyle.Highlight;
+            if (highlight)
             {
-                builder.FillRectangle(0, 0, w, stripe, look.Style == KeyStyle.Dim ? AgentStatus.Overlay : look.Accent);
+                builder.FillCircle(cx, cy, w * 0.46f, look.Accent);
             }
 
             if (look.Framed)
             {
                 for (var i = 0; i < 3; i++)
                 {
-                    builder.DrawRectangle(i, i, w - 1 - 2 * i, h - 1 - 2 * i, AgentStatus.Text);
+                    builder.DrawCircle(cx, cy, w * 0.48f - i, AgentStatus.Text);
                 }
             }
 
-            var pad = Math.Max(4, w / 18);
-            var titleHeight = look.Subtitle == null ? h - stripe - pad : (h - stripe) * 3 / 5;
-            builder.DrawText(Wrap(look.Title), pad, stripe, w - 2 * pad, titleHeight, ink);
-            if (look.Subtitle != null)
+            var color = highlight ? AgentStatus.Ground : look.Style == KeyStyle.Dim ? AgentStatus.Overlay : look.Accent;
+            var size = (Int32)(w * (highlight || look.Framed ? 0.5f : 0.64f));
+            var icon = Icons.Render(look.Icon ?? Icons.Dot, color, size);
+            if (icon != null)
             {
-                builder.DrawText(Wrap(look.Subtitle, 13, 2), pad, stripe + titleHeight, w - 2 * pad, h - stripe - titleHeight - pad, subInk);
+                builder.DrawImage(icon, (w - size) / 2, (h - size) / 2, size, size, BitmapRotation.None);
+            }
+
+            if (look.Badge != null)
+            {
+                var radius = Math.Max(9, h / 7);
+                var bx = w - radius - 1;
+                var by = radius + 1;
+                builder.FillCircle(bx, by, radius, look.Accent);
+
+                // The default font is too big for the badge, so the count gets a size of its own.
+                builder.DrawText(look.Badge, bx - radius, by - radius + radius / 4, radius * 2, radius * 2, AgentStatus.Ground, fontSize: radius * 5 / 4);
             }
 
             return builder.ToImage();

@@ -12,7 +12,8 @@ Edit `config/keypad.json`. The plugin reads it again when it changes, so no rebu
 | `type: "keys"` | key presses for the issue's agent, space separated: `enter`, `esc`, `ctrl+c` |
 | `type: "shell"` | a command run in the issue's worktree, with `$ISSUE_CWD` set |
 | `type: "open-pr"` | opens the issue's pull request in the browser; greyed out while the issue has none |
-| `color` | the stripe on the key, `#RRGGBB` |
+| `icon` | the key's icon by name, such as `play`, `tool` or `commit`; the names are the constants in `plugin/src/Helpers/Icons.cs`. Without one, the key gets an icon that fits its type |
+| `color` | the circle behind the icon when the key lights up, `#RRGGBB` |
 | `when` | the issue statuses in which the key lights up, such as `["go?"]`; the statuses are in [How it works](flows.md#statuses) |
 | `onlyWhen` | the statuses in which the key works at all; it is greyed out in the others |
 | `terminalBundleId` | the app brought to the front when you pick an issue (iTerm2 by default); `""` leaves focus alone |
