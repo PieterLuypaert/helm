@@ -6,31 +6,41 @@ namespace Loupedeck.HerdrPlugin
     using System.Threading;
     using System.Threading.Tasks;
 
-    // The keypad's ticket menu. Level 1 shows every ticket tab of the herdr workspace you are in;
-    // pressing one focuses that tab and turns the folder into level 2, the actions for that ticket.
+    // The keypad's herdr menu, three levels deep: every project (herdr workspace) with a summary of its
+    // agents; a project's main tab and ticket tabs; and the actions for the tab you picked.
     public class TicketsFolder : PluginDynamicFolder
     {
-        private const String TicketPrefix = "tab:";
+        private const String ProjectPrefix = "proj:";
+        private const String TabPrefix = "tab:";
         private const String ActionPrefix = "act:";
         private const String HeaderParam = "header";
-        private const String BackParam = "back";
+        private const String BackToProjectParam = "back:project";
+        private const String BackToProjectsParam = "back:projects";
         private const String OfflineParam = "offline";
+        private const String MoreParam = "more";
+
+        // Nine keys: with more items than fit, seven items, "meer" and the way back share a page.
+        private const Int32 Keys = 9;
 
         private static readonly BitmapColor Ground = new(16, 16, 16);
         private static readonly BitmapColor Text = new(235, 235, 235);
-        private static readonly BitmapColor Dim = new(150, 150, 150);
+        private static readonly BitmapColor Dim = new(110, 110, 110);
 
         private readonly Object _lock = new();
-        private List<Ticket> _tickets = new();
+        private List<Project> _projects = new();
         private Boolean _offline;
-        private String _selectedTabId;
+        private String _projectId;
+        private String _tabId;
+        private Int32 _page;
+        private List<String> _shownParams = new();
+        private Dictionary<String, (String, String, BitmapColor)> _shownLooks = new();
         private Timer _timer;
         private Int32 _refreshing;
 
         public TicketsFolder()
         {
-            this.DisplayName = "Herdr tickets";
-            this.Description = "Your herdr ticket tabs, and actions for the one you pick";
+            this.DisplayName = "Herdr";
+            this.Description = "Your herdr projects, their tickets, and actions for the one you pick";
             this.GroupName = "Herdr";
         }
 
@@ -50,43 +60,28 @@ namespace Loupedeck.HerdrPlugin
             return true;
         }
 
-        public override String GetButtonDisplayName(PluginImageSize imageSize) => "Herdr\ntickets";
+        public override String GetButtonDisplayName(PluginImageSize imageSize) => "Herdr";
 
         public override IEnumerable<String> GetButtonPressActionNames(DeviceType deviceType)
         {
             lock (this._lock)
             {
-                var selected = this.Selected();
-                if (selected != null)
+                var names = this.CurrentParams().Select(p => this.CreateCommandName(p)).ToList();
+                if (this.Level() == 0)
                 {
-                    var names = new List<String> { this.CreateCommandName(HeaderParam) };
-                    var actions = KeypadConfig.Current.Actions;
-                    for (var i = 0; i < actions.Count; i++)
-                    {
-                        names.Add(this.CreateCommandName(ActionPrefix + i));
-                    }
-
-                    names.Add(this.CreateCommandName(BackParam));
-                    return names;
+                    names.Add(PluginDynamicFolder.NavigateUpActionName);
                 }
 
-                if (this._offline)
-                {
-                    return new[] { this.CreateCommandName(OfflineParam), PluginDynamicFolder.NavigateUpActionName };
-                }
-
-                return this._tickets.Select(t => this.CreateCommandName(TicketPrefix + t.TabId))
-                                    .Append(PluginDynamicFolder.NavigateUpActionName)
-                                    .ToList();
+                return names;
             }
         }
 
         public override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
-            this.Describe(actionParameter).Title.Replace('\n', ' ');
+            this.Look(actionParameter).Title.Replace('\n', ' ');
 
         public override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize)
         {
-            var (title, subtitle, accent) = this.Describe(actionParameter);
+            var (title, subtitle, accent) = this.Look(actionParameter);
             using var builder = new BitmapBuilder(imageSize);
             builder.Clear(Ground);
             var w = builder.Width;
@@ -94,11 +89,11 @@ namespace Loupedeck.HerdrPlugin
             var stripe = Math.Max(4, h / 12);
             builder.FillRectangle(0, 0, w, stripe, accent);
             var pad = Math.Max(3, w / 20);
-            var titleHeight = subtitle == null ? h - stripe - pad : (h - stripe) * 2 / 3;
+            var titleHeight = subtitle == null ? h - stripe - pad : (h - stripe) * 3 / 5;
             builder.DrawText(Wrap(title), pad, stripe, w - 2 * pad, titleHeight, Text);
             if (subtitle != null)
             {
-                builder.DrawText(subtitle, pad, stripe + titleHeight, w - 2 * pad, h - stripe - titleHeight - pad, accent);
+                builder.DrawText(Wrap(subtitle, 13, 2), pad, stripe + titleHeight, w - 2 * pad, h - stripe - titleHeight - pad, accent);
             }
 
             return builder.ToImage();
@@ -111,61 +106,81 @@ namespace Loupedeck.HerdrPlugin
                 return;
             }
 
-            Ticket selected;
+            Project project;
+            Ticket tab;
             lock (this._lock)
             {
-                selected = this.Selected();
+                project = this.SelectedProject();
+                tab = this.SelectedTab();
             }
 
-            if (actionParameter.StartsWith(TicketPrefix))
+            if (actionParameter.StartsWith(ProjectPrefix))
             {
-                var tabId = actionParameter[TicketPrefix.Length..];
+                var id = actionParameter[ProjectPrefix.Length..];
+                this.Navigate(id, null);
+                Task.Run(() => HerdrClient.FocusWorkspace(id));
+            }
+            else if (actionParameter.StartsWith(TabPrefix))
+            {
+                var id = actionParameter[TabPrefix.Length..];
+                this.Navigate(project?.WorkspaceId, id);
+                Task.Run(() => FocusTab(id));
+            }
+            else if (actionParameter == BackToProjectParam)
+            {
+                this.Navigate(project?.WorkspaceId, null);
+            }
+            else if (actionParameter == BackToProjectsParam)
+            {
+                this.Navigate(null, null);
+            }
+            else if (actionParameter == HeaderParam && tab != null)
+            {
+                Task.Run(() => FocusTab(tab.TabId));
+            }
+            else if (actionParameter == MoreParam)
+            {
                 lock (this._lock)
                 {
-                    this._selectedTabId = tabId;
+                    this._page++;
                 }
 
-                this.ButtonActionNamesChanged();
-                Task.Run(() => FocusTicket(tabId));
-                return;
+                this.Navigate(project?.WorkspaceId, tab?.TabId, keepPage: true);
             }
-
-            if (actionParameter == BackParam)
-            {
-                lock (this._lock)
-                {
-                    this._selectedTabId = null;
-                }
-
-                this.ButtonActionNamesChanged();
-                return;
-            }
-
-            if (actionParameter == HeaderParam && selected != null)
-            {
-                Task.Run(() => FocusTicket(selected.TabId));
-                return;
-            }
-
-            if (actionParameter == OfflineParam)
+            else if (actionParameter == OfflineParam)
             {
                 this.Refresh();
-                return;
             }
-
-            if (actionParameter.StartsWith(ActionPrefix) && selected != null
-                && Int32.TryParse(actionParameter[ActionPrefix.Length..], out var index))
+            else if (actionParameter.StartsWith(ActionPrefix) && tab != null
+                     && Int32.TryParse(actionParameter[ActionPrefix.Length..], out var index))
             {
                 var actions = KeypadConfig.Current.Actions;
                 if (index >= 0 && index < actions.Count)
                 {
                     var action = actions[index];
-                    Task.Run(() => RunAction(action, selected));
+                    Task.Run(() => RunAction(action, tab));
                 }
             }
         }
 
-        private static void FocusTicket(String tabId)
+        private void Navigate(String projectId, String tabId, Boolean keepPage = false)
+        {
+            lock (this._lock)
+            {
+                this._projectId = projectId;
+                this._tabId = tabId;
+                if (!keepPage)
+                {
+                    this._page = 0;
+                }
+
+                this.Remember();
+            }
+
+            this.ButtonActionNamesChanged();
+        }
+
+        private static void FocusTab(String tabId)
         {
             HerdrClient.FocusTab(tabId);
             HerdrClient.ActivateApp(KeypadConfig.Current.TerminalBundleId);
@@ -191,7 +206,7 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
-        // Reads herdr again and tells the keypad what changed: the list of keys, or only some images.
+        // Reads herdr again and tells the keypad what changed: the set of keys, or only some of their images.
         private void Refresh()
         {
             if (Interlocked.Exchange(ref this._refreshing, 1) == 1)
@@ -201,33 +216,30 @@ namespace Loupedeck.HerdrPlugin
 
             try
             {
-                var fresh = HerdrClient.ReadTickets();
+                var fresh = HerdrClient.ReadProjects();
                 Boolean namesChanged;
                 List<String> imagesChanged;
                 lock (this._lock)
                 {
-                    var offline = fresh == null;
-                    fresh ??= new List<Ticket>();
-                    var oldSelected = this.Selected();
-                    namesChanged = offline != this._offline
-                        || !fresh.Select(t => t.TabId).SequenceEqual(this._tickets.Select(t => t.TabId));
-                    var old = this._tickets.ToDictionary(t => t.TabId);
-                    imagesChanged = fresh.Where(t => !old.TryGetValue(t.TabId, out var prev) || prev != t)
-                                         .Select(t => TicketPrefix + t.TabId).ToList();
-                    this._offline = offline;
-                    this._tickets = fresh;
+                    this._offline = fresh == null;
+                    this._projects = fresh ?? new List<Project>();
 
-                    var newSelected = this.Selected();
-                    if (this._selectedTabId != null && newSelected == null)
+                    // A closed tab drops you back to its project; a closed workspace back to the projects.
+                    if (this._projectId != null && this.SelectedProject() == null)
                     {
-                        // The ticket tab was closed: fall back to the overview.
-                        this._selectedTabId = null;
-                        namesChanged = true;
+                        this._projectId = null;
+                        this._tabId = null;
                     }
-                    else if (newSelected != null && newSelected != oldSelected)
+                    else if (this._tabId != null && this.SelectedTab() == null)
                     {
-                        imagesChanged.Add(HeaderParam);
+                        this._tabId = null;
                     }
+
+                    var oldParams = this._shownParams;
+                    var oldLooks = this._shownLooks;
+                    this.Remember();
+                    namesChanged = !oldParams.SequenceEqual(this._shownParams);
+                    imagesChanged = this._shownParams.Where(p => !oldLooks.TryGetValue(p, out var look) || !look.Equals(this._shownLooks[p])).ToList();
                 }
 
                 if (namesChanged)
@@ -252,52 +264,138 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
-        private Ticket Selected() => this._selectedTabId == null ? null : this._tickets.FirstOrDefault(t => t.TabId == this._selectedTabId);
+        // Records which keys are on the keypad and how they look, to diff against on the next refresh.
+        private void Remember()
+        {
+            this._shownParams = this.CurrentParams();
+            this._shownLooks = this._shownParams.ToDictionary(p => p, p => this.Look(p));
+        }
 
-        private (String Title, String Subtitle, BitmapColor Accent) Describe(String actionParameter)
+        private Int32 Level() => this._tabId != null ? 2 : this._projectId != null ? 1 : 0;
+
+        private Project SelectedProject() => this._projects.FirstOrDefault(p => p.WorkspaceId == this._projectId);
+
+        private Ticket SelectedTab() => this.SelectedProject()?.Tabs.FirstOrDefault(t => t.TabId == this._tabId);
+
+        private List<String> CurrentParams()
+        {
+            if (this._offline)
+            {
+                return new List<String> { OfflineParam };
+            }
+
+            switch (this.Level())
+            {
+                case 2:
+                    var names = new List<String> { HeaderParam };
+                    names.AddRange(Enumerable.Range(0, KeypadConfig.Current.Actions.Count).Select(i => ActionPrefix + i));
+                    names.Add(BackToProjectParam);
+                    return names;
+                case 1:
+                    return this.Paged(this.SelectedProject().Tabs.Select(t => TabPrefix + t.TabId).ToList()).Append(BackToProjectsParam).ToList();
+                default:
+                    return this.Paged(this._projects.Select(p => ProjectPrefix + p.WorkspaceId).ToList());
+            }
+        }
+
+        // The items on the current page, followed by "meer" when they do not all fit beside the way back.
+        private List<String> Paged(List<String> items)
+        {
+            if (items.Count <= Keys - 1)
+            {
+                this._page = 0;
+                return items;
+            }
+
+            var pages = this.PageCount(items.Count);
+            this._page %= pages;
+            return items.Skip(this._page * (Keys - 2)).Take(Keys - 2).Append(MoreParam).ToList();
+        }
+
+        private Int32 PageCount(Int32 items) => items <= Keys - 1 ? 1 : (items + Keys - 3) / (Keys - 2);
+
+        private (String Title, String Subtitle, BitmapColor Accent) Look(String param)
         {
             lock (this._lock)
             {
-                if (actionParameter == null)
+                if (param == null)
                 {
                     return ("", null, Dim);
                 }
 
-                if (actionParameter == OfflineParam)
+                if (param == OfflineParam)
                 {
                     return ("herdr\nniet bereikbaar", null, StatusColor("blocked"));
                 }
 
-                if (actionParameter == BackParam)
+                if (param == MoreParam)
                 {
-                    return ("terug", null, Dim);
+                    var count = this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._projects.Count;
+                    return ("meer", $"{this._page + 1}/{this.PageCount(count)}", Dim);
                 }
 
-                if (actionParameter == HeaderParam)
+                if (param == BackToProjectsParam)
                 {
-                    var selected = this.Selected();
-                    return selected == null ? ("", null, Dim) : (selected.ShortName, StatusLabel(selected.Status), StatusColor(selected.Status));
+                    return ("terug", "projecten", Dim);
                 }
 
-                if (actionParameter.StartsWith(TicketPrefix))
+                if (param == BackToProjectParam)
                 {
-                    var ticket = this._tickets.FirstOrDefault(t => t.TabId == actionParameter[TicketPrefix.Length..]);
-                    return ticket == null ? ("", null, Dim) : (ticket.ShortName, StatusLabel(ticket.Status), StatusColor(ticket.Status));
+                    return ("terug", this.SelectedProject()?.Name, Dim);
                 }
 
-                if (actionParameter.StartsWith(ActionPrefix) && Int32.TryParse(actionParameter[ActionPrefix.Length..], out var index))
+                if (param == HeaderParam)
+                {
+                    var tab = this.SelectedTab();
+                    return tab == null ? ("", null, Dim) : (tab.ShortName, StatusLabel(tab.Status), StatusColor(tab.Status));
+                }
+
+                if (param.StartsWith(ProjectPrefix))
+                {
+                    var project = this._projects.FirstOrDefault(p => p.WorkspaceId == param[ProjectPrefix.Length..]);
+                    return project == null ? ("", null, Dim) : (project.Name, Summary(project), StatusColor(project.Status));
+                }
+
+                if (param.StartsWith(TabPrefix))
+                {
+                    var tab = this.SelectedProject()?.Tabs.FirstOrDefault(t => t.TabId == param[TabPrefix.Length..]);
+                    return tab == null ? ("", null, Dim) : (tab.ShortName, StatusLabel(tab.Status), StatusColor(tab.Status));
+                }
+
+                if (param.StartsWith(ActionPrefix) && Int32.TryParse(param[ActionPrefix.Length..], out var index))
                 {
                     var actions = KeypadConfig.Current.Actions;
                     if (index >= 0 && index < actions.Count)
                     {
                         var action = actions[index];
-                        var accent = ParseHex(action.Color) ?? Dim;
-                        return (action.Label ?? action.Value ?? "?", null, accent);
+                        return (action.Label ?? action.Value ?? "?", null, ParseHex(action.Color) ?? Dim);
                     }
                 }
 
                 return ("?", null, Dim);
             }
+        }
+
+        // "1 wacht, 2 klaar": what a project's agents need, most urgent first.
+        private static String Summary(Project project)
+        {
+            var parts = new List<String>();
+            if (project.Count("blocked") > 0)
+            {
+                parts.Add($"{project.Count("blocked")} wacht");
+            }
+
+            if (project.Count("done") > 0)
+            {
+                parts.Add($"{project.Count("done")} klaar");
+            }
+
+            if (project.Count("working") > 0)
+            {
+                parts.Add($"{project.Count("working")} bezig");
+            }
+
+            return parts.Count > 0 ? String.Join(", ", parts) : "rustig";
         }
 
         private static String StatusLabel(String status) => status switch
@@ -315,7 +413,7 @@ namespace Loupedeck.HerdrPlugin
             "blocked" => new BitmapColor(229, 72, 77),
             "done" => new BitmapColor(255, 138, 61),
             "working" => new BitmapColor(245, 196, 81),
-            _ => new BitmapColor(110, 110, 110),
+            _ => Dim,
         };
 
         private static BitmapColor? ParseHex(String hex)
@@ -329,12 +427,12 @@ namespace Loupedeck.HerdrPlugin
             return new BitmapColor((Int32)(rgb >> 16) & 0xFF, (Int32)(rgb >> 8) & 0xFF, (Int32)rgb & 0xFF);
         }
 
-        // Breaks a label into at most three short lines so it fits a key.
+        // Breaks a label into at most a few short lines so it fits a key.
         private static String Wrap(String text, Int32 width = 11, Int32 maxLines = 3)
         {
-            if (text.Contains('\n'))
+            if (String.IsNullOrEmpty(text) || text.Contains('\n'))
             {
-                return text;
+                return text ?? "";
             }
 
             var lines = new List<String>();

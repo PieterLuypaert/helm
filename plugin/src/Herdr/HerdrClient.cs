@@ -8,7 +8,7 @@ namespace Loupedeck.HerdrPlugin
     using System.Text.Json;
     using System.Text.RegularExpressions;
 
-    // One ticket tab in herdr: a tab opened by hagent, with its Claude agent.
+    // One tab with a Claude agent: a ticket tab opened by hagent, or the project's main tab.
     public sealed record Ticket(
         String TabId,
         Int32 Number,
@@ -19,7 +19,30 @@ namespace Loupedeck.HerdrPlugin
         String PaneId,
         String Cwd,
         String Topic,
-        Boolean Focused);
+        Boolean Focused,
+        Boolean IsMain);
+
+    // One herdr workspace: a project, with its main tab first and then its tickets in the order you opened them.
+    public sealed record Project(
+        String WorkspaceId,
+        Int32 Number,
+        String Name,
+        Boolean Focused,
+        IReadOnlyList<Ticket> Tabs)
+    {
+        private static readonly String[] Urgency = { "blocked", "done", "working", "idle", "unknown" };
+
+        // The most urgent status of its tabs: blocked before done before working.
+        public String Status => this.Tabs.Select(t => t.Status).OrderBy(s => Array.IndexOf(Urgency, s) is var i && i < 0 ? Urgency.Length : i).FirstOrDefault() ?? "idle";
+
+        public Int32 Count(String status) => this.Tabs.Count(t => t.Status == status);
+
+        public Boolean Equals(Project other) =>
+            other != null && other.WorkspaceId == this.WorkspaceId && other.Number == this.Number && other.Name == this.Name
+            && other.Focused == this.Focused && other.Tabs.SequenceEqual(this.Tabs);
+
+        public override Int32 GetHashCode() => HashCode.Combine(this.WorkspaceId, this.Name, this.Tabs.Count);
+    }
 
     // Talks to the herdr server through its CLI, which reaches the socket API from outside herdr.
     public static class HerdrClient
@@ -47,13 +70,13 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
-        // Ticket tabs of the workspace that holds the focused tab, in the order they were opened.
-        // Returns null when herdr cannot be reached.
-        public static List<Ticket> ReadTickets()
+        // Every herdr workspace as a project, in herdr's order. Returns null when herdr cannot be reached.
+        public static List<Project> ReadProjects()
         {
+            var workspacesJson = Run(HerdrBinary, "workspace", "list");
             var tabsJson = Run(HerdrBinary, "tab", "list");
             var agentsJson = Run(HerdrBinary, "agent", "list");
-            if (tabsJson == null || agentsJson == null)
+            if (workspacesJson == null || tabsJson == null || agentsJson == null)
             {
                 return null;
             }
@@ -72,52 +95,26 @@ namespace Loupedeck.HerdrPlugin
                 }
 
                 using var tabsDoc = JsonDocument.Parse(tabsJson);
-                var tabs = tabsDoc.RootElement.GetProperty("result").GetProperty("tabs").EnumerateArray().Select(t => t.Clone()).ToList();
-                var focusedWorkspace = tabs.Where(t => t.TryGetProperty("focused", out var f) && f.GetBoolean())
-                                           .Select(t => Str(t, "workspace_id")).FirstOrDefault();
+                var tabsByWorkspace = tabsDoc.RootElement.GetProperty("result").GetProperty("tabs").EnumerateArray()
+                    .Select(t => t.Clone())
+                    .GroupBy(t => Str(t, "workspace_id") ?? "")
+                    .ToDictionary(g => g.Key, g => g.ToList());
 
-                var raw = new List<(JsonElement Tab, JsonElement? Agent, String Branch)>();
-                foreach (var tab in tabs)
+                using var workspacesDoc = JsonDocument.Parse(workspacesJson);
+                var projects = new List<Project>();
+                foreach (var workspace in workspacesDoc.RootElement.GetProperty("result").GetProperty("workspaces").EnumerateArray())
                 {
-                    if (focusedWorkspace != null && Str(tab, "workspace_id") != focusedWorkspace)
-                    {
-                        continue;
-                    }
-
-                    var label = Str(tab, "label") ?? "";
-                    agentsByTab.TryGetValue(Str(tab, "tab_id") ?? "", out var agent);
-                    var hasAgent = agentsByTab.ContainsKey(Str(tab, "tab_id") ?? "");
-                    var cwd = hasAgent ? Str(agent, "cwd") ?? "" : "";
-
-                    // hagent names a ticket tab after its branch and opens it in a worktree.
-                    var isTicket = label.Contains('/') || cwd.Contains("/worktrees/");
-                    if (!isTicket)
-                    {
-                        continue;
-                    }
-
-                    raw.Add((tab, hasAgent ? agent : null, PortSuffix.Replace(label, "")));
+                    var id = Str(workspace, "workspace_id");
+                    var tabs = tabsByWorkspace.GetValueOrDefault(id ?? "") ?? new List<JsonElement>();
+                    projects.Add(new Project(
+                        WorkspaceId: id,
+                        Number: Int(workspace, "number"),
+                        Name: Str(workspace, "label") ?? id,
+                        Focused: Bool(workspace, "focused"),
+                        Tabs: ReadTabs(tabs, agentsByTab)));
                 }
 
-                var shortNames = TicketNames.Shorten(raw.Select(r => r.Branch).ToList());
-                var tickets = new List<Ticket>();
-                for (var i = 0; i < raw.Count; i++)
-                {
-                    var (tab, agent, branch) = raw[i];
-                    tickets.Add(new Ticket(
-                        TabId: Str(tab, "tab_id"),
-                        Number: tab.TryGetProperty("number", out var n) ? n.GetInt32() : 0,
-                        WorkspaceId: Str(tab, "workspace_id"),
-                        Branch: branch,
-                        ShortName: shortNames[i],
-                        Status: agent.HasValue ? Str(agent.Value, "agent_status") ?? "unknown" : Str(tab, "agent_status") ?? "unknown",
-                        PaneId: agent.HasValue ? Str(agent.Value, "pane_id") : null,
-                        Cwd: agent.HasValue ? Str(agent.Value, "cwd") : null,
-                        Topic: agent.HasValue ? Str(agent.Value, "terminal_title_stripped") : null,
-                        Focused: tab.TryGetProperty("focused", out var f) && f.GetBoolean()));
-                }
-
-                return tickets.OrderBy(t => t.Number).ToList();
+                return projects.OrderBy(p => p.Number).ToList();
             }
             catch (Exception ex)
             {
@@ -125,6 +122,62 @@ namespace Loupedeck.HerdrPlugin
                 return null;
             }
         }
+
+        // The tabs of one workspace that hold an agent or a ticket: main tabs first, then tickets by number.
+        private static List<Ticket> ReadTabs(List<JsonElement> tabs, Dictionary<String, JsonElement> agentsByTab)
+        {
+            var mains = new List<(JsonElement Tab, JsonElement? Agent)>();
+            var tickets = new List<(JsonElement Tab, JsonElement? Agent, String Branch)>();
+            foreach (var tab in tabs.OrderBy(t => Int(t, "number")))
+            {
+                var label = Str(tab, "label") ?? "";
+                var hasAgent = agentsByTab.TryGetValue(Str(tab, "tab_id") ?? "", out var agent);
+                var cwd = hasAgent ? Str(agent, "cwd") ?? "" : "";
+
+                // hagent names a ticket tab after its branch and opens it in a worktree.
+                if (label.Contains('/') || cwd.Contains("/worktrees/"))
+                {
+                    tickets.Add((tab, hasAgent ? agent : null, PortSuffix.Replace(label, "")));
+                }
+                else if (hasAgent)
+                {
+                    mains.Add((tab, agent));
+                }
+            }
+
+            var result = new List<Ticket>();
+            for (var i = 0; i < mains.Count; i++)
+            {
+                var (tab, agent) = mains[i];
+                var label = Str(tab, "label") ?? "";
+                var name = Int32.TryParse(label, out _) || label.Length == 0 ? (i == 0 ? "main" : $"main {i + 1}") : label;
+                result.Add(ToTicket(tab, agent, name, name, isMain: true));
+            }
+
+            var shortNames = TicketNames.Shorten(tickets.Select(t => t.Branch).ToList());
+            for (var i = 0; i < tickets.Count; i++)
+            {
+                result.Add(ToTicket(tickets[i].Tab, tickets[i].Agent, tickets[i].Branch, shortNames[i], isMain: false));
+            }
+
+            return result;
+        }
+
+        private static Ticket ToTicket(JsonElement tab, JsonElement? agent, String branch, String shortName, Boolean isMain) =>
+            new(
+                TabId: Str(tab, "tab_id"),
+                Number: Int(tab, "number"),
+                WorkspaceId: Str(tab, "workspace_id"),
+                Branch: branch,
+                ShortName: shortName,
+                Status: agent.HasValue ? Str(agent.Value, "agent_status") ?? "unknown" : Str(tab, "agent_status") ?? "unknown",
+                PaneId: agent.HasValue ? Str(agent.Value, "pane_id") : null,
+                Cwd: agent.HasValue ? Str(agent.Value, "cwd") : null,
+                Topic: agent.HasValue ? Str(agent.Value, "terminal_title_stripped") : null,
+                Focused: Bool(tab, "focused"),
+                IsMain: isMain);
+
+        public static void FocusWorkspace(String workspaceId) => Run(HerdrBinary, "workspace", "focus", workspaceId);
 
         public static void FocusTab(String tabId) => Run(HerdrBinary, "tab", "focus", tabId);
 
@@ -195,6 +248,14 @@ namespace Loupedeck.HerdrPlugin
                 return null;
             }
         }
+
+        private static Int32 Int(JsonElement element, String name) =>
+            element.ValueKind == JsonValueKind.Object && element.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number
+                ? value.GetInt32()
+                : 0;
+
+        private static Boolean Bool(JsonElement element, String name) =>
+            element.ValueKind == JsonValueKind.Object && element.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.True;
 
         private static String Str(JsonElement element, String name) =>
             element.ValueKind == JsonValueKind.Object && element.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String
