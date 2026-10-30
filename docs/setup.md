@@ -4,7 +4,7 @@ Everything the README keeps short: every field of the action config, the herdr c
 
 ## Actions
 
-Edit `config/keypad.json`. The plugin reads it again when it changes, so no rebuild is needed.
+Edit `config/keypad.json`. The plugin reads it again when it changes, so no rebuild is needed. The issue page holds seven actions; any after the seventh do not show. A file that does not parse is reported once in the plugin log, and the defaults apply until you save it again.
 
 | Field | Meaning |
 |---|---|

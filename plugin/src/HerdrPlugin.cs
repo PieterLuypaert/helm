@@ -28,6 +28,7 @@ namespace Loupedeck.HerdrPlugin
             // One reader of herdr for the whole plugin: the folder and the All issues key share it. A change
             // in a pull request makes it read herdr again, so the keys show it at once.
             PullRequests.Changed += HerdrState.Refresh;
+            PullRequests.Start();
             HerdrState.Start();
         }
 

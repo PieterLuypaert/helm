@@ -30,7 +30,8 @@ namespace Loupedeck.HerdrPlugin
         private static readonly TimeSpan FlashTime = TimeSpan.FromMilliseconds(1500);
 
         private readonly Object _lock = new();
-        private readonly Dictionary<String, KeyLook> _flashes = new();
+        private readonly Dictionary<String, (KeyLook Look, Int32 Id)> _flashes = new();
+        private Int32 _flashCount;
         private Snapshot _snapshot = Snapshot.Empty;
         private String _projectId;
         private String _tabId;
@@ -38,6 +39,13 @@ namespace Loupedeck.HerdrPlugin
 
         // True while you browse the overview of all issues rather than one project.
         private Boolean _all;
+
+        // The overview's order, fixed while you page through it and visit its issues: sorted afresh only
+        // when you open it, so a status change does not move keys between pages under your fingers.
+        private List<String> _overviewOrder;
+
+        // The page of the list you opened the issue from, for back.
+        private Int32 _returnPage;
         private String _lastSeenFocus;
         private Boolean _active;
         private List<String> _shownParams = new();
@@ -50,8 +58,11 @@ namespace Loupedeck.HerdrPlugin
             this.GroupName = "Herdr";
 
             // The folder places its own back keys. Logi reads this property, which defaults to adding a back key
-            // of its own on every page, next to ours.
+            // of its own on every page, next to ours. The SDK marks it obsolete in favour of GetNavigationArea,
+            // but on the MX Keypad only this property removes Logi's key.
+#pragma warning disable CS0618
             this.Navigation = PluginDynamicFolderNavigation.None;
+#pragma warning restore CS0618
         }
 
         // The action name that opens this folder, for the All issues key.
@@ -119,8 +130,9 @@ namespace Loupedeck.HerdrPlugin
             {
                 var names = this.CurrentParams().Select(p => this.CreateCommandName(p)).ToList();
 
-                // Only the projects close the menu, with Logi's own back key; every other page has ours.
-                if (this.Level() == 0)
+                // Only the projects close the menu, with Logi's own back key; every other page has ours. With
+                // herdr offline there is only the offline key, so the menu needs Logi's back key to close.
+                if (this.Level() == 0 || this._snapshot.Offline)
                 {
                     names.Add(PluginDynamicFolder.NavigateUpActionName);
                 }
@@ -166,6 +178,7 @@ namespace Loupedeck.HerdrPlugin
                 lock (this._lock)
                 {
                     this._all = true;
+                    this._overviewOrder = null;
                 }
 
                 this.Navigate(null, null);
@@ -179,6 +192,7 @@ namespace Loupedeck.HerdrPlugin
                 lock (this._lock)
                 {
                     owner = this._snapshot.FindTab(id).Project;
+                    this._returnPage = this._page;
                 }
 
                 this.Navigate(owner?.WorkspaceId ?? project?.WorkspaceId, id);
@@ -186,14 +200,16 @@ namespace Loupedeck.HerdrPlugin
             }
             else if (actionParameter == BackToProjectParam)
             {
-                // Back where you came from: the overview of all issues, or the issue's project.
+                // Back where you came from: the overview of all issues, or the issue's project, on the page
+                // you opened the issue from.
                 Boolean all;
                 lock (this._lock)
                 {
                     all = this._all;
+                    this._page = this._returnPage;
                 }
 
-                this.Navigate(all ? null : project?.WorkspaceId, null);
+                this.Navigate(all ? null : project?.WorkspaceId, null, keepPage: true);
             }
             else if (actionParameter == BackToProjectsParam)
             {
@@ -213,10 +229,18 @@ namespace Loupedeck.HerdrPlugin
 
                 this.Navigate(project?.WorkspaceId, tab?.TabId, keepPage: true);
             }
-            else if (actionParameter.StartsWith(AnswerPrefix) && tab?.Question != null
-                     && Int32.TryParse(actionParameter[AnswerPrefix.Length..], out var choice))
+            else if (FolderKeys.TryParseKeyed(actionParameter, AnswerPrefix, out var choice, out var askingId))
             {
-                this.Answer(actionParameter, tab, choice);
+                Issue asking;
+                lock (this._lock)
+                {
+                    asking = this._snapshot.FindTab(askingId).Tab;
+                }
+
+                if (asking?.Question != null)
+                {
+                    this.Answer(actionParameter, asking, choice);
+                }
             }
             else if (actionParameter == OnScreenParam && tab != null)
             {
@@ -230,13 +254,18 @@ namespace Loupedeck.HerdrPlugin
             {
                 Task.Run(HerdrState.Refresh);
             }
-            else if (actionParameter.StartsWith(ActionPrefix) && tab != null
-                     && Int32.TryParse(actionParameter[ActionPrefix.Length..], out var index))
+            else if (FolderKeys.TryParseKeyed(actionParameter, ActionPrefix, out var index, out var targetId))
             {
-                var actions = KeypadConfig.Current.Actions;
-                if (index >= 0 && index < actions.Count)
+                Issue target;
+                lock (this._lock)
                 {
-                    this.RunAction(actionParameter, actions[index], tab);
+                    target = this._snapshot.FindTab(targetId).Tab;
+                }
+
+                var actions = KeypadConfig.Current.Actions;
+                if (target != null && index >= 0 && index < actions.Count)
+                {
+                    this.RunAction(actionParameter, actions[index], target);
                 }
             }
         }
@@ -290,6 +319,7 @@ namespace Loupedeck.HerdrPlugin
                 if (now == null || now.Signature != shown.Signature)
                 {
                     this.Flash(param, new KeyLook("changed, look again", Icons.Refresh, AgentStatus.Overlay, KeyStyle.Highlight));
+                    HerdrState.ForgetQuestion(tab.PaneId);
                     HerdrState.Refresh();
                     return;
                 }
@@ -309,9 +339,11 @@ namespace Loupedeck.HerdrPlugin
         // Shows a look on one key for a moment, then the key's own look again.
         private void Flash(String param, KeyLook look)
         {
+            Int32 id;
             lock (this._lock)
             {
-                this._flashes[param] = look;
+                id = ++this._flashCount;
+                this._flashes[param] = (look, id);
             }
 
             this.CommandImageChanged(param);
@@ -319,7 +351,11 @@ namespace Loupedeck.HerdrPlugin
             {
                 lock (this._lock)
                 {
-                    this._flashes.Remove(param);
+                    // A newer flash on the same key keeps its own full time.
+                    if (this._flashes.TryGetValue(param, out var shown) && shown.Id == id)
+                    {
+                        this._flashes.Remove(param);
+                    }
                 }
 
                 this.CommandImageChanged(param);
@@ -355,6 +391,7 @@ namespace Loupedeck.HerdrPlugin
             }
 
             this._all = request.Value.WorkspaceId == HerdrState.AllIssues;
+            this._overviewOrder = null;
             this._projectId = this._all ? null : request.Value.WorkspaceId;
             this._tabId = this._all ? null : request.Value.TabId;
             this._page = 0;
@@ -375,31 +412,44 @@ namespace Loupedeck.HerdrPlugin
 
                 // On an issue page, the keypad follows the tab herdr shows. It reacts to a change on the
                 // screen only, so a key press is not undone while herdr still shows the previous tab.
+                // While herdr cannot be read, the keys say so but keep your place for when it is back.
                 var focus = snapshot.FocusedTabId;
-                var screenMoved = focus != this._lastSeenFocus;
-                this._lastSeenFocus = focus;
+                var screenMoved = !snapshot.Offline && focus != this._lastSeenFocus;
+                if (!snapshot.Offline)
+                {
+                    this._lastSeenFocus = focus;
+                }
+
                 if ((screenMoved || followScreen) && this.Level() == 2 && focus != null && focus != this._tabId)
                 {
                     var (project, tab) = snapshot.FindTab(focus);
                     if (tab != null)
                     {
+                        if (!this._all && project.WorkspaceId != this._projectId)
+                        {
+                            this._returnPage = 0;
+                        }
+
                         this._projectId = project.WorkspaceId;
                         this._tabId = tab.TabId;
                     }
                 }
 
                 // A closed tab drops you back to its project; a closed workspace back to the projects.
-                if (this._projectId != null && this.SelectedProject() == null)
+                if (!snapshot.Offline)
                 {
-                    this._projectId = null;
-                    this._tabId = null;
-                }
-                else if (this._tabId != null && this.SelectedTab() == null)
-                {
-                    this._tabId = null;
-                    if (this._all)
+                    if (this._projectId != null && this.SelectedProject() == null)
                     {
                         this._projectId = null;
+                        this._tabId = null;
+                    }
+                    else if (this._tabId != null && this.SelectedTab() == null)
+                    {
+                        this._tabId = null;
+                        if (this._all)
+                        {
+                            this._projectId = null;
+                        }
                     }
                 }
 
@@ -472,26 +522,35 @@ namespace Loupedeck.HerdrPlugin
                         // cannot hold the question: helm cannot read it, or it has more choices than fit.
                         var choices = tab.Question?.Options.Count ?? 0;
                         var fits = choices > 0 && choices <= Keys - 2;
-                        names.AddRange(Enumerable.Range(0, fits ? choices : Math.Min(choices, Keys - 3)).Select(i => AnswerPrefix + i));
+                        names.AddRange(Enumerable.Range(0, fits ? choices : Math.Min(choices, Keys - 3)).Select(i => FolderKeys.Keyed(AnswerPrefix, i, tab.TabId)));
                         if (!fits)
                         {
                             names.Add(OnScreenParam);
                         }
                     }
-                    else
+                    else if (tab != null)
                     {
-                        names.AddRange(Enumerable.Range(0, KeypadConfig.Current.Actions.Count).Select(i => ActionPrefix + i));
+                        // Seven keys between the issue and the way back: actions past the seventh do not fit.
+                        names.AddRange(Enumerable.Range(0, Math.Min(KeypadConfig.Current.Actions.Count, Keys - 2)).Select(i => FolderKeys.Keyed(ActionPrefix, i, tab.TabId)));
                     }
 
                     names.Add(BackToProjectParam);
                     return names;
                 case 1 when this._all:
-                    return this.Paged(this._snapshot.AllTabs().Select(x => TabPrefix + x.Tab.TabId).ToList()).Append(BackToProjectsParam).ToList();
+                    return this.Paged(this.OverviewOrder().Select(id => TabPrefix + id).ToList()).Append(BackToProjectsParam).ToList();
                 case 1:
-                    return this.Paged(this.SelectedProject().Tabs.Select(t => TabPrefix + t.TabId).ToList()).Append(BackToProjectsParam).ToList();
+                    var tabs = this.SelectedProject()?.Tabs ?? Array.Empty<Issue>();
+                    return this.Paged(tabs.Select(t => TabPrefix + t.TabId).ToList()).Append(BackToProjectsParam).ToList();
                 default:
                     return this.Paged(this._snapshot.Projects.Select(p => ProjectPrefix + p.WorkspaceId).Prepend(AllParam).ToList());
             }
+        }
+
+        // Every tab in the overview's fixed order. Call under the lock.
+        private List<String> OverviewOrder()
+        {
+            this._overviewOrder = FolderKeys.KeepOrder(this._overviewOrder, this._snapshot.AllTabs().Select(x => x.Tab.TabId).ToList());
+            return this._overviewOrder;
         }
 
         // The items on the current page, followed by "more" when they do not all fit beside the way back.
@@ -516,7 +575,7 @@ namespace Loupedeck.HerdrPlugin
             {
                 if (param != null && this._flashes.TryGetValue(param, out var flash))
                 {
-                    return flash;
+                    return flash.Look;
                 }
 
                 var focus = this._snapshot.FocusedTabId;
@@ -533,7 +592,7 @@ namespace Loupedeck.HerdrPlugin
                     case BackToProjectParam:
                         return new KeyLook("back", Icons.Back, nav);
                     case MoreParam:
-                        var count = this._all ? this._snapshot.AllTabs().Count : this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count + 1;
+                        var count = this._all ? this.OverviewOrder().Count : this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count + 1;
                         return new KeyLook($"more {this._page + 1}/{PageCount(count)}", Icons.Dots, nav);
                     case OnScreenParam:
                         return new KeyLook("answer on screen", Icons.Screen, nav);
@@ -582,9 +641,9 @@ namespace Loupedeck.HerdrPlugin
                     return new KeyLook(label, icon, AgentStatus.Color(tab.Status), Framed: tab.TabId == focus);
                 }
 
-                if (param.StartsWith(AnswerPrefix) && Int32.TryParse(param[AnswerPrefix.Length..], out var choiceIndex))
+                if (FolderKeys.TryParseKeyed(param, AnswerPrefix, out var choiceIndex, out var askingId))
                 {
-                    var asking = this.SelectedTab();
+                    var asking = this._snapshot.FindTab(askingId).Tab;
                     var question = asking?.Question;
                     if (question != null && choiceIndex >= 0 && choiceIndex < question.Options.Count)
                     {
@@ -604,10 +663,10 @@ namespace Loupedeck.HerdrPlugin
                     }
                 }
 
-                if (param.StartsWith(ActionPrefix) && Int32.TryParse(param[ActionPrefix.Length..], out var index))
+                if (FolderKeys.TryParseKeyed(param, ActionPrefix, out var index, out var targetId))
                 {
                     var actions = KeypadConfig.Current.Actions;
-                    var selectedTab = this.SelectedTab();
+                    var selectedTab = this._snapshot.FindTab(targetId).Tab;
                     var status = selectedTab?.Status ?? AgentStatus.Unknown;
                     if (index >= 0 && index < actions.Count)
                     {

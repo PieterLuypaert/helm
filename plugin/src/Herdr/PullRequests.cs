@@ -22,11 +22,15 @@ namespace Loupedeck.HerdrPlugin
         private static readonly String[] Failing = { "FAILURE", "ERROR", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED", "STARTUP_FAILURE" };
         private static readonly String[] Passing = { "SUCCESS", "NEUTRAL", "SKIPPED" };
 
+        // gh asks GitHub for every check of every open pull request, which takes longer than a herdr call.
+        private static readonly TimeSpan GhTimeout = TimeSpan.FromSeconds(30);
+
         private static readonly Object Gate = new();
         private static HashSet<String> _tracked = new();
         private static Dictionary<String, (String Branch, String Repo)> _checkouts = new();
         private static Dictionary<String, Dictionary<String, PrInfo>> _byRepo = new();
         private static Timer _timer;
+        private static Boolean _running;
         private static Int32 _refreshing;
 
         // Raised when a pull request changed, so the keys can show it.
@@ -35,6 +39,37 @@ namespace Loupedeck.HerdrPlugin
         public static String GhBinary =>
             new[] { "/opt/homebrew/bin/gh", "/usr/local/bin/gh", "/usr/bin/gh" }.FirstOrDefault(File.Exists);
 
+        public static Boolean IsRunning
+        {
+            get
+            {
+                lock (Gate)
+                {
+                    return _running;
+                }
+            }
+        }
+
+        public static void Start()
+        {
+            lock (Gate)
+            {
+                _running = true;
+                _timer ??= new Timer(_ => Refresh(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+            }
+        }
+
+        // Stops for good: a herdr read still in flight when the plugin unloads must not start it again.
+        public static void Stop()
+        {
+            lock (Gate)
+            {
+                _running = false;
+                _timer?.Dispose();
+                _timer = null;
+            }
+        }
+
         // The folders of the issue tabs on screen; new ones are read right away, the rest once a minute.
         public static void Track(IEnumerable<String> cwds)
         {
@@ -42,23 +77,13 @@ namespace Loupedeck.HerdrPlugin
             Boolean hasNew;
             lock (Gate)
             {
-                hasNew = fresh.Any(c => !_tracked.Contains(c));
+                hasNew = _running && fresh.Any(c => !_tracked.Contains(c));
                 _tracked = fresh;
-                _timer ??= new Timer(_ => Refresh(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
             }
 
             if (hasNew)
             {
                 Task.Run(Refresh);
-            }
-        }
-
-        public static void Stop()
-        {
-            lock (Gate)
-            {
-                _timer?.Dispose();
-                _timer = null;
             }
         }
 
@@ -99,9 +124,10 @@ namespace Loupedeck.HerdrPlugin
                     cwds = _tracked.ToArray();
                 }
 
-                // The real branch of each worktree: a tab's label can be stale.
+                // The real branch of each worktree: a tab's label can be stale. A worktree removed under a
+                // running agent has no branch to read.
                 var checkouts = new Dictionary<String, (String Branch, String Repo)>();
-                foreach (var cwd in cwds)
+                foreach (var cwd in cwds.Where(Directory.Exists))
                 {
                     var branch = HerdrClient.RunTool(cwd, "/usr/bin/git", "-C", cwd, "branch", "--show-current").Output?.Trim() ?? "";
                     var repo = RepoSlug(HerdrClient.RunTool(cwd, "/usr/bin/git", "-C", cwd, "remote", "get-url", "origin").Output ?? "");
@@ -115,9 +141,9 @@ namespace Loupedeck.HerdrPlugin
                 foreach (var repo in checkouts.Values.Select(c => c.Repo).Distinct())
                 {
                     // Only your own pull requests: a team repo has more open ones than any limit holds.
-                    var open = HerdrClient.RunTool(null, gh, "pr", "list", "--repo", repo, "--author", "@me", "--state", "open", "--limit", "50",
+                    var open = HerdrClient.RunTool(null, GhTimeout, gh, "pr", "list", "--repo", repo, "--author", "@me", "--state", "open", "--limit", "50",
                         "--json", "number,url,state,headRefName,isDraft,reviewDecision,statusCheckRollup");
-                    var merged = HerdrClient.RunTool(null, gh, "pr", "list", "--repo", repo, "--author", "@me", "--state", "merged", "--limit", "30",
+                    var merged = HerdrClient.RunTool(null, GhTimeout, gh, "pr", "list", "--repo", repo, "--author", "@me", "--state", "merged", "--limit", "30",
                         "--json", "number,url,state,headRefName");
                     if (!open.Ok)
                     {

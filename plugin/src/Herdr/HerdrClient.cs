@@ -274,6 +274,8 @@ end tell";
         public static CommandResult Shell(String command, String cwd) =>
             RunChecked(cwd, "/bin/bash", new[] { "-c", command }, new Dictionary<String, String> { ["ISSUE_CWD"] = cwd ?? "" });
 
+        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(5);
+
         // Runs a command and returns its stdout, or null when it fails or takes longer than five seconds.
         private static String Run(String file, params String[] args)
         {
@@ -286,7 +288,10 @@ end tell";
         // Runs any tool with the plugin's PATH, such as git or gh, and reports how it went.
         public static CommandResult RunTool(String cwd, String file, params String[] args) => RunChecked(cwd, file, args, null);
 
-        private static CommandResult RunChecked(String cwd, String file, String[] args, IDictionary<String, String> env)
+        // The same, for a tool that may take longer than five seconds.
+        public static CommandResult RunTool(String cwd, TimeSpan timeout, String file, params String[] args) => RunChecked(cwd, file, args, null, timeout);
+
+        private static CommandResult RunChecked(String cwd, String file, String[] args, IDictionary<String, String> env, TimeSpan? timeout = null)
         {
             try
             {
@@ -313,11 +318,19 @@ end tell";
                 using var process = Process.Start(psi);
                 var stdout = process.StandardOutput.ReadToEndAsync();
                 var stderr = process.StandardError.ReadToEndAsync();
-                if (!process.WaitForExit(5000))
+                if (!process.WaitForExit(timeout ?? DefaultTimeout))
                 {
                     try { process.Kill(true); } catch { }
                     PluginLog.Warning($"Timed out: {file} {String.Join(' ', args)}");
                     return new CommandResult(false, null, "timed out");
+                }
+
+                // A command can exit while something it started in the background keeps its output open,
+                // such as `cmd &` in a shell action: take what it wrote so far rather than wait for that.
+                if (!System.Threading.Tasks.Task.WaitAll(new[] { stdout, stderr }, TimeSpan.FromSeconds(1)))
+                {
+                    PluginLog.Warning($"Output still open after exit: {file} {String.Join(' ', args)}");
+                    return process.ExitCode == 0 ? new CommandResult(true, "", null) : new CommandResult(false, "", "failed");
                 }
 
                 if (process.ExitCode != 0)

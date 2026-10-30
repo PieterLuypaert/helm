@@ -73,6 +73,43 @@ public class StatusTests
     }
 
     [Fact]
+    public void A_navigation_request_is_used_once_and_expires()
+    {
+        var now = new DateTime(2026, 10, 30, 20, 0, 0, DateTimeKind.Utc);
+        HerdrState.RequestNavigation(HerdrState.AllIssues, null, now);
+        Assert.Equal(HerdrState.AllIssues, HerdrState.TakeNavigationRequest(now.AddSeconds(1))?.WorkspaceId);
+        Assert.Null(HerdrState.TakeNavigationRequest(now.AddSeconds(1)));
+
+        HerdrState.RequestNavigation(HerdrState.AllIssues, null, now);
+        Assert.Null(HerdrState.TakeNavigationRequest(now.AddSeconds(30)));
+    }
+
+    [Fact]
+    public void Pull_requests_do_not_start_reading_from_a_track_after_stop()
+    {
+        PullRequests.Stop();
+        PullRequests.Track(new[] { "/tmp/helm-test-worktree" });
+        Assert.False(PullRequests.IsRunning);
+    }
+
+    [Fact]
+    public void A_key_name_carries_the_tab_it_was_drawn_for()
+    {
+        var name = FolderKeys.Keyed("act:", 3, "wW:tQ");
+        Assert.True(FolderKeys.TryParseKeyed(name, "act:", out var index, out var tabId));
+        Assert.Equal((3, "wW:tQ"), (index, tabId));
+        Assert.False(FolderKeys.TryParseKeyed("act:3", "act:", out _, out _));
+        Assert.False(FolderKeys.TryParseKeyed(name, "ans:", out _, out _));
+    }
+
+    [Fact]
+    public void The_overview_keeps_its_order_drops_closed_tabs_and_adds_new_ones_last()
+    {
+        Assert.Equal(new[] { "b", "a" }, FolderKeys.KeepOrder(null, new[] { "b", "a" }));
+        Assert.Equal(new[] { "a", "c", "d" }, FolderKeys.KeepOrder(new[] { "a", "b", "c" }, new[] { "d", "c", "a" }));
+    }
+
+    [Fact]
     public void Main_tabs_are_not_counted_as_issues_and_come_last_unless_they_need_you()
     {
         Issue Tab(String id, Int32 number, String status, Boolean main = false) =>

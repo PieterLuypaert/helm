@@ -1,6 +1,7 @@
 namespace Loupedeck.HerdrPlugin
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
@@ -68,11 +69,19 @@ namespace Loupedeck.HerdrPlugin
 
         private static readonly Object Gate = new();
         private static readonly Dictionary<String, (Int64 Seq, Boolean HasPlan)> Plans = new();
-        private static readonly Dictionary<String, (Int64 Seq, Question Question)> Asked = new();
+
+        // Read by the poll and cleared by an answer that found the question changed.
+        private static readonly ConcurrentDictionary<String, (Int64 Seq, Question Question)> Asked = new();
         private static Snapshot _current = Snapshot.Empty;
         private static Timer _timer;
         private static Int32 _refreshing;
-        private static (String WorkspaceId, String TabId)? _requested;
+        private static Int32 _failedReads;
+        private static Int32 _configVersion;
+        private static (String WorkspaceId, String TabId, DateTime At)? _requested;
+
+        // How long a request waits for the folder to open. Logi may not open it at all; the Projects key
+        // must then still open on your projects.
+        private static readonly TimeSpan RequestLifetime = TimeSpan.FromSeconds(5);
 
         public static event Action<Snapshot> Changed;
 
@@ -101,23 +110,28 @@ namespace Loupedeck.HerdrPlugin
         // Asks the folder to open on the overview of all issues.
         public const String AllIssues = "*all*";
 
-        public static void RequestNavigation(String workspaceId, String tabId)
+        public static void RequestNavigation(String workspaceId, String tabId) => RequestNavigation(workspaceId, tabId, DateTime.UtcNow);
+
+        public static void RequestNavigation(String workspaceId, String tabId, DateTime now)
         {
             lock (Gate)
             {
-                _requested = (workspaceId, tabId);
+                _requested = (workspaceId, tabId, now);
             }
 
             NavigationRequested?.Invoke();
         }
 
-        public static (String WorkspaceId, String TabId)? TakeNavigationRequest()
+        public static (String WorkspaceId, String TabId)? TakeNavigationRequest() => TakeNavigationRequest(DateTime.UtcNow);
+
+        // The pending request, unless it is older than a few seconds; either way it is used up.
+        public static (String WorkspaceId, String TabId)? TakeNavigationRequest(DateTime now)
         {
             lock (Gate)
             {
                 var request = _requested;
                 _requested = null;
-                return request;
+                return request is { } r && now - r.At <= RequestLifetime ? (r.WorkspaceId, r.TabId) : null;
             }
         }
 
@@ -131,8 +145,22 @@ namespace Loupedeck.HerdrPlugin
             try
             {
                 var fresh = Read();
+
+                // One failed or slow herdr call is not herdr going away: keep what the keys show until the
+                // next read fails too.
+                if (fresh.Offline && !Current.Offline && ++_failedReads < 2)
+                {
+                    return;
+                }
+
+                _failedReads = fresh.Offline ? _failedReads : 0;
                 var previous = Interlocked.Exchange(ref _current, fresh);
-                if (!fresh.Equals(previous))
+
+                // A saved config changes the action keys even when herdr did not change.
+                var configVersion = KeypadConfig.Version;
+                var configChanged = configVersion != _configVersion;
+                _configVersion = configVersion;
+                if (!fresh.Equals(previous) || configChanged)
                 {
                     Changed?.Invoke(fresh);
                 }
@@ -180,14 +208,24 @@ namespace Loupedeck.HerdrPlugin
 
             foreach (var gone in Asked.Keys.Where(k => !seen.Contains(k)).ToList())
             {
-                Asked.Remove(gone);
+                Asked.TryRemove(gone, out _);
             }
 
             var focused = withStatus.SelectMany(p => p.Tabs).FirstOrDefault(t => t.Focused)?.TabId;
             return new Snapshot(withStatus, false, focused);
         }
 
-        // Reads the question a waiting agent asks, once per state change: its choices go on the keys.
+        // Drops the question read for a pane, so the next read of herdr reads it from the screen again.
+        public static void ForgetQuestion(String paneId)
+        {
+            if (paneId != null)
+            {
+                Asked.TryRemove(paneId, out _);
+            }
+        }
+
+        // Reads the question a waiting agent asks, once per state change: its choices go on the keys. A
+        // screen that shows no question yet, such as one still drawing, is read again on the next poll.
         private static Question QuestionOf(Issue tab)
         {
             if (tab.PaneId == null || tab.Status != "blocked")
@@ -201,7 +239,11 @@ namespace Loupedeck.HerdrPlugin
             }
 
             var question = Questions.Parse(HerdrClient.ReadRecent(tab.PaneId, 40));
-            Asked[tab.PaneId] = (tab.StateSeq, question);
+            if (question != null)
+            {
+                Asked[tab.PaneId] = (tab.StateSeq, question);
+            }
+
             return question;
         }
 
