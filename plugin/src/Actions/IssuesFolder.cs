@@ -32,6 +32,9 @@ namespace Loupedeck.HerdrPlugin
         private String _projectId;
         private String _tabId;
         private Int32 _page;
+
+        // True while you browse the overview of all issues rather than one project.
+        private Boolean _all;
         private String _lastSeenFocus;
         private Boolean _active;
         private List<String> _shownParams = new();
@@ -44,7 +47,7 @@ namespace Loupedeck.HerdrPlugin
             this.GroupName = "Herdr";
         }
 
-        // The action name that opens this folder, for the status key.
+        // The action name that opens this folder, for the All issues key.
         public static String ActionName { get; private set; }
 
         public override PluginDynamicFolderNavigation GetNavigationArea(DeviceType _) => PluginDynamicFolderNavigation.None;
@@ -69,13 +72,14 @@ namespace Loupedeck.HerdrPlugin
             {
                 this._active = true;
 
-                // The Projects key always opens on your projects. Only the status key opens the folder on
-                // an issue: it asks for that issue just before it opens the folder.
+                // The Projects key always opens on your projects. Only the All issues key opens the folder
+                // elsewhere: it asks for the overview just before it opens the folder.
                 if (!this.ApplyNavigationRequest())
                 {
                     this._projectId = null;
                     this._tabId = null;
                     this._page = 0;
+                    this._all = false;
                 }
             }
 
@@ -107,7 +111,9 @@ namespace Loupedeck.HerdrPlugin
             lock (this._lock)
             {
                 var names = this.CurrentParams().Select(p => this.CreateCommandName(p)).ToList();
-                if (this.Level() == 0)
+
+                // The projects and the overview of all issues close the menu with Logi's back key.
+                if (this.Level() == 0 || (this._all && this._tabId == null))
                 {
                     names.Add(PluginDynamicFolder.NavigateUpActionName);
                 }
@@ -140,21 +146,46 @@ namespace Loupedeck.HerdrPlugin
             if (actionParameter.StartsWith(ProjectPrefix))
             {
                 var id = actionParameter[ProjectPrefix.Length..];
+                lock (this._lock)
+                {
+                    this._all = false;
+                }
+
                 this.Navigate(id, null);
                 Task.Run(() => HerdrClient.FocusWorkspace(id));
             }
             else if (actionParameter.StartsWith(TabPrefix))
             {
                 var id = actionParameter[TabPrefix.Length..];
-                this.Navigate(project?.WorkspaceId, id);
+
+                // In the overview a tab can belong to any project: open it in its own.
+                Project owner;
+                lock (this._lock)
+                {
+                    owner = this._snapshot.FindTab(id).Project;
+                }
+
+                this.Navigate(owner?.WorkspaceId ?? project?.WorkspaceId, id);
                 Task.Run(() => Screen.ShowTab(id));
             }
             else if (actionParameter == BackToProjectParam)
             {
-                this.Navigate(project?.WorkspaceId, null);
+                // Back where you came from: the overview of all issues, or the issue's project.
+                Boolean all;
+                lock (this._lock)
+                {
+                    all = this._all;
+                }
+
+                this.Navigate(all ? null : project?.WorkspaceId, null);
             }
             else if (actionParameter == BackToProjectsParam)
             {
+                lock (this._lock)
+                {
+                    this._all = false;
+                }
+
                 this.Navigate(null, null);
             }
             else if (actionParameter == MoreParam)
@@ -298,7 +329,7 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
-        // Takes a pending request from the status key; true when there was one. Call under the lock.
+        // Takes a pending request from the All issues key; true when there was one. Call under the lock.
         private Boolean ApplyNavigationRequest()
         {
             var request = HerdrState.TakeNavigationRequest();
@@ -307,8 +338,9 @@ namespace Loupedeck.HerdrPlugin
                 return false;
             }
 
-            this._projectId = request.Value.WorkspaceId;
-            this._tabId = request.Value.TabId;
+            this._all = request.Value.WorkspaceId == HerdrState.AllIssues;
+            this._projectId = this._all ? null : request.Value.WorkspaceId;
+            this._tabId = this._all ? null : request.Value.TabId;
             this._page = 0;
             return true;
         }
@@ -349,6 +381,10 @@ namespace Loupedeck.HerdrPlugin
                 else if (this._tabId != null && this.SelectedTab() == null)
                 {
                     this._tabId = null;
+                    if (this._all)
+                    {
+                        this._projectId = null;
+                    }
                 }
 
                 var oldParams = this._shownParams;
@@ -395,7 +431,7 @@ namespace Loupedeck.HerdrPlugin
             this._shownLooks = this._shownParams.ToDictionary(p => p, p => this.Look(p));
         }
 
-        private Int32 Level() => this._tabId != null ? 2 : this._projectId != null ? 1 : 0;
+        private Int32 Level() => this._tabId != null ? 2 : this._all || this._projectId != null ? 1 : 0;
 
         private Project SelectedProject() => this._snapshot.FindProject(this._projectId);
 
@@ -427,6 +463,8 @@ namespace Loupedeck.HerdrPlugin
 
                     names.Add(BackToProjectParam);
                     return names;
+                case 1 when this._all:
+                    return this.Paged(this._snapshot.AllTabs().Select(x => TabPrefix + x.Tab.TabId).ToList());
                 case 1:
                     return this.Paged(this.SelectedProject().Tabs.Select(t => TabPrefix + t.TabId).ToList()).Append(BackToProjectsParam).ToList();
                 default:
@@ -472,7 +510,7 @@ namespace Loupedeck.HerdrPlugin
                     case BackToProjectParam:
                         return new KeyLook("terug", Icons.Back, nav);
                     case MoreParam:
-                        var count = this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count;
+                        var count = this._all ? this._snapshot.AllTabs().Count : this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count;
                         return new KeyLook($"meer {this._page + 1}/{PageCount(count)}", Icons.Dots, nav);
                     case OnScreenParam:
                         return new KeyLook("answer on screen", Icons.Screen, nav);
@@ -506,7 +544,7 @@ namespace Loupedeck.HerdrPlugin
 
                 if (param.StartsWith(TabPrefix))
                 {
-                    var tab = this.SelectedProject()?.Tabs.FirstOrDefault(t => t.TabId == param[TabPrefix.Length..]);
+                    var (owner, tab) = this._snapshot.FindTab(param[TabPrefix.Length..]);
                     if (tab == null)
                     {
                         return new KeyLook("", Icons.Dot, AgentStatus.Overlay);
@@ -514,7 +552,11 @@ namespace Loupedeck.HerdrPlugin
 
                     // The main tab keeps its house while it rests; any other state shows like an issue's.
                     var icon = tab.IsMain && tab.Status == AgentStatus.Idle ? Icons.Home : AgentStatus.Icon(tab.Status);
-                    return new KeyLook(tab.ShortName, icon, AgentStatus.Color(tab.Status), Framed: tab.TabId == focus);
+
+                    // In the overview of all issues, a main tab or a tab beside other projects' says whose it is.
+                    var several = this._snapshot.Projects.Count(p => p.Tabs.Any(t => !t.IsMain)) > 1;
+                    var label = this._all && (tab.IsMain || several) ? $"{tab.ShortName} · {owner.Name}" : tab.ShortName;
+                    return new KeyLook(label, icon, AgentStatus.Color(tab.Status), Framed: tab.TabId == focus);
                 }
 
                 if (param.StartsWith(AnswerPrefix) && Int32.TryParse(param[AnswerPrefix.Length..], out var choiceIndex))
