@@ -190,7 +190,7 @@ namespace Loupedeck.HerdrPlugin
             }
 
             UsePlanPattern(KeypadConfig.Current.PlanPattern);
-            PullRequests.Track(projects.SelectMany(p => p.Tabs).Where(t => !t.IsMain).Select(t => t.Cwd));
+            PullRequests.Track(projects.SelectMany(p => p.Tabs).Where(t => !t.IsMain).Select(t => (t.Cwd, t.Branch)));
 
             var seen = new HashSet<String>();
             var withStatus = projects.Select(p => p with

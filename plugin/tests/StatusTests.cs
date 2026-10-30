@@ -88,7 +88,7 @@ public class StatusTests
     public void Pull_requests_do_not_start_reading_from_a_track_after_stop()
     {
         PullRequests.Stop();
-        PullRequests.Track(new[] { "/tmp/helm-test-worktree" });
+        PullRequests.Track(new[] { ("/tmp/helm-test-worktree", "feat/test") });
         Assert.False(PullRequests.IsRunning);
     }
 
