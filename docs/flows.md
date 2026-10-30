@@ -12,15 +12,21 @@ You still reach every project and every issue from the keypad; the rule only con
 
 ## Statuses
 
-Every key carries the quarterdeck's word for its agent and herdr's colour for it, so an issue reads the same on the keypad, in herdr and in the quarterdeck.
+Every key shows one word for its issue, from its agent and its pull request, in herdr's colours. The agent wins while it asks or works; after that the pull request speaks.
 
 | Colour | Status | Meaning |
 |---|---|---|
 | red | `waiting` | the agent asks you something: a permission or a question |
-| orange | `go?` | the agent sits still with a plan (`Single PR:` or `PR 1:`) waiting for your go |
+| orange | `go?` | the agent sits still with a plan waiting for your go, and there is no pull request yet |
+| red | `CI failed` | the pull request's checks fail |
+| red | `changes` | a reviewer asked for changes |
 | orange | `done` | the agent finished its turn |
+| teal | `ready` | the pull request is approved and its checks pass: yours to merge |
 | yellow | `working` | the agent is busy |
-| grey | `idle` | nothing going on |
+| grey | `review`, `draft` | the pull request waits on a review, or is a draft |
+| dark grey | `idle`, `merged`, `closed` | nothing going on, or nothing left to do |
+
+A plan is a line in the agent's last output that matches `planPattern` in `config/keypad.json`; by default a line starting with `Single PR:` or `PR 1:`.
 
 A project key shows the most urgent status among its tabs, with up to two counts, such as "1 waiting, 1 go?". A white frame marks the project and the tab that are on screen.
 
@@ -78,14 +84,16 @@ The herdr server keeps running after iTerm closes, so statuses and actions work 
 
 ## The issue page
 
-The page shows the issue with its status, seven actions and `terug`. The action that fits the issue's status lights up, filled with its colour; an action that does nothing in that status is greyed out.
+The page shows the issue with its status, and its pull request number when it has one, seven actions and `terug`. The action that fits the issue's status lights up, filled with its colour; an action that does nothing in that status is greyed out.
 
 | Issue status | Lights up | Greyed out |
 |---|---|---|
-| `go?` | `go` | `toestaan` |
+| `go?` | `go` | `toestaan`, and `open PR` without a pull request |
 | `waiting` | `toestaan` | |
+| `CI failed`, `changes` | `babysit pr` | `toestaan` |
 | `done` | `review and fix` | `toestaan` |
-| `working`, `idle` | | `toestaan` |
+| `ready` | `open PR` | `toestaan` |
+| anything else | | `toestaan` |
 
 `toestaan` presses Enter, so it works only while the agent waits on you; anywhere else Enter would send whatever sits in the agent's input.
 
@@ -95,10 +103,10 @@ The page shows the issue with its status, seven actions and `terug`. The action 
 | `go` | sends `go`: approves the plan the agent shows |
 | `toestaan` | presses Enter: picks the selected option of a permission prompt, usually Yes |
 | `review and fix` | runs `/review-and-fix` |
-| `code review` | runs `/code-review` |
+| `babysit pr` | runs `/babysit-pr`: drives the pull request through its checks and review |
 | `commit` | asks for the work in logical conventional commits |
 | `stop` | presses Esc: interrupts the agent |
-| `editor` | opens the issue's worktree with `hopen` |
+| `open PR` | opens the issue's pull request in your browser |
 | `terug` | back to the project |
 
 The actions, and when they light up or grey out, come from `config/keypad.json`; see [Setup details](setup.md) to change them.
@@ -119,30 +127,34 @@ Each action goes to the agent of the issue on the page, by its pane, never to wh
 
 ```mermaid
 flowchart LR
-    prompt["Prompt actions<br/>go, review and fix, code review, commit"] --> promptCmd["herdr agent prompt<br/>the text plus Enter"]
+    prompt["Prompt actions<br/>go, review and fix, babysit pr, commit"] --> promptCmd["herdr agent prompt<br/>the text plus Enter"]
     keysAction["Key actions<br/>toestaan, stop"] --> keysCmd["herdr agent send-keys<br/>Enter or Esc"]
-    shell["Shell action<br/>editor"] --> shellCmd["hopen<br/>the issue's worktree in your editor"]
+    openPr["Open PR"] --> openCmd["open<br/>the pull request in your browser"]
 ```
 
 ## The status key
 
-A key for your normal keypad page, outside the folder: what needs you across every project, filled with the colour of the most urgent status. With nothing waiting it reads "all clear".
+A key for your normal keypad page, outside the folder: how many issues need you across every project, and how many are ready to merge. It is filled with the colour of the most urgent status; with nothing waiting it reads "all clear".
 
 ```mermaid
 flowchart TD
-    look["The status key shows what needs you<br/>such as 1 waiting, 1 go?, 1 done"] --> press["Press it"]
+    look["The status key: 3 need you, 1 ready"] --> press["Press it"]
     press --> any{"Does an issue need you?"}
-    any -->|yes| most["Pick the most urgent:<br/>waiting, then go?, then done"]
-    most --> screen["herdr shows that tab"]
-    most --> folder["The folder opens on its issue page"]
     any -->|no| projects["The folder opens on the projects page"]
+    any -->|yes| within{"Pressed within ten seconds<br/>of the last press?"}
+    within -->|no| first["The most urgent issue:<br/>waiting, go?, CI failed, changes, then done"]
+    within -->|yes| next["The next issue in that list"]
+    first --> show["herdr shows it, the folder opens on it,<br/>the key reads 1 of 3"]
+    next --> show
 ```
+
+An issue that no longer needs you drops out of the list, so pressing the key walks you through whatever is left. `ready` does not count as needing you; the key shows it beside the count instead.
 
 The key opens the folder through a generic action of the Logi plugin API that is not documented for folders. If the folder does not open, press the folder key: it opens on the issue the status key picked.
 
 ## What happens on its own
 
-One reader serves the whole plugin, so the folder and the status key always agree.
+One reader serves the whole plugin, so the folder and the status key always agree. It reads herdr every two seconds and pull requests once a minute.
 
 ```mermaid
 flowchart TD
@@ -150,11 +162,18 @@ flowchart TD
     read --> reachable{"Is herdr reachable?"}
     reachable -->|no| offline["The folder shows herdr offline<br/>press it to retry"]
     reachable -->|yes| plan["For an idle or done agent whose state changed:<br/>read its last 30 lines for a plan"]
-    plan --> changed{"Did anything change?"}
+    plan --> status["Combine the agent with its pull request<br/>into one status word"]
+    status --> changed{"Did anything change?"}
     changed -->|no| quiet["Nothing to redraw"]
     changed -->|yes| folder["Folder: follow the screen, drop closed tabs,<br/>redraw the keys that changed"]
     changed -->|yes| statusKey["Status key: redraw its counts"]
+    minute["Every minute, and for a new issue at once"] --> branch["Read each issue folder's real branch and GitHub repo"]
+    branch --> gh["Per repo: gh pr list for your open<br/>and your merged pull requests"]
+    gh --> status
 ```
 
+- **Pull requests come from the GitHub CLI.** Per repo, helm asks for your own open pull requests with their checks and review decision, and your own merged ones; two calls a minute, whatever the number of issues. It matches them to an issue by the branch the issue's worktree is on, not by the tab's label, which can be stale. Without `gh`, or for a repo that is not on GitHub, issues simply have no pull request.
+- **A failed call keeps what helm knew,** so one GitHub hiccup does not blank the keys.
 - **A closed tab** drops the folder back to its project; a closed workspace back to the projects.
 - **The folder may close on an app switch.** The Logi Plugin Service can close it when iTerm comes to the front. Pressing the folder key again opens the issue on screen.
+
