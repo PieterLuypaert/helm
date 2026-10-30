@@ -95,7 +95,7 @@ namespace Loupedeck.HerdrPlugin
         public override String GetButtonDisplayName(PluginImageSize imageSize) => "Issues";
 
         public override BitmapImage GetButtonImage(PluginImageSize imageSize) =>
-            KeyArt.Draw(new KeyLook("Issues", "herdr menu", AgentStatus.Accent), imageSize);
+            KeyArt.Draw(new IconKey(Icons.Stack, AgentStatus.Accent, "Issues"), imageSize);
 
         public override IEnumerable<String> GetButtonPressActionNames(DeviceType deviceType)
         {
