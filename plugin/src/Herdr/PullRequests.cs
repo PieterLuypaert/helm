@@ -26,7 +26,7 @@ namespace Loupedeck.HerdrPlugin
         private static readonly TimeSpan GhTimeout = TimeSpan.FromSeconds(30);
 
         private static readonly Object Gate = new();
-        private static HashSet<String> _tracked = new();
+        private static Dictionary<String, String> _tracked = new();
         private static Dictionary<String, (String Branch, String Repo)> _checkouts = new();
         private static Dictionary<String, Dictionary<String, PrInfo>> _byRepo = new();
         private static Timer _timer;
@@ -70,14 +70,20 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
-        // The folders of the issue tabs on screen; new ones are read right away, the rest once a minute.
-        public static void Track(IEnumerable<String> cwds)
+        // The folders of the issue tabs on screen, each with the branch its tab is named after; new ones are
+        // read right away, the rest once a minute.
+        public static void Track(IEnumerable<(String Cwd, String Label)> tabs)
         {
-            var fresh = new HashSet<String>(cwds.Where(c => !String.IsNullOrEmpty(c)));
+            var fresh = new Dictionary<String, String>();
+            foreach (var (cwd, label) in tabs.Where(t => !String.IsNullOrEmpty(t.Cwd)))
+            {
+                fresh[cwd] = label;
+            }
+
             Boolean hasNew;
             lock (Gate)
             {
-                hasNew = _running && fresh.Any(c => !_tracked.Contains(c));
+                hasNew = _running && fresh.Keys.Any(c => !_tracked.ContainsKey(c));
                 _tracked = fresh;
             }
 
@@ -118,18 +124,18 @@ namespace Loupedeck.HerdrPlugin
                     return;
                 }
 
-                String[] cwds;
+                KeyValuePair<String, String>[] tracked;
                 lock (Gate)
                 {
-                    cwds = _tracked.ToArray();
+                    tracked = _tracked.ToArray();
                 }
 
                 // The real branch of each worktree: a tab's label can be stale. A worktree removed under a
                 // running agent has no branch to read.
                 var checkouts = new Dictionary<String, (String Branch, String Repo)>();
-                foreach (var cwd in cwds.Where(Directory.Exists))
+                foreach (var (cwd, label) in tracked.Where(t => Directory.Exists(t.Key)))
                 {
-                    var branch = HerdrClient.RunTool(cwd, "/usr/bin/git", "-C", cwd, "branch", "--show-current").Output?.Trim() ?? "";
+                    var branch = BranchFor(HerdrClient.RunTool(cwd, "/usr/bin/git", "-C", cwd, "branch", "--show-current").Output, label);
                     var repo = RepoSlug(HerdrClient.RunTool(cwd, "/usr/bin/git", "-C", cwd, "remote", "get-url", "origin").Output ?? "");
                     if (repo != null)
                     {
@@ -188,6 +194,20 @@ namespace Loupedeck.HerdrPlugin
             {
                 Interlocked.Exchange(ref _refreshing, 0);
             }
+        }
+
+        // The branch an issue's pull request is on: the one its worktree has checked out, since a tab's name
+        // can be stale. A worktree with no branch checked out, or back on main, falls back to the branch
+        // its tab is named after.
+        public static String BranchFor(String checkedOut, String label)
+        {
+            var current = checkedOut?.Trim() ?? "";
+            if (current.Length > 0 && current != "main" && current != "master")
+            {
+                return current;
+            }
+
+            return label != null && label.Contains('/') ? label : current;
         }
 
         // "owner/name" from a GitHub remote URL, or null for any other remote.

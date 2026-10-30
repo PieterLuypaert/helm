@@ -43,4 +43,13 @@ public class PullRequestTests
         Assert.Equal("none", prs[1].Pr.Checks);
         Assert.Empty(PullRequests.Parse(""));
     }
+
+    [Fact]
+    public void A_worktree_without_its_branch_falls_back_to_the_tab_name()
+    {
+        Assert.Equal("feat/slice-3-accept", PullRequests.BranchFor("feat/slice-3-accept\n", "feat/slice-3-invite-and-accept"));
+        Assert.Equal("feat/slice-4-clients", PullRequests.BranchFor("", "feat/slice-4-clients"));
+        Assert.Equal("feat/slice-5-archive", PullRequests.BranchFor("main", "feat/slice-5-archive"));
+        Assert.Equal("", PullRequests.BranchFor(null, "1"));
+    }
 }
