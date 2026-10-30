@@ -25,7 +25,7 @@ namespace Loupedeck.HerdrPlugin
         // This method is called when the plugin is loaded.
         public override void Load()
         {
-            // One reader of herdr for the whole plugin: the folder and the status key share it. A change
+            // One reader of herdr for the whole plugin: the folder and the All issues key share it. A change
             // in a pull request makes it read herdr again, so the keys show it at once.
             PullRequests.Changed += HerdrState.Refresh;
             HerdrState.Start();
