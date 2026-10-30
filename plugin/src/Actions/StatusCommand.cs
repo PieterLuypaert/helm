@@ -46,16 +46,17 @@ namespace Loupedeck.HerdrPlugin
         }
 
         // A list in the colour of the most urgent issue, with the count of those that need you in a badge.
-        private static KeyLook Look(Snapshot snapshot)
+        // The Projects page shows the same key.
+        public static KeyLook Look(Snapshot snapshot)
         {
             if (snapshot.Offline)
             {
                 return new KeyLook("herdr offline", Icons.Offline, AgentStatus.Red);
             }
 
-            var all = snapshot.AllTabs();
+            var issues = snapshot.IssueCount();
             var needsYou = snapshot.NeedsYou();
-            var title = all.Count == 1 ? "1 issue" : $"{all.Count} issues";
+            var title = issues switch { 0 => "no issues", 1 => "1 issue", _ => $"{issues} issues" };
             return needsYou.Count > 0
                 ? new KeyLook(title, Icons.List, AgentStatus.Color(needsYou[0].Tab.Status), Badge: needsYou.Count.ToString())
                 : new KeyLook(title, Icons.List, AgentStatus.Text);

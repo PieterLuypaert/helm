@@ -73,6 +73,20 @@ public class StatusTests
     }
 
     [Fact]
+    public void Main_tabs_are_not_counted_as_issues_and_come_last_unless_they_need_you()
+    {
+        Issue Tab(String id, Int32 number, String status, Boolean main = false) =>
+            new(id, number, "w", "b", id, status, "p" + id, "/tmp", null, false, main);
+        var snapshot = new Snapshot(new[]
+        {
+            new Project("w1", 1, "a", true, new[] { Tab("m1", 1, "working", main: true), Tab("t2", 2, "idle") }),
+            new Project("w2", 2, "b", false, new[] { Tab("m2", 1, "waiting", main: true), Tab("t3", 2, "ready") }),
+        }, false, "m1");
+        Assert.Equal(new[] { "m2", "t3", "t2", "m1" }, snapshot.AllTabs().Select(x => x.Tab.TabId));
+        Assert.Equal(2, snapshot.IssueCount());
+    }
+
+    [Fact]
     public void A_snapshot_lists_what_needs_you_most_urgent_first()
     {
         Issue Tab(String id, Int32 number, String status) =>

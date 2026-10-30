@@ -8,7 +8,7 @@ An issue here is a herdr tab whose agent works on one branch, the way `hagent` o
 
 **Status:** tested against herdr, GitHub and real Claude Code questions.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=7ae7c521)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=e9ce80f7)
 
 ## What it does
 
@@ -22,7 +22,7 @@ helm adds three keys you place on your own keypad page, next to your other apps:
 
 In more detail:
 
-- **The All issues key** counts your issues across every herdr workspace, with how many need you in a badge. Pressing it opens the menu on one overview of all of them, most urgent first; press one to open its page. That the key opens the menu by itself is not yet confirmed on the keypad; if it does not, press Projects.
+- **The All issues key** counts your issues across every herdr workspace, with how many need you in a badge; main tabs do not count. Pressing it opens the menu on one overview of all of them, most urgent first; press one to open its page. The same key sits first on the projects page. That the key opens the menu by itself is not yet confirmed on the keypad; if it does not, press Projects.
 - **The herdr menu** has three levels: your projects, the tabs of one project, and the actions for one issue.
 - **Pull requests** show on the issue keys: failing checks, requested changes, ready to merge. helm reads them with the GitHub CLI.
 - **Actions** such as go, review, babysit and commit go to that issue's agent. The one that fits lights up, and every press is confirmed on the key and in herdr.
