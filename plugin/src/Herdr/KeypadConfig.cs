@@ -9,7 +9,9 @@ namespace Loupedeck.HerdrPlugin
     // "keys" (key presses, space separated, such as "esc" or "enter") or "shell" (a command run
     // in the issue's folder, with $ISSUE_CWD set). When lists the issue statuses in which the key
     // lights up; OnlyWhen, when set, the statuses in which it works at all (it is greyed out otherwise).
-    // Statuses are the quarterdeck's: waiting, go?, done, working, idle.
+    // Statuses are helm's: waiting, go?, CI failed, changes, done, ready, working, review, draft, idle,
+    // merged, closed. Type "open-pr" opens the issue's pull request in the browser; it is greyed out
+    // while the issue has none.
     public sealed class IssueAction
     {
         public String Label { get; set; }
@@ -32,15 +34,18 @@ namespace Loupedeck.HerdrPlugin
         // Works with iTerm only; other terminals are only brought to the front.
         public Boolean OpenHerdrWhenClosed { get; set; } = true;
 
+        // A line in an idle agent's output that marks a plan waiting for your go, as a regular expression.
+        public String PlanPattern { get; set; } = @"^\s*(Single PR:|PR 1:)";
+
         public List<IssueAction> Actions { get; set; } = new()
         {
             new() { Label = "go", Type = "prompt", Value = "go", Color = "#f36a1b", When = new() { "go?" } },
             new() { Label = "toestaan", Type = "keys", Value = "enter", Color = "#ff8080", When = new() { "waiting" }, OnlyWhen = new() { "waiting" } },
             new() { Label = "review\nand fix", Type = "prompt", Value = "/review-and-fix", When = new() { "done" } },
-            new() { Label = "code\nreview", Type = "prompt", Value = "/code-review" },
+            new() { Label = "babysit\npr", Type = "prompt", Value = "/babysit-pr", When = new() { "CI failed", "changes" } },
             new() { Label = "commit", Type = "prompt", Value = "Commit the work in several logical commits, each with its own conventional-commit message." },
             new() { Label = "stop", Type = "keys", Value = "esc" },
-            new() { Label = "editor", Type = "shell", Value = "\"$HOME/.local/bin/hopen\" \"$ISSUE_CWD\"" },
+            new() { Label = "open PR", Type = "open-pr", When = new() { "ready" } },
         };
 
         private static DateTime _loadedStamp = DateTime.MinValue;
