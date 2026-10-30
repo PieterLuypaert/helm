@@ -57,6 +57,7 @@ namespace Loupedeck.HerdrPlugin
 
         private static readonly Object Gate = new();
         private static readonly Dictionary<String, (Int64 Seq, Boolean HasPlan)> Plans = new();
+        private static readonly Dictionary<String, (Int64 Seq, Question Question)> Asked = new();
         private static Snapshot _current = Snapshot.Empty;
         private static Timer _timer;
         private static Int32 _refreshing;
@@ -154,7 +155,7 @@ namespace Loupedeck.HerdrPlugin
                     }
 
                     var pr = t.IsMain ? null : PullRequests.Lookup(t.Cwd);
-                    return t with { Status = AgentStatus.From(t.Status, HasPlan(t), pr), Pr = pr };
+                    return t with { Status = AgentStatus.From(t.Status, HasPlan(t), pr), Pr = pr, Question = QuestionOf(t) };
                 }).ToList(),
             }).ToList();
 
@@ -163,8 +164,31 @@ namespace Loupedeck.HerdrPlugin
                 Plans.Remove(gone);
             }
 
+            foreach (var gone in Asked.Keys.Where(k => !seen.Contains(k)).ToList())
+            {
+                Asked.Remove(gone);
+            }
+
             var focused = withStatus.SelectMany(p => p.Tabs).FirstOrDefault(t => t.Focused)?.TabId;
             return new Snapshot(withStatus, false, focused);
+        }
+
+        // Reads the question a waiting agent asks, once per state change: its choices go on the keys.
+        private static Question QuestionOf(Issue tab)
+        {
+            if (tab.PaneId == null || tab.Status != "blocked")
+            {
+                return null;
+            }
+
+            if (Asked.TryGetValue(tab.PaneId, out var cached) && cached.Seq == tab.StateSeq)
+            {
+                return cached.Question;
+            }
+
+            var question = Questions.Parse(HerdrClient.ReadRecent(tab.PaneId, 40));
+            Asked[tab.PaneId] = (tab.StateSeq, question);
+            return question;
         }
 
         // Compiles the configured plan pattern once; a pattern that does not compile falls back to the default.

@@ -40,12 +40,12 @@ namespace Loupedeck.HerdrPlugin
         public List<IssueAction> Actions { get; set; } = new()
         {
             new() { Label = "go", Type = "prompt", Value = "go", Color = "#f36a1b", When = new() { "go?" } },
-            new() { Label = "toestaan", Type = "keys", Value = "enter", Color = "#ff8080", When = new() { "waiting" }, OnlyWhen = new() { "waiting" } },
             new() { Label = "review\nand fix", Type = "prompt", Value = "/review-and-fix", When = new() { "done" } },
             new() { Label = "babysit\npr", Type = "prompt", Value = "/babysit-pr", When = new() { "CI failed", "changes" } },
             new() { Label = "commit", Type = "prompt", Value = "Commit the work in several logical commits, each with its own conventional-commit message." },
             new() { Label = "stop", Type = "keys", Value = "esc" },
             new() { Label = "open PR", Type = "open-pr", When = new() { "ready" } },
+            new() { Label = "editor", Type = "shell", Value = "\"$HOME/.local/bin/hopen\" \"$ISSUE_CWD\"" },
         };
 
         private static DateTime _loadedStamp = DateTime.MinValue;
