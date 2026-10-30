@@ -16,7 +16,7 @@ import re
 RED, ACCENT, YELLOW, GREEN, BLUE = "#ff8080", "#f36a1b", "#ffc799", "#99ffe4", "#82aaff"
 OVERLAY, SUBTEXT, GROUND, TEXT = "#5c5c5c", "#afb6c2", "#24282d", "#ebf0ec"
 KEY = "#2b2d30"       # a keypad key
-TILE = "#1c1f23"      # a herdr key on your own page
+TILE = "#000000"      # a herdr key on your own page
 LABEL = "#8b949e"
 K, G = 76, 8          # key size and gap
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -41,7 +41,7 @@ class Picture:
 
     def key(self, x, y, label="", icon=None, color=TEXT, style="normal", framed=False, badge=None, empty=False, count=None):
         """A key as the keypad shows it: the icon, and under it the label Logi writes. A tile, on your own
-        page, is a big icon or a count over a small icon on dark grey, with a short label under it."""
+        page, is a big icon or a count over a small icon on black, with a short label under it."""
         p = self.parts
         if empty:
             p.append(f'<rect x="{x}" y="{y}" width="{K}" height="{K}" rx="10" fill="none" stroke="{LABEL}" '
@@ -164,7 +164,7 @@ def flow():
         dict(label="projects", icon="Stack", color=ACCENT, style="tile"),
         EMPTY, EMPTY, EMPTY,
     ])
-    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, dark tiles with a short word:\n" + "The stack, Projects, opens the herdr menu.\n"
+    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, black tiles with a short word:\n" + "The stack, Projects, opens the herdr menu.\n"
              + "The terminal opens herdr in iTerm.\n" + "The count, All issues, opens every issue at\nonce, most urgent first; the badge counts\nthose that need you.", 11, "400")
 
     px = x0 + step

@@ -8,11 +8,11 @@ An issue here is a herdr tab whose agent works on one branch, the way `hagent` o
 
 **Status:** tested against herdr, GitHub and real Claude Code questions.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=4f609a85)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=73addbcf)
 
 ## What it does
 
-helm adds three keys you place on your own keypad page, next to your other apps: dark grey tiles with a big icon and a short word under it, like your own macros.
+helm adds three keys you place on your own keypad page, next to your other apps: black tiles with a big icon and a short word under it, like your own macros.
 
 | Key | On the key | What it does |
 |---|---|---|
