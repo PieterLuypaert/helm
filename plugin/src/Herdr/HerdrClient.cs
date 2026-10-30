@@ -186,6 +186,61 @@ namespace Loupedeck.HerdrPlugin
         public static void SendKeys(String paneId, params String[] keys) =>
             Run(HerdrBinary, new[] { "agent", "send-keys", paneId }.Concat(keys).ToArray());
 
+        private static DateTime _lastClientLaunch = DateTime.MinValue;
+
+        // True when a herdr window is open somewhere: a "herdr" process that attaches to the server,
+        // as opposed to "herdr server" or the short CLI calls this plugin makes.
+        public static Boolean HasAttachedClient()
+        {
+            var ps = Run("/bin/ps", "-axo", "args=");
+            if (ps == null)
+            {
+                return true;
+            }
+
+            foreach (var line in ps.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var tokens = line.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (tokens.Length == 0 || System.IO.Path.GetFileName(tokens[0]) != "herdr")
+                {
+                    continue;
+                }
+
+                if (tokens.Length == 1 || tokens[1].StartsWith("--session") || tokens[1].StartsWith("--remote")
+                    || (tokens.Length > 2 && tokens[1] == "session" && tokens[2] == "attach"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Opens a new iTerm window and starts herdr in it, in your own shell so its PATH applies.
+        // macOS asks once whether the Logi Plugin Service may control iTerm.
+        public static void OpenHerdrInIterm(String bundleId)
+        {
+            if (DateTime.UtcNow - _lastClientLaunch < TimeSpan.FromSeconds(15))
+            {
+                return;
+            }
+
+            _lastClientLaunch = DateTime.UtcNow;
+            // Reuse the window iTerm opens on launch; when it was already running, open a new one.
+            var script = $@"
+set wasRunning to application id ""{bundleId}"" is running
+tell application id ""{bundleId}""
+    activate
+    if not wasRunning then delay 1
+    if wasRunning or (count of windows) = 0 then
+        create window with default profile
+    end if
+    tell current session of current window to write text ""herdr""
+end tell";
+            PluginLog.Info("No herdr window open: starting herdr in a new iTerm window");
+            Run("/usr/bin/osascript", "-e", script);
+        }
+
         public static void ActivateApp(String bundleId)
         {
             if (!String.IsNullOrWhiteSpace(bundleId))

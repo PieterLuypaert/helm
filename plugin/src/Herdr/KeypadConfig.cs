@@ -24,6 +24,10 @@ namespace Loupedeck.HerdrPlugin
         // The app that runs herdr, brought to the front when you pick a ticket. Empty leaves focus alone.
         public String TerminalBundleId { get; set; } = "com.googlecode.iterm2";
 
+        // With no herdr window open, picking a tab opens iTerm with herdr in it instead of a bare shell.
+        // Works with iTerm only; other terminals are only brought to the front.
+        public Boolean OpenHerdrWhenClosed { get; set; } = true;
+
         public List<TicketAction> Actions { get; set; } = new()
         {
             new() { Label = "go", Type = "prompt", Value = "go", Color = "#FF8A3D" },

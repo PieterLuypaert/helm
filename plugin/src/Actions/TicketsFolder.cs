@@ -18,6 +18,7 @@ namespace Loupedeck.HerdrPlugin
         private const String BackToProjectsParam = "back:projects";
         private const String OfflineParam = "offline";
         private const String MoreParam = "more";
+        private const String ItermBundleId = "com.googlecode.iterm2";
 
         // Nine keys: with more items than fit, seven items, "meer" and the way back share a page.
         private const Int32 Keys = 9;
@@ -180,10 +181,20 @@ namespace Loupedeck.HerdrPlugin
             this.ButtonActionNamesChanged();
         }
 
+        // Focuses the tab in herdr, then shows it: the terminal comes to the front, or, with no herdr
+        // window open, a new iTerm window attaches to herdr, which opens on the tab just focused.
         private static void FocusTab(String tabId)
         {
             HerdrClient.FocusTab(tabId);
-            HerdrClient.ActivateApp(KeypadConfig.Current.TerminalBundleId);
+            var config = KeypadConfig.Current;
+            if (config.OpenHerdrWhenClosed && config.TerminalBundleId == ItermBundleId && !HerdrClient.HasAttachedClient())
+            {
+                HerdrClient.OpenHerdrInIterm(ItermBundleId);
+            }
+            else
+            {
+                HerdrClient.ActivateApp(config.TerminalBundleId);
+            }
         }
 
         private static void RunAction(TicketAction action, Ticket ticket)
