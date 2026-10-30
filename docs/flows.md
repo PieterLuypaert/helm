@@ -2,17 +2,17 @@
 
 How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own. The keys carry Dutch labels for navigation (`terug`, `meer`); this page uses them as they appear on the keypad.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=40a4e13a)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=0d03498b)
 
 ## Your page
 
 The keypad starts on a page you set up yourself in Logi Options+, with your own apps and keys. helm adds three keys to it, each with its own job:
 
-| Key | Label | What it does | Where |
+| Key | On the key | What it does | Where |
 |---|---|---|---|
-| Herdr issues | Issues, in herdr's orange | opens the herdr menu below | on the keypad |
-| Herdr status | the count, filled in the colour of what needs you | jumps to the most urgent issue | on the keypad and the screen |
-| Open herdr | herdr, grey like an app key | opens herdr itself in iTerm: in front if it runs, else in a new iTerm window | on the screen |
+| Herdr issues | an orange stack, Issues | opens the herdr menu below | on the keypad |
+| Herdr status | a bell in the colour of what needs you, with the count in a badge | jumps to the most urgent issue | on the keypad and the screen |
+| Open herdr | a grey terminal, herdr, like an app key | opens herdr itself in iTerm: in front if it runs, else in a new iTerm window | on the screen |
 
 ## One rule: the keypad and the screen show the same issue
 
