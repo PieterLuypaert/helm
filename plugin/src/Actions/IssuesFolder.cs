@@ -582,8 +582,10 @@ namespace Loupedeck.HerdrPlugin
                     case OfflineParam:
                         return new KeyLook("herdr offline", Icons.Offline, AgentStatus.Red);
                     case var empty when empty.StartsWith(EmptyPrefix):
-                        // A zero-width space: an empty title would make Logi write the folder's name there.
-                        return new KeyLook("\u200B", Icons.None, AgentStatus.Overlay);
+                        // Solid black, not see-through: Logi keeps the previous key's picture under a clear
+                        // image, so an empty key showed the issue that sat there on the page before. A
+                        // zero-width space: an empty title would make Logi write the folder's name there.
+                        return new KeyLook("\u200B", Icons.None, AgentStatus.Overlay, KeyStyle.Tile);
                     case BackToProjectsParam:
                         // One level up, named after where it goes, so it does not read as a second back arrow.
                         return new KeyLook("projects", Icons.Stack, nav);
