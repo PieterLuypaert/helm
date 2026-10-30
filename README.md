@@ -8,7 +8,7 @@ An issue here is a herdr tab whose agent works on one branch, the way `hagent` o
 
 **Status:** tested against herdr, GitHub and real Claude Code questions.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=e9e13577)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=6321bb06)
 
 ## What it does
 
@@ -20,7 +20,7 @@ helm adds three keys you place on your own keypad page, next to your other apps:
 | **Herdr all issues** | the number of issues over a list, with how many need you in a badge | opens the herdr menu on every issue at once, most urgent first |
 | **Open herdr** | a grey terminal | opens herdr itself in iTerm, like any app key |
 
-- **The herdr menu** goes from your projects, with All issues first, to a project's tabs or every issue at once, to the actions for one issue. `back` always goes one level up. That the All issues key opens the menu by itself is not yet confirmed on the keypad; if it does not, press Projects and then All issues.
+- **The herdr menu** goes from your projects to a project's tabs, or from the issues key straight to every issue at once, and on to the actions for one issue. `back` always goes one level up and always sits on the last key.
 - **Pull requests** show on the issue keys: failing checks, requested changes, ready to merge. helm reads them with the GitHub CLI.
 - **Actions** such as go, review, babysit and commit go to that issue's agent. The issue's page shows only the ones that fit it now, the best one lit up, and every press is confirmed on the key and in herdr.
 - **Questions** an agent asks, such as a permission prompt, show as one key per choice, exactly as the screen lists them. helm reads the question again just before it answers, and sends nothing when it changed.
@@ -36,7 +36,7 @@ A plan counts when the agent's output has a line starting with `Single PR:` or `
 
 When an agent waits on you, for a permission or a choice, its key turns red with `waiting`. To answer it from the keypad:
 
-1. **Go to the issue:** press All issues and pick the red one at the top, or open it through Projects, its project and its key.
+1. **Go to the issue:** press the issues key and pick the red one at the top, or open it through Projects, its project and its key.
 2. **Pick your answer:** the issue's page shows the question's choices, one key each, with the numbers your screen shows: `1 Yes`, `2 Always`, `3 Auto mode`, `4 No`. Each choice carries the issue's name under it, and your screen shows that same issue, so you always know whose question you answer. Press the one you want.
 3. **See it land:** the key flashes `sent` and herdr shows a notification. If the question changed in the meantime, nothing is sent and the key reads `changed`.
 

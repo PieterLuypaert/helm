@@ -39,7 +39,7 @@ class Picture:
     def __init__(self, title):
         self.title, self.parts = title, []
 
-    def key(self, x, y, label="", icon=None, color=TEXT, style="normal", badge=None, empty=False, count=None):
+    def key(self, x, y, label="", icon=None, color=TEXT, style="normal", badge=None, empty=False, count=None, badge_color=None):
         """A key as the keypad shows it: the icon, and under it the label Logi writes. A tile, on your own
         page, is a big icon or a count over a small icon on black, with a short label under it."""
         p = self.parts
@@ -61,7 +61,7 @@ class Picture:
                          f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{ICONS[icon]}</g>')
             p.append(f'<text x="{cx}" y="{y + K - 10}" text-anchor="middle" font-size="9.5" fill="{TEXT}">{html.escape(label)}</text>')
             if badge:
-                p.append(f'<circle cx="{x + K - 13}" cy="{y + 12}" r="8" fill="{color}"/>')
+                p.append(f'<circle cx="{x + K - 13}" cy="{y + 12}" r="8" fill="{badge_color or color}"/>')
                 p.append(f'<text x="{x + K - 13}" y="{y + 15.5}" text-anchor="middle" font-size="10" font-weight="600" fill="{GROUND}">{html.escape(badge)}</text>')
             return
         p.append(f'<rect x="{x}" y="{y}" width="{K}" height="{K}" rx="10" fill="{KEY}"/>')
@@ -77,7 +77,7 @@ class Picture:
             p.append(f'<g transform="translate({cx - size / 2} {cy - size / 2}) scale({size / 24})" fill="none" stroke="{ink}" '
                      f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{ICONS[icon]}</g>')
         if badge:
-            p.append(f'<circle cx="{x + K - 13}" cy="{y + 12}" r="8" fill="{color}"/>')
+            p.append(f'<circle cx="{x + K - 13}" cy="{y + 12}" r="8" fill="{badge_color or color}"/>')
             p.append(f'<text x="{x + K - 13}" y="{y + 15.5}" text-anchor="middle" font-size="10" font-weight="600" fill="{GROUND}">{html.escape(badge)}</text>')
         lines = wrap(label)
         for i, line in enumerate(lines):
@@ -165,13 +165,12 @@ def flow():
 
     px = x0 + step
     pic.text(px, 40, "1. Projects")
-    pic.text(px, 56, "all issues, then one key per workspace", 11, "400")
+    pic.text(px, 56, "one key per project", 11, "400")
     pic.grid(px, top, [
-        dict(label="9 issues", icon="List", color=RED, badge="2"),
-        dict(label="project A", icon="Folder", color=RED, badge="2"),
-        dict(label="project B", icon="Folder", color=YELLOW),
-        dict(label="project C", icon="Folder", color=OVERLAY),
-        EMPTY, EMPTY, EMPTY, EMPTY,
+        dict(label="project A · 7 issues", icon="Folder", badge="2", badge_color=RED),
+        dict(label="project B · 1 issue", icon="Folder"),
+        dict(label="project C", icon="Folder"),
+        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
         dict(label="back", icon="Back", color=SUBTEXT),
     ])
 
@@ -197,8 +196,8 @@ def flow():
         issue("7 checkout · go?", "go?"),
         dict(label="go", icon="Play", color=ACCENT, style="highlight"),
         dict(label="editor", icon="Code"),
-        dict(label="back", icon="Back", color=SUBTEXT),
         EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+        dict(label="back", icon="Back", color=SUBTEXT),
     ])
 
     fy = top + 3 * (K + G) + 30

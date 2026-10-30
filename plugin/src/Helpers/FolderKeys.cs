@@ -34,6 +34,11 @@ namespace Loupedeck.HerdrPlugin
             return tabId.Length > 0;
         }
 
+        // The keys padded with empty ones up to a count, so the keys after them, back and more, always land
+        // on the same key. Each empty key gets a name of its own.
+        public static List<String> Fill(IReadOnlyList<String> keys, Int32 count, String emptyPrefix) =>
+            keys.Concat(Enumerable.Range(0, Math.Max(0, count - keys.Count)).Select(i => emptyPrefix + i)).ToList();
+
         // The overview's order: the one it had when you opened it, without closed tabs, and with new tabs
         // after it in their sorted order. With no earlier order, the sorted one.
         public static List<String> KeepOrder(IReadOnlyList<String> earlier, IReadOnlyList<String> sorted)

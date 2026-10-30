@@ -2,7 +2,7 @@
 
 How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=e9e13577)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=6321bb06)
 
 ## Your page
 
@@ -43,35 +43,35 @@ Every key shows one icon per colour for its issue, from its agent and its pull r
 
 A plan is a line in the agent's last output that matches `planPattern` in `config/keypad.json`; by default a line starting with `Single PR:` or `PR 1:`.
 
-A project key takes the colour of its most urgent tab, with how many of its tabs need you in a badge.
+A project key is a white folder with how many issues the project has, such as `project A · 7 issues`. A badge says how many of its tabs need you, in the colour of the most urgent one.
 
 ## Navigation
 
 ```mermaid
 flowchart TD
-    key["Projects key<br/>on your page"] --> projects["Projects<br/>All issues, then one key per workspace"]
-    allIssues["All issues key<br/>on your page"] --> overview
-    projects <-->|"press All issues · back"| overview["All issues<br/>every issue, most urgent first"]
+    key["Projects key<br/>on your page"] --> projects["Projects<br/>one key per project"]
+    allIssues["Issues key<br/>on your page"] --> overview["All issues<br/>every issue, most urgent first"]
+    overview -->|back| projects
     projects <-->|"press a project · back"| project["Project<br/>main tab, then issues"]
     overview <-->|"press an issue · back"| issue["Issue<br/>the actions that fit, and back"]
     project <-->|"press a tab · back"| issue
     projects -->|"Logi's back key"| closed(["Menu closed"])
 ```
 
-- **Every arrow goes both ways:** press to go down, `back` to come up. Pressing a project or a tab also shows it in herdr; `back` on an issue returns to the page you came from.
+- **Arrows with two heads go both ways:** press to go down, `back` to come up. Pressing a project or a tab also shows it in herdr; `back` on an issue returns to the page you came from.
 - **Each key opens the menu on its own page:** Projects always on your projects, wherever you were before; All issues on the overview.
-- **`back` always goes one level up,** so your projects are never more than two presses away. On the projects page, Logi's own back key closes the menu; Logi puts it there itself.
-- **When a page has more items than fit** beside `back`, seven share a page with `more`, which pages through the rest.
+- **`back` always goes one level up and always sits on the last key,** so you press it without looking. Your projects are never more than two presses away. On the projects page, Logi's own back key closes the menu; Logi puts it there itself.
+- **When a page has more items than fit,** seven share a page with `more` on the key before `back`, which pages through the rest. Empty keys fill a short page, so `more` and `back` never move.
 
 ### The overview
 
-All issues counts your issues across every project, such as "9 issues", with how many need you in a badge in the colour of the most urgent one. Main tabs are not issues, so they do not count. It sits on your page and first on the projects page; both open the overview, so you can go through every issue in detail.
+All issues counts your issues across every project, such as "9 issues", with how many need you in a badge in the colour of the most urgent one. Main tabs are not issues, so they do not count. It sits on your page and opens the overview, so you can go through every issue in detail.
 
 ![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=c1337b21)
 
 The overview sorts by status: waiting, go?, CI failed, changes and done, which need you, then ready, working, review, draft and idle. Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. The order is set when you open the overview and holds while you page through it and visit its issues, so keys do not move under your fingers; a closed tab drops out and a new one joins at the end. Open it again for a fresh order. A main tab goes by its project's name, and an issue shown beside other projects' issues names its project, such as "4 search · project A".
 
-The key on your page opens the menu through a generic action of the Logi plugin API that is not documented for folders. If the menu does not open, press Projects and then All issues.
+The key opens the menu through a generic action of the Logi plugin API that is not documented for folders; on the MX Keypad it works.
 
 ## The keypad and the screen together
 
