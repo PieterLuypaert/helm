@@ -51,7 +51,7 @@ DOTNET_ROOT="$HOME/.dotnet" PATH="$HOME/.dotnet:$PATH" dotnet watch build
 
 Each build relinks the plugin and asks the Logi Plugin Service to reload it.
 
-The rules that need no keypad (the status words, reading GitHub's checks, the status key's order, shortening branch names, wrapping labels) have tests; they build the plugin without touching the Logi Plugin Service:
+The rules that need no keypad (the status words, reading GitHub's checks, the overview's order, shortening branch names, wrapping labels) have tests; they build the plugin without touching the Logi Plugin Service:
 
 ```bash
 cd plugin/tests

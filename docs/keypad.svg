@@ -10,11 +10,10 @@
 <g transform="translate(129.0 84.0) scale(1.0833333333333333)" fill="none" stroke="#ebf0ec" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2zm0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2zm-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6z"/></g>
 <text x="142.0" y="134" text-anchor="middle" font-size="9.5" fill="#ebf0ec">Claude</text>
 <rect x="188" y="70" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(213.0 84.0) scale(1.0833333333333333)" fill="none" stroke="#ff8080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727"/><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727"/></g>
+<g transform="translate(213.0 84.0) scale(1.0833333333333333)" fill="none" stroke="#ff8080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h8"/><path d="M13 9h5"/><path d="M13 15h8"/><path d="M13 19h5"/><path d="M3 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M3 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/></g>
 <circle cx="251" cy="82" r="8" fill="#ff8080"/>
 <text x="251" y="85.5" text-anchor="middle" font-size="10" font-weight="600" fill="#24282d">2</text>
-<text x="226.0" y="123" text-anchor="middle" font-size="9.5" fill="#ebf0ec">2 need you, 1</text>
-<text x="226.0" y="134" text-anchor="middle" font-size="9.5" fill="#ebf0ec">ready</text>
+<text x="226.0" y="134" text-anchor="middle" font-size="9.5" fill="#ebf0ec">9 issues</text>
 <rect x="20" y="154" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(45.0 168.0) scale(1.0833333333333333)" fill="none" stroke="#ebf0ec" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/><path d="M9.5 9h.01"/><path d="M14.5 9h.01"/><path d="M9.5 13a3.5 3.5 0 0 0 5 0"/></g>
 <text x="58.0" y="218" text-anchor="middle" font-size="9.5" fill="#ebf0ec">ChatGPT</text>
@@ -30,8 +29,9 @@
 <text x="20" y="336" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">Three herdr keys, each with its own job:</text>
 <text x="20" y="350" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">Projects opens the herdr menu on your projects.</text>
 <text x="20" y="364" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">The terminal, herdr, opens herdr in iTerm.</text>
-<text x="20" y="378" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">The bell, Herdr status, counts what needs you</text>
-<text x="20" y="392" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">and jumps to the most urgent issue (step 3).</text>
+<text x="20" y="378" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">The list, All issues, opens every issue at</text>
+<text x="20" y="392" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">once, most urgent first; the badge counts</text>
+<text x="20" y="406" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">those that need you.</text>
 <text x="308" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">1. Projects</text>
 <text x="308" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">one key per workspace</text>
 <rect x="308" y="70" width="76" height="76" rx="10" fill="#2b2d30"/>
