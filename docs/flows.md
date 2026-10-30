@@ -20,6 +20,10 @@ Whatever you do on one, the other follows. Pressing a tab on the keypad shows it
 
 You still reach every project and every issue from the keypad; the rule only concerns the issue whose page is open.
 
+## Issue names
+
+A key names an issue after its branch, kept short: the type prefix such as `feat/` and the words most issues share go, and what is left keeps its number and at most two words that carry meaning. `feat/shop-slice-3-invite-and-accept-members` reads `3 invite accept`.
+
 ## Statuses
 
 Every key shows one icon per colour for its issue, from its agent and its pull request, in herdr's colours. The agent wins while it asks or works; after that the pull request speaks. The issue's own page names the exact status, such as `7 checkout · CI failed`.
@@ -65,7 +69,7 @@ All issues counts your issues across every project, such as "9 issues", with how
 
 ![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=c1337b21)
 
-The overview sorts by status: waiting, go?, CI failed, changes and done, which need you, then ready, working, review, draft and idle. Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. The order is set when you open the overview and holds while you page through it and visit its issues, so keys do not move under your fingers; a closed tab drops out and a new one joins at the end. Open it again for a fresh order. A main tab, or an issue shown beside other projects' issues, names its project, such as "4 search · project A".
+The overview sorts by status: waiting, go?, CI failed, changes and done, which need you, then ready, working, review, draft and idle. Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. The order is set when you open the overview and holds while you page through it and visit its issues, so keys do not move under your fingers; a closed tab drops out and a new one joins at the end. Open it again for a fresh order. A main tab goes by its project's name, and an issue shown beside other projects' issues names its project, such as "4 search · project A".
 
 The key on your page opens the menu through a generic action of the Logi plugin API that is not documented for folders. If the menu does not open, press Projects and then All issues.
 
