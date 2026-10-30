@@ -135,10 +135,11 @@ def wrap(label, width=14):
 
 
 EMPTY = dict(empty=True)
+# One icon per colour, as the plugin draws them (AgentStatus.Icon).
 STATUS = {
-    "waiting": ("Question", RED), "go?": ("Plan", ACCENT), "CI failed": ("Alert", RED), "changes": ("Report", RED),
-    "done": ("Check", GREEN), "ready": ("Merge", BLUE), "working": ("Working", YELLOW), "review": ("Eye", SUBTEXT),
-    "idle": ("Sleep", OVERLAY),
+    "waiting": ("Alert", RED), "CI failed": ("Alert", RED), "changes": ("Alert", RED), "go?": ("Plan", ACCENT),
+    "done": ("Check", GREEN), "ready": ("Merge", BLUE), "working": ("Working", YELLOW),
+    "review": ("Sleep", OVERLAY), "draft": ("Sleep", OVERLAY), "idle": ("Sleep", OVERLAY),
 }
 
 
@@ -196,17 +197,13 @@ def flow():
 
     tx = qx + step
     pic.text(tx, 40, "3. Issue: 7 checkout")
-    pic.text(tx, 56, "the action that fits lights up", 11, "400")
+    pic.text(tx, 56, "only the actions that fit", 11, "400")
     pic.grid(tx, top, [
-        issue("7 checkout", "go?"),
+        issue("7 checkout · go?", "go?"),
         dict(label="go", icon="Play", color=ACCENT, style="highlight"),
-        dict(label="review and fix", icon="Tool"),
-        dict(label="babysit pr", icon="Lifebuoy"),
-        dict(label="commit", icon="Commit"),
-        dict(label="stop", icon="Stop"),
-        dict(label="open PR", icon="PullRequest", style="dim"),
         dict(label="editor", icon="Code"),
         dict(label="back", icon="Back", color=SUBTEXT),
+        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
     ])
 
     fy = top + 3 * (K + G) + 30
@@ -226,23 +223,23 @@ def flow():
 
 
 def statuses():
-    """Every word a key can show, with what it means."""
-    pic, top = Picture("What a key can say"), 64
+    """One icon per colour, and the statuses behind each."""
+    pic, top = Picture("What a key can say"), 40
     slot = 112
     groups = [
-        ("The agent", [("waiting", "asks you\nsomething"), ("go?", "a plan waits\nfor your go"), ("working", "is busy"), ("done", "finished\nits turn")]),
-        ("The pull request", [("CI failed", "checks fail"), ("changes", "changes\nrequested"), ("review", "waits on\na review"), ("ready", "approved,\nyours to merge")]),
+        ("waiting", "answer or fix", "waiting, CI failed,\nchanges"),
+        ("go?", "decide", "go?: a plan waits\nfor your go"),
+        ("done", "look at result", "done: finished\nits turn"),
+        ("ready", "merge", "ready: approved,\nchecks pass"),
+        ("working", "working", "working"),
+        ("idle", "quiet", "review, draft, idle,\nmerged, closed"),
     ]
-    x0 = 20
-    for name, keys in groups:
-        pic.text(x0, 34, name)
-        for i, (word, meaning) in enumerate(keys):
-            x = x0 + i * slot
-            pic.key(x, top, **issue(word, word))
-            pic.text(x + K / 2, top + K + 20, meaning, 11, "400", "middle")
-        x0 += 4 * slot + 30
-    pic.text(20, top + K + 70, "Each status has its own icon and colour. The agent wins while it asks or works; after that the pull request speaks.", 12, "400")
-    pic.save("statuses.svg", 4 * slot * 2 + 50, top + K + 84)
+    for i, (status, word, statuses) in enumerate(groups):
+        x = 20 + i * slot
+        pic.key(x, top, **issue(word, status))
+        pic.text(x + K / 2, top + K + 20, statuses, 11, "400", "middle")
+    pic.text(20, top + K + 70, "One icon per colour. The issue's own page names its exact status, such as 7 checkout · CI failed.", 12, "400")
+    pic.save("statuses.svg", 6 * slot + 10, top + K + 84)
 
 
 def all_issues():
