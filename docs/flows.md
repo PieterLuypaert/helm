@@ -14,6 +14,8 @@ You still reach every project and every issue from the keypad; the rule only con
 
 Every key shows one word for its issue, from its agent and its pull request, in herdr's colours. The agent wins while it asks or works; after that the pull request speaks.
 
+![What a key can say](statuses.svg)
+
 | Colour | Status | Meaning |
 |---|---|---|
 | red | `waiting` | the agent asks you something: a permission or a question |
@@ -135,6 +137,8 @@ flowchart LR
 ## The status key
 
 A key for your normal keypad page, outside the folder: how many issues need you across every project, and how many are ready to merge. It is filled with the colour of the most urgent status; with nothing waiting it reads "all clear".
+
+![Walking through what needs you: the count, the most urgent issue, the next one, and an issue you handled dropping out](status-key.svg)
 
 ```mermaid
 flowchart TD

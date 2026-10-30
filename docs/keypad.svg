@@ -1,16 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 388" width="1040" height="388" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 366" width="1040" height="366" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
 <title>The Herdr folder on the MX Keypad</title>
 <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#8b949e" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
-<text x="20" y="40" font-size="13" font-weight="600" fill="#8b949e">Status key</text>
-<text x="20" y="56" font-size="11" font-weight="400" fill="#8b949e">press again: the next</text>
-<rect x="30" y="70" width="70" height="70" rx="8" fill="#ff8080"/>
-<text x="65.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#24282d">3 need you</text>
-<text x="65.0" y="128" text-anchor="middle" font-size="9.5" fill="#24282d">1 ready</text>
-<rect x="30" y="226" width="70" height="70" rx="8" fill="#f36a1b"/>
-<text x="65.0" y="250" text-anchor="middle" font-size="11" font-weight="600" fill="#24282d">2 of 3</text>
-<text x="65.0" y="284" text-anchor="middle" font-size="9.5" fill="#24282d">7 checkout</text>
-<text x="150" y="40" font-size="13" font-weight="600" fill="#8b949e">1. Projects</text>
-<text x="150" y="56" font-size="11" font-weight="400" fill="#8b949e">one key per workspace</text>
+<text x="20" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">Status key</text>
+<text x="20" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">on your normal page</text>
+<rect x="30" y="148" width="70" height="70" rx="8" fill="#ff8080"/>
+<text x="65.0" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#24282d">2 need you</text>
+<text x="65.0" y="206" text-anchor="middle" font-size="9.5" fill="#24282d">1 ready</text>
+<text x="150" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">1. Projects</text>
+<text x="150" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">one key per workspace</text>
 <rect x="150" y="70" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="150" y="70" width="70" height="6" rx="3" fill="#ff8080"/>
 <rect x="151.5" y="71.5" width="67" height="67" rx="7" fill="none" stroke="#ebf0ec" stroke-width="3"/>
@@ -34,8 +31,8 @@
 <rect x="306" y="226" width="70" height="6" rx="3" fill="#5c5c5c"/>
 <text x="341.0" y="250" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">back</text>
 <text x="341.0" y="284" text-anchor="middle" font-size="9.5" fill="#5c5c5c">closes</text>
-<text x="420" y="40" font-size="13" font-weight="600" fill="#8b949e">2. A project</text>
-<text x="420" y="56" font-size="11" font-weight="400" fill="#8b949e">main tab, then issues</text>
+<text x="420" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">2. A project</text>
+<text x="420" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">main tab, then issues</text>
 <rect x="420" y="70" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="420" y="70" width="70" height="6" rx="3" fill="#5c5c5c"/>
 <text x="455.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">main</text>
@@ -49,9 +46,9 @@
 <text x="611.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">4 search</text>
 <text x="611.0" y="128" text-anchor="middle" font-size="9.5" fill="#ffc799">working</text>
 <rect x="420" y="148" width="70" height="70" rx="8" fill="#24282d"/>
-<rect x="420" y="148" width="70" height="6" rx="3" fill="#ff8080"/>
+<rect x="420" y="148" width="70" height="6" rx="3" fill="#5c5c5c"/>
 <text x="455.0" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">5 export</text>
-<text x="455.0" y="206" text-anchor="middle" font-size="9.5" fill="#ff8080">CI failed</text>
+<text x="455.0" y="206" text-anchor="middle" font-size="9.5" fill="#5c5c5c">idle</text>
 <rect x="498" y="148" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="498" y="148" width="70" height="6" rx="3" fill="#ff8080"/>
 <text x="533.0" y="166" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">6 dark</text>
@@ -63,9 +60,9 @@
 <text x="611.0" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">7 checkout</text>
 <text x="611.0" y="206" text-anchor="middle" font-size="9.5" fill="#f36a1b">go?</text>
 <rect x="420" y="226" width="70" height="70" rx="8" fill="#24282d"/>
-<rect x="420" y="226" width="70" height="6" rx="3" fill="#afb6c2"/>
+<rect x="420" y="226" width="70" height="6" rx="3" fill="#5c5c5c"/>
 <text x="455.0" y="250" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">8 settings</text>
-<text x="455.0" y="284" text-anchor="middle" font-size="9.5" fill="#afb6c2">review</text>
+<text x="455.0" y="284" text-anchor="middle" font-size="9.5" fill="#5c5c5c">idle</text>
 <rect x="498" y="226" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="498" y="226" width="70" height="6" rx="3" fill="#5c5c5c"/>
 <text x="533.0" y="250" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">meer</text>
@@ -74,8 +71,8 @@
 <rect x="576" y="226" width="70" height="6" rx="3" fill="#5c5c5c"/>
 <text x="611.0" y="250" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">terug</text>
 <text x="611.0" y="284" text-anchor="middle" font-size="9.5" fill="#5c5c5c">projecten</text>
-<text x="690" y="40" font-size="13" font-weight="600" fill="#8b949e">3. Issue: 7 checkout</text>
-<text x="690" y="56" font-size="11" font-weight="400" fill="#8b949e">the action that fits lights up</text>
+<text x="690" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">3. Issue: 7 checkout</text>
+<text x="690" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">the action that fits lights up</text>
 <rect x="690" y="70" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="690" y="70" width="70" height="6" rx="3" fill="#f36a1b"/>
 <text x="725.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">7 checkout</text>
@@ -106,8 +103,8 @@
 <rect x="846" y="226" width="70" height="6" rx="3" fill="#5c5c5c"/>
 <text x="881.0" y="250" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">terug</text>
 <text x="881.0" y="284" text-anchor="middle" font-size="9.5" fill="#5c5c5c">project A</text>
-<text x="950" y="40" font-size="13" font-weight="600" fill="#8b949e">After a press</text>
-<text x="950" y="56" font-size="11" font-weight="400" fill="#8b949e">for 1.5 seconds</text>
+<text x="950" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">After a press</text>
+<text x="950" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">for 1.5 seconds</text>
 <rect x="950" y="70" width="70" height="70" rx="8" fill="#99ffe4"/>
 <text x="985.0" y="100" text-anchor="middle" font-size="11" font-weight="600" fill="#24282d">sent</text>
 <rect x="950" y="148" width="70" height="70" rx="8" fill="#ff8080"/>
@@ -119,17 +116,15 @@
 <line x1="382" y1="183.0" x2="412" y2="183.0" stroke="#8b949e" stroke-width="1.5" marker-end="url(#a)"/>
 <line x1="652" y1="183.0" x2="682" y2="183.0" stroke="#8b949e" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="20" y="330" width="12" height="12" rx="3" fill="#ff8080"/>
-<text x="40" y="340" font-size="12" font-weight="400" fill="#8b949e">waiting, CI failed, changes: needs you</text>
-<rect x="324.79999999999995" y="330" width="12" height="12" rx="3" fill="#f36a1b"/>
-<text x="344.79999999999995" y="340" font-size="12" font-weight="400" fill="#8b949e">go? or done: your turn</text>
-<rect x="524.0" y="330" width="12" height="12" rx="3" fill="#66ddcc"/>
-<text x="544.0" y="340" font-size="12" font-weight="400" fill="#8b949e">ready to merge</text>
-<rect x="20" y="352" width="12" height="12" rx="3" fill="#ffc799"/>
-<text x="40" y="362" font-size="12" font-weight="400" fill="#8b949e">working</text>
-<rect x="120.19999999999999" y="352" width="12" height="12" rx="3" fill="#afb6c2"/>
-<text x="140.2" y="362" font-size="12" font-weight="400" fill="#8b949e">review or draft</text>
-<rect x="273.2" y="352" width="12" height="12" rx="3" fill="#5c5c5c"/>
-<text x="293.2" y="362" font-size="12" font-weight="400" fill="#8b949e">idle</text>
-<rect x="353.6" y="351" width="14" height="14" rx="3" fill="none" stroke="#8b949e" stroke-width="2.5"/>
-<text x="373.6" y="362" font-size="12" font-weight="400" fill="#8b949e">white frame: what is on screen</text>
+<text x="40" y="340" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">needs you</text>
+<rect x="133.4" y="330" width="12" height="12" rx="3" fill="#f36a1b"/>
+<text x="153.4" y="340" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">your turn</text>
+<rect x="246.8" y="330" width="12" height="12" rx="3" fill="#66ddcc"/>
+<text x="266.8" y="340" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">ready to merge</text>
+<rect x="393.2" y="330" width="12" height="12" rx="3" fill="#ffc799"/>
+<text x="413.2" y="340" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">working</text>
+<rect x="493.4" y="330" width="12" height="12" rx="3" fill="#5c5c5c"/>
+<text x="513.4" y="340" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">quiet</text>
+<rect x="580.4" y="329" width="14" height="14" rx="3" fill="none" stroke="#8b949e" stroke-width="2.5"/>
+<text x="600.4" y="340" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">white frame: what is on screen</text>
 </svg>
