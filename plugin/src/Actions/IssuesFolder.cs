@@ -18,6 +18,8 @@ namespace Loupedeck.HerdrPlugin
         private const String BackToProjectsParam = "back:projects";
         private const String OfflineParam = "offline";
         private const String MoreParam = "more";
+        private const String AnswerPrefix = "ans:";
+        private const String OnScreenParam = "on-screen";
 
         // Nine keys: with more items than fit, seven items, "meer" and the way back share a page.
         private const Int32 Keys = 9;
@@ -159,6 +161,15 @@ namespace Loupedeck.HerdrPlugin
 
                 this.Navigate(project?.WorkspaceId, tab?.TabId, keepPage: true);
             }
+            else if (actionParameter.StartsWith(AnswerPrefix) && tab?.Question != null
+                     && Int32.TryParse(actionParameter[AnswerPrefix.Length..], out var choice))
+            {
+                this.Answer(actionParameter, tab, choice);
+            }
+            else if (actionParameter == OnScreenParam && tab != null)
+            {
+                Task.Run(() => Screen.ShowTab(tab.TabId));
+            }
             else if (actionParameter == HeaderParam && tab != null)
             {
                 Task.Run(() => Screen.ShowTab(tab.TabId));
@@ -206,6 +217,39 @@ namespace Loupedeck.HerdrPlugin
                 HerdrClient.Notify(
                     result.Ok ? $"{label}: {tab.ShortName}" : $"{label} not sent: {tab.ShortName}",
                     result.Ok ? "Sent from the keypad" : $"Not sent: {result.ShortReason}");
+                HerdrState.Refresh();
+            });
+        }
+
+        // Answers the agent's question with the choice on the key. It reads the question again first and
+        // sends nothing when the choices changed, so a key never answers a question you did not see.
+        private void Answer(String param, Issue tab, Int32 choice)
+        {
+            var shown = tab.Question;
+            if (choice < 0 || choice >= shown.Options.Count || tab.PaneId == null)
+            {
+                return;
+            }
+
+            var label = Question.ShortLabel(shown.Options[choice]);
+            Task.Run(() =>
+            {
+                var now = Questions.Parse(HerdrClient.ReadRecent(tab.PaneId, 40));
+                if (now == null || now.Signature != shown.Signature)
+                {
+                    this.Flash(param, new KeyLook("changed", "look again", AgentStatus.Overlay, KeyStyle.Highlight));
+                    HerdrState.Refresh();
+                    return;
+                }
+
+                PluginLog.Info($"Answer {label} on {tab.Branch}");
+                var result = HerdrClient.SendKeys(tab.PaneId, now.KeysFor(choice).ToArray());
+                this.Flash(param, result.Ok
+                    ? new KeyLook("sent", null, AgentStatus.Green, KeyStyle.Highlight)
+                    : new KeyLook(result.ShortReason, null, AgentStatus.Red, KeyStyle.Highlight));
+                HerdrClient.Notify(
+                    result.Ok ? $"{label}: {tab.ShortName}" : $"{label} not sent: {tab.ShortName}",
+                    result.Ok ? "Answered from the keypad" : $"Not sent: {result.ShortReason}");
                 HerdrState.Refresh();
             });
         }
@@ -363,7 +407,19 @@ namespace Loupedeck.HerdrPlugin
             {
                 case 2:
                     var names = new List<String> { HeaderParam };
-                    names.AddRange(Enumerable.Range(0, KeypadConfig.Current.Actions.Count).Select(i => ActionPrefix + i));
+                    var tab = this.SelectedTab();
+                    if (tab?.Status == AgentStatus.Waiting)
+                    {
+                        // A waiting agent's page is its question: one key per choice, as its screen shows them.
+                        var choices = tab.Question?.Options.Count ?? 0;
+                        names.AddRange(Enumerable.Range(0, Math.Min(choices, Keys - 3)).Select(i => AnswerPrefix + i));
+                        names.Add(OnScreenParam);
+                    }
+                    else
+                    {
+                        names.AddRange(Enumerable.Range(0, KeypadConfig.Current.Actions.Count).Select(i => ActionPrefix + i));
+                    }
+
                     names.Add(BackToProjectParam);
                     return names;
                 case 1:
@@ -413,9 +469,22 @@ namespace Loupedeck.HerdrPlugin
                         return new KeyLook("meer", $"{this._page + 1}/{PageCount(count)}", AgentStatus.Overlay);
                     case HeaderParam:
                         var selected = this.SelectedTab();
-                        return selected == null
-                            ? new KeyLook("", null, AgentStatus.Overlay)
-                            : new KeyLook(selected.ShortName, selected.Pr == null ? selected.Status : $"{selected.Status}\nPR {selected.Pr.Number}", AgentStatus.Color(selected.Status));
+                        if (selected == null)
+                        {
+                            return new KeyLook("", null, AgentStatus.Overlay);
+                        }
+
+                        if (selected.Status == AgentStatus.Waiting)
+                        {
+                            // What the agent asks about, such as the command it wants to run.
+                            var about = selected.Question?.Detail ?? selected.Question?.Title ?? "asks you";
+                            return new KeyLook(selected.ShortName, about, AgentStatus.Red);
+                        }
+
+                        return new KeyLook(selected.ShortName, selected.Pr == null ? selected.Status : $"{selected.Status}\nPR {selected.Pr.Number}", AgentStatus.Color(selected.Status));
+                    case OnScreenParam:
+                        var hasChoices = this.SelectedTab()?.Question != null;
+                        return new KeyLook("answer on\nscreen", hasChoices ? null : "no choices\nfound", AgentStatus.Subtext);
                 }
 
                 if (param.StartsWith(ProjectPrefix))
@@ -433,6 +502,23 @@ namespace Loupedeck.HerdrPlugin
                     return tab == null
                         ? new KeyLook("", null, AgentStatus.Overlay)
                         : new KeyLook(tab.ShortName, tab.Status, AgentStatus.Color(tab.Status), Framed: tab.TabId == focus);
+                }
+
+                if (param.StartsWith(AnswerPrefix) && Int32.TryParse(param[AnswerPrefix.Length..], out var choiceIndex))
+                {
+                    var question = this.SelectedTab()?.Question;
+                    if (question != null && choiceIndex >= 0 && choiceIndex < question.Options.Count)
+                    {
+                        var option = question.Options[choiceIndex];
+                        var label = Question.ShortLabel(option);
+                        var title = option.Number != null ? $"{option.Number} {label}" : label;
+
+                        // Yes in green, No in red, anything else neutral, so the answer reads at a glance.
+                        var accent = label.StartsWith("No", StringComparison.OrdinalIgnoreCase) ? AgentStatus.Red
+                            : label.StartsWith("Yes", StringComparison.OrdinalIgnoreCase) || label == "Always" ? AgentStatus.Green
+                            : AgentStatus.Subtext;
+                        return new KeyLook(title, null, accent);
+                    }
                 }
 
                 if (param.StartsWith(ActionPrefix) && Int32.TryParse(param[ActionPrefix.Length..], out var index))

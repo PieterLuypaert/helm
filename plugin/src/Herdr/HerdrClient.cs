@@ -22,7 +22,8 @@ namespace Loupedeck.HerdrPlugin
         Boolean Focused,
         Boolean IsMain,
         Int64 StateSeq = 0,
-        PrInfo Pr = null);
+        PrInfo Pr = null,
+        Question Question = null);
 
     // One herdr workspace: a project, with its main tab first and then its issues in the order you opened them.
     public sealed record Project(

@@ -27,12 +27,14 @@ namespace Loupedeck.HerdrPlugin
         // What needs you now, in the order the status key walks through it.
         private static readonly String[] Yours = { Waiting, Go, CiFailed, Changes, Done };
 
-        // herdr's palette.
+        // herdr's palette, plus a blue for ready. Each colour stands for what you do next: red answer or
+        // fix, orange decide, green look at the result, blue merge, yellow wait, grey nothing.
         public static readonly BitmapColor Red = Hex(0xff8080);
         public static readonly BitmapColor Accent = Hex(0xf36a1b);
         public static readonly BitmapColor Yellow = Hex(0xffc799);
         public static readonly BitmapColor Green = Hex(0x99ffe4);
         public static readonly BitmapColor Teal = Hex(0x66ddcc);
+        public static readonly BitmapColor Blue = Hex(0x82aaff);
         public static readonly BitmapColor Overlay = Hex(0x5c5c5c);
         public static readonly BitmapColor Ground = Hex(0x24282d);
         public static readonly BitmapColor Text = Hex(0xebf0ec);
@@ -115,8 +117,9 @@ namespace Loupedeck.HerdrPlugin
         public static BitmapColor Color(String status) => status switch
         {
             Waiting or CiFailed or Changes => Red,
-            Go or Done => Accent,
-            Ready => Teal,
+            Go => Accent,
+            Done => Green,
+            Ready => Blue,
             Working => Yellow,
             Review or Draft => Subtext,
             _ => Overlay,
