@@ -28,7 +28,7 @@ namespace Loupedeck.HerdrPlugin
         private static readonly String[] Yours = { Waiting, Go, CiFailed, Changes, Done };
 
         // herdr's palette, plus a blue for ready. Each colour stands for what you do next: red answer or
-        // fix, orange decide, green look at the result, blue merge, yellow wait, grey nothing.
+        // fix, orange decide, green look at the result, blue merge, yellow wait, grey nothing for you.
         public static readonly BitmapColor Red = Hex(0xff8080);
         public static readonly BitmapColor Accent = Hex(0xf36a1b);
         public static readonly BitmapColor Yellow = Hex(0xffc799);
@@ -120,26 +120,19 @@ namespace Loupedeck.HerdrPlugin
             Done => Green,
             Ready => Blue,
             Working => Yellow,
-            Review or Draft => Subtext,
             _ => Overlay,
         };
 
-        // The icon for a status, so a key says it without text.
+        // One icon per colour, so a key reads at a glance: what needs you, a plan to decide, finished
+        // work, ready to merge, busy, or quiet. The exact status shows on the issue's own page.
         public static String Icon(String status) => status switch
         {
-            Waiting => Icons.Question,
+            Waiting or CiFailed or Changes => Icons.Alert,
             Go => Icons.Plan,
-            CiFailed => Icons.Alert,
-            Changes => Icons.Report,
             Done => Icons.Check,
             Ready => Icons.Merge,
             Working => Icons.Working,
-            Review => Icons.Eye,
-            Draft => Icons.Pencil,
-            Idle => Icons.Sleep,
-            Merged => Icons.Merge,
-            Closed => Icons.CircleX,
-            _ => Icons.Help,
+            _ => Icons.Sleep,
         };
 
         public static BitmapColor Hex(UInt32 rgb) => new((Int32)(rgb >> 16) & 0xFF, (Int32)(rgb >> 8) & 0xFF, (Int32)rgb & 0xFF);
