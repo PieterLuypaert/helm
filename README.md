@@ -6,6 +6,8 @@ An issue here is a herdr tab whose agent works on one branch, the way `hagent` o
 
 **[How it works](docs/flows.md)** walks through every flow with diagrams: the pages, the keys, answering a question and what the plugin does on its own. **[Setup details](docs/setup.md)** has every config field.
 
+**Status:** tested against herdr, GitHub and real Claude Code questions; not yet tried on the keypad itself.
+
 ![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=40a4e13a)
 
 ## What it does
@@ -20,7 +22,7 @@ helm adds three keys you place on your own keypad page, next to your other apps:
 
 In more detail:
 
-- **The status key** shows how many issues need you across every herdr workspace. Pressing it shows the most urgent issue in herdr and opens the folder on it; pressing it again walks on to the next. That the key opens the menu by itself is not yet confirmed on the keypad; if it does not, the Issues key lands on that issue.
+- **The status key** shows how many issues need you across every herdr workspace. Pressing it shows the most urgent issue in herdr and opens the menu on it; pressing it again walks on to the next. That the key opens the menu by itself is not yet confirmed on the keypad; if it does not, the Issues key lands on that issue.
 - **The herdr menu** has three levels: your projects, the tabs of one project, and the actions for one issue.
 - **Pull requests** show on the issue keys: failing checks, requested changes, ready to merge. helm reads them with the GitHub CLI.
 - **Actions** such as go, review, babysit and commit go to that issue's agent. The one that fits lights up, and every press is confirmed on the key and in herdr.
@@ -53,7 +55,7 @@ A question helm cannot read, such as one that wants typed text, shows only `answ
 
 It builds the plugin and links it into Logi Options+, links the action config, and adds keypad chords to herdr. It is safe to run again; run it after every pull. Then, once, in Logi Options+: open **Installed Plugins > Herdr** and drag **Herdr issues**, **Herdr status** and **Open herdr** onto keys of your keypad.
 
-Needs macOS, Logi Options+ with Logi Plugin Service 6.4 or later, herdr, iTerm2 (configurable), and the GitHub CLI `gh`, logged in, for the pull requests. The script installs the .NET 10 SDK in `~/.dotnet` when it is missing. The editor action and the chords call helper scripts in `~/.local/bin` (`hagent`, `hcleanup`, `hproject`, `hopen`), and the lazygit chord needs `lazygit`; without them, those keys do nothing.
+Needs macOS, Logi Options+ with Logi Plugin Service 6.4 or later, herdr, iTerm2 (configurable), and the GitHub CLI `gh`, logged in, for the pull requests. The script installs the .NET 10 SDK in `~/.dotnet` when it is missing. The editor action and the chords call helper scripts in `~/.local/bin` (`hagent`, `hcleanup`, `hproject`, `hopen`), and the lazygit chord needs `lazygit`; without them, those keys do nothing. The first time a key opens herdr in iTerm, macOS asks whether the Logi Plugin Service may control iTerm: allow it, or the plugin cannot open a new iTerm window with herdr.
 
 ## Configure
 
