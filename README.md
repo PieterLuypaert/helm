@@ -1,10 +1,12 @@
 # Helm
 
-The setup for my Logitech MX Keypad as the helm of [herdr](https://herdr.dev): a key per project, a key per ticket tab in it, and the actions for the ticket you pick.
+The setup for my Logitech MX Keypad as the helm of [herdr](https://herdr.dev): a key per project, a key per ticket tab in it, and the actions for the ticket you pick. The keypad and the screen always show the same ticket.
+
+![The Herdr folder on the keypad](docs/keypad.svg)
 
 It holds three things:
 
-- **`plugin/`**: a Logi Actions plugin (C#, .NET 10) with one dynamic folder, **Herdr**.
+- **`plugin/`**: a Logi Actions plugin (C#, .NET 10) with a dynamic folder, **Herdr**, and a key, **Herdr status**.
 - **`config/keypad.json`**: the actions on a ticket's page.
 - **`herdr/keys.toml`**: direct `ctrl+alt+shift` chords for the ticketflow scripts, so a plain keystroke key can run them.
 
@@ -16,38 +18,44 @@ It holds three things:
 
 It installs the .NET 10 SDK in `~/.dotnet` when missing (no sudo), builds the plugin and links it into the Logi Plugin Service, links `~/.config/herdr-keypad/config.json` to `config/keypad.json`, and writes `herdr/keys.toml` into herdr's `config.toml` between `helm: keypad chords` markers. It is safe to run again; run it after every pull.
 
-Then, once, in Logi Options+: select the keypad, open **Installed Plugins > Herdr** and drag the **Herdr** folder onto a key.
+Then, once, in Logi Options+: select the keypad, open **Installed Plugins > Herdr**, drag the **Herdr** folder onto a key, and drag **Herdr status** onto another key of your normal page.
 
 Needs Logi Options+ with Logi Plugin Service 6.4 or later, herdr, and the herdr-ticketflow scripts in `~/.local/bin` for the chords and the editor action.
 
-## The folder
+## How it works
 
 Diagrams of every flow, from navigation to what the plugin does on its own, are in [docs/flows.md](docs/flows.md).
 
-The folder has three levels on the keypad's nine keys. Every key carries a stripe in a status colour:
+**One rule: the keypad and the screen show the same ticket.** Pressing a tab on the keypad shows it in herdr; switching tabs in herdr moves the keypad's ticket page along. An action always goes to the ticket you are looking at.
 
-| Stripe | Status |
+Every key shows its agent's status in the quarterdeck's words and herdr's colours:
+
+| Colour | Status |
 |---|---|
-| red | waiting on you (`blocked`) |
-| orange | done |
-| yellow | working |
-| grey | idle |
+| red | `waiting`: the agent asks you something |
+| orange | `go?`: a plan waits for your go; `done`: the agent finished |
+| yellow | `working` |
+| grey | `idle` |
 
-**Projects.** One key per herdr workspace, in herdr's order, with a summary such as "1 wacht, 2 klaar". Its stripe is the most urgent status among its agents. Pressing one focuses that workspace in herdr and opens its page.
+A white frame marks the project and the tab that are on screen.
 
-**A project.** Its main tab first (the Claude in the main checkout, shown as "main"), then its ticket tabs in the order you opened them. A ticket tab is a tab named after a branch, or one whose agent runs in a worktree, which is what `hagent` makes. Each key shows the branch without its `feat/` prefix and without the leading words most tickets share. Pressing one focuses that tab, brings the terminal to the front and opens its actions.
+**The status key.** On your normal page: what needs you across every project, such as "1 waiting, 1 go?". Pressing it shows the most urgent ticket in herdr and opens the folder on it.
+
+**Projects.** One key per herdr workspace, in herdr's order, with up to two counts and the colour of its most urgent status. Pressing one shows that workspace in herdr and opens its page.
+
+**A project.** Its main tab first (the Claude in the main checkout, shown as "main"), then its ticket tabs in the order you opened them. A ticket tab is a tab named after a branch, or one whose agent runs in a worktree, which is what `hagent` makes. Each key shows the branch without its `feat/` prefix and without the leading words most tickets share. Pressing one shows that tab, in iTerm, and opens its page.
 
 **A ticket.**
 
 | | | |
 |---|---|---|
-| the ticket (focus it again) | go | toestaan |
+| the ticket | go | toestaan |
 | review and fix | code review | commit |
 | stop | editor | terug |
 
-Every action goes to that ticket's agent through the herdr CLI, never to whatever pane happens to have focus.
+The action that fits the ticket's status lights up: `go` for `go?`, `toestaan` for `waiting`, `review and fix` for `done`. One that does nothing is greyed out: `toestaan` works only while the agent waits on you. After a press the key flashes `sent` or the reason it was not sent, and herdr shows a notification. Every action goes to that ticket's agent through the herdr CLI, never to whatever pane happens to have focus.
 
-**terug** goes up one level. On the projects page, the back key the service adds closes the folder. When a level has more items than fit beside the way back, seven share a page with **meer**, which pages through the rest. The keys refresh every two seconds while the folder is open; a closed tab or workspace drops you one level up on its own.
+**terug** goes up one level. On the projects page, the back key the service adds closes the folder. When a level has more items than fit beside the way back, seven share a page with **meer**, which pages through the rest. The plugin reads herdr every two seconds; a closed tab or workspace drops you one level up on its own.
 
 ## Changing the actions
 
@@ -59,6 +67,8 @@ Edit `config/keypad.json`. The plugin reads it again when it changes, so no rebu
 | `type: "keys"` | key presses for the ticket's agent, space separated: `enter`, `esc`, `ctrl+c` |
 | `type: "shell"` | a command run in the ticket's worktree, with `$TICKET_CWD` set |
 | `color` | the stripe on the key, `#RRGGBB` |
+| `when` | the ticket statuses in which the key lights up, such as `["go?"]` |
+| `onlyWhen` | the statuses in which the key works at all; it is greyed out in the others |
 | `terminalBundleId` | the app brought to the front when you pick a ticket (iTerm2 by default); `""` leaves focus alone |
 | `openHerdrWhenClosed` | with no herdr window open, picking a ticket opens a new iTerm window and starts herdr in it, on that ticket (iTerm only; `true` by default). macOS asks once whether the Logi Plugin Service may control iTerm |
 
