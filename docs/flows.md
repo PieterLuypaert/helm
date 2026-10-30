@@ -52,12 +52,12 @@ flowchart TD
     projects <-->|"press a project · back"| project["Project<br/>main tab, then issues"]
     overview <-->|"press an issue · back"| issue["Issue<br/>seven actions and back"]
     project <-->|"press a tab · back"| issue
-    projects -->|back| closed(["Menu closed"])
+    projects -->|"Logi's back key"| closed(["Menu closed"])
 ```
 
 - **Every arrow goes both ways:** press to go down, `back` to come up. Pressing a project or a tab also shows it in herdr; `back` on an issue returns to the page you came from.
 - **Each key opens the menu on its own page:** Projects always on your projects, wherever you were before; All issues on the overview.
-- **`back` always goes one level up,** so your projects are never more than two presses away. On the projects page it closes the menu. Every page has helm's own `back`, never Logi's.
+- **`back` always goes one level up,** so your projects are never more than two presses away. On the projects page, Logi's own back key closes the menu; Logi puts it there itself.
 - **When a page has more items than fit** beside `back`, seven share a page with `more`, which pages through the rest.
 
 ### The overview
@@ -186,7 +186,7 @@ flowchart TD
 ```
 
 - **Pull requests come from the GitHub CLI.** Per repo, helm asks for your own open pull requests with their checks and review decision, and your own merged ones; two calls a minute, whatever the number of issues. It matches them to an issue by the branch the issue's worktree is on, not by the tab's label, which can be stale. Without `gh`, or for a repo that is not on GitHub, issues simply have no pull request.
-- **A failed call keeps what helm knew,** so one GitHub hiccup does not blank the keys. The same goes for herdr: only a second failed read in a row shows `herdr offline`, and the menu keeps your place for when herdr is back. `back` beside it closes the menu while herdr is offline.
+- **A failed call keeps what helm knew,** so one GitHub hiccup does not blank the keys. The same goes for herdr: only a second failed read in a row shows `herdr offline`, and the menu keeps your place for when herdr is back. Logi's back key closes the menu while herdr is offline.
 - **A key acts on the issue it showed.** Action and answer keys carry their issue, so a press right after the page followed the screen still goes to the issue that key was drawn for.
 - **A closed tab** drops the menu back to the page you came from; a closed workspace back to the projects.
 - **The folder may close on an app switch.** The Logi Plugin Service can close it when iTerm comes to the front. Pressing the Projects key opens it again, on your projects.
