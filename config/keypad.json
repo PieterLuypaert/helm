@@ -5,21 +5,25 @@
   // With no herdr window open, picking a tab opens a new iTerm window with herdr in it (iTerm only).
   "openHerdrWhenClosed": true,
 
+  // A line in an idle agent's output that marks a plan waiting for your go, as a regular expression.
+  "planPattern": "^\\s*(Single PR:|PR 1:)",
+
   // The issue page: one key per action, after the issue itself and before "terug".
-  // type "prompt": the text plus Enter, to the issue's agent.
-  // type "keys":   key presses for the issue's agent, space separated (enter, esc, ctrl+c).
-  // type "shell":  a command run in the issue's worktree, with $ISSUE_CWD set.
+  // type "prompt":  the text plus Enter, to the issue's agent.
+  // type "keys":    key presses for the issue's agent, space separated (enter, esc, ctrl+c).
+  // type "shell":   a command run in the issue's worktree, with $ISSUE_CWD set.
+  // type "open-pr": opens the issue's pull request in the browser; greyed out while there is none.
   // color: the stripe on top of the key, as #RRGGBB (herdr's palette: #ff8080 red, #f36a1b accent).
   // when: the issue statuses in which the key lights up, so the action that fits stands out.
   // onlyWhen: the statuses in which the key works at all; it is greyed out in the others.
-  // Statuses are the quarterdeck's: waiting, go?, done, working, idle.
+  // Statuses: waiting, go?, CI failed, changes, done, ready, working, review, draft, idle, merged, closed.
   "actions": [
     { "label": "go", "type": "prompt", "value": "go", "color": "#f36a1b", "when": ["go?"] },
     { "label": "toestaan", "type": "keys", "value": "enter", "color": "#ff8080", "when": ["waiting"], "onlyWhen": ["waiting"] },
     { "label": "review\nand fix", "type": "prompt", "value": "/review-and-fix", "when": ["done"] },
-    { "label": "code\nreview", "type": "prompt", "value": "/code-review" },
+    { "label": "babysit\npr", "type": "prompt", "value": "/babysit-pr", "when": ["CI failed", "changes"] },
     { "label": "commit", "type": "prompt", "value": "Commit the work in several logical commits, each with its own conventional-commit message." },
     { "label": "stop", "type": "keys", "value": "esc" },
-    { "label": "editor", "type": "shell", "value": "\"$HOME/.local/bin/hopen\" \"$ISSUE_CWD\"" }
+    { "label": "open PR", "type": "open-pr", "when": ["ready"] }
   ]
 }

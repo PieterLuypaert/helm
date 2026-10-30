@@ -177,7 +177,7 @@ namespace Loupedeck.HerdrPlugin
         private void RunAction(String param, IssueAction action, Issue tab)
         {
             var label = (action.Label ?? action.Value ?? "action").Replace('\n', ' ');
-            if (StyleFor(action, tab.Status) == KeyStyle.Dim)
+            if (StyleFor(action, tab) == KeyStyle.Dim)
             {
                 this.Flash(param, new KeyLook("not now", tab.Status, AgentStatus.Overlay, KeyStyle.Highlight));
                 return;
@@ -191,6 +191,7 @@ namespace Loupedeck.HerdrPlugin
                     "prompt" when tab.PaneId != null => HerdrClient.Prompt(tab.PaneId, action.Value ?? ""),
                     "keys" when tab.PaneId != null => HerdrClient.SendKeys(tab.PaneId, (action.Value ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries)),
                     "shell" => HerdrClient.Shell(action.Value ?? "", tab.Cwd),
+                    "open-pr" when tab.Pr?.Url != null => HerdrClient.RunTool(null, "/usr/bin/open", tab.Pr.Url),
                     _ => new CommandResult(false, null, $"unknown type {action.Type}"),
                 };
 
@@ -409,7 +410,7 @@ namespace Loupedeck.HerdrPlugin
                         var selected = this.SelectedTab();
                         return selected == null
                             ? new KeyLook("", null, AgentStatus.Overlay)
-                            : new KeyLook(selected.ShortName, selected.Status, AgentStatus.Color(selected.Status));
+                            : new KeyLook(selected.ShortName, selected.Pr == null ? selected.Status : $"{selected.Status}\nPR {selected.Pr.Number}", AgentStatus.Color(selected.Status));
                 }
 
                 if (param.StartsWith(ProjectPrefix))
@@ -432,11 +433,12 @@ namespace Loupedeck.HerdrPlugin
                 if (param.StartsWith(ActionPrefix) && Int32.TryParse(param[ActionPrefix.Length..], out var index))
                 {
                     var actions = KeypadConfig.Current.Actions;
-                    var status = this.SelectedTab()?.Status ?? AgentStatus.Unknown;
+                    var selectedTab = this.SelectedTab();
+                    var status = selectedTab?.Status ?? AgentStatus.Unknown;
                     if (index >= 0 && index < actions.Count)
                     {
                         var action = actions[index];
-                        var style = StyleFor(action, status);
+                        var style = StyleFor(action, selectedTab);
                         var accent = ParseHex(action.Color) ?? (style == KeyStyle.Highlight ? AgentStatus.Color(status) : AgentStatus.Overlay);
                         return new KeyLook(action.Label ?? action.Value ?? "?", null, accent, style);
                     }
@@ -447,8 +449,14 @@ namespace Loupedeck.HerdrPlugin
         }
 
         // Greyed out where it does nothing, lit up where it fits the issue's status.
-        private static KeyStyle StyleFor(IssueAction action, String status)
+        private static KeyStyle StyleFor(IssueAction action, Issue tab)
         {
+            var status = tab?.Status ?? AgentStatus.Unknown;
+            if (action.Type == "open-pr" && tab?.Pr == null)
+            {
+                return KeyStyle.Dim;
+            }
+
             if (action.OnlyWhen != null && action.OnlyWhen.Count > 0 && !action.OnlyWhen.Contains(status))
             {
                 return KeyStyle.Dim;
@@ -457,10 +465,10 @@ namespace Loupedeck.HerdrPlugin
             return action.When != null && action.When.Contains(status) ? KeyStyle.Highlight : KeyStyle.Normal;
         }
 
-        // "1 waiting, 2 go?": what a project's agents need, most urgent first, at most two parts.
+        // "1 waiting, 1 CI failed": what a project's issues need, most urgent first, at most two parts.
         private static String Summary(Project project)
         {
-            var parts = new[] { AgentStatus.Waiting, AgentStatus.Go, AgentStatus.Done, AgentStatus.Working }
+            var parts = new[] { AgentStatus.Waiting, AgentStatus.Go, AgentStatus.CiFailed, AgentStatus.Changes, AgentStatus.Done, AgentStatus.Ready, AgentStatus.Working }
                 .Select(s => (Status: s, Count: project.Count(s)))
                 .Where(x => x.Count > 0)
                 .Take(2)
