@@ -6,7 +6,7 @@ An issue here is a herdr tab whose agent works on one branch, the way `hagent` o
 
 **[How it works](docs/flows.md)** walks through every flow with diagrams: the pages, the keys, answering a question and what the plugin does on its own. **[Setup details](docs/setup.md)** has every config field.
 
-**Status:** tested against herdr, GitHub and real Claude Code questions; not yet tried on the keypad itself.
+**Status:** tested against herdr, GitHub and real Claude Code questions.
 
 ![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=40a4e13a)
 
