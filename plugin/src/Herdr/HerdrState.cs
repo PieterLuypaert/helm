@@ -37,8 +37,6 @@ namespace Loupedeck.HerdrPlugin
                 .ThenBy(x => x.Tab.Number)
                 .ToList();
 
-        public (Project Project, Issue Tab) MostUrgent() => this.NeedsYou().FirstOrDefault();
-
         // How many issue tabs there are across all projects; main tabs are not issues.
         public Int32 IssueCount() => this.Projects.Sum(p => p.Tabs.Count(t => !t.IsMain));
 

@@ -8,7 +8,7 @@ An issue here is a herdr tab whose agent works on one branch, the way `hagent` o
 
 **Status:** tested against herdr, GitHub and real Claude Code questions.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=e9ce80f7)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=f8422494)
 
 ## What it does
 
@@ -16,14 +16,11 @@ helm adds three keys you place on your own keypad page, next to your other apps:
 
 | Key | On the key | What it does |
 |---|---|---|
-| **Herdr projects** | an orange stack, Projects | opens the herdr menu on the keypad, always on your projects; from there their issues and the actions for one issue |
-| **Herdr all issues** | a list, with how many issues need you in a badge | opens an overview of all your issues, most urgent first |
+| **Herdr projects** | an orange stack, Projects | opens the herdr menu on the keypad, on your projects |
+| **Herdr all issues** | a list, "7 issues", with how many need you in a badge | opens the herdr menu on every issue at once, most urgent first |
 | **Open herdr** | a grey terminal, herdr | opens herdr itself in iTerm, like any app key |
 
-In more detail:
-
-- **The All issues key** counts your issues across every herdr workspace, with how many need you in a badge; main tabs do not count. Pressing it opens the menu on one overview of all of them, most urgent first; press one to open its page. The same key sits first on the projects page. That the key opens the menu by itself is not yet confirmed on the keypad; if it does not, press Projects.
-- **The herdr menu** has three levels: your projects, the tabs of one project, and the actions for one issue.
+- **The herdr menu** goes from your projects, with All issues first, to a project's tabs or every issue at once, to the actions for one issue. `back` always goes one level up. That the All issues key opens the menu by itself is not yet confirmed on the keypad; if it does not, press Projects and then All issues.
 - **Pull requests** show on the issue keys: failing checks, requested changes, ready to merge. helm reads them with the GitHub CLI.
 - **Actions** such as go, review, babysit and commit go to that issue's agent. The one that fits lights up, and every press is confirmed on the key and in herdr.
 - **Questions** an agent asks, such as a permission prompt, show as one key per choice, exactly as the screen lists them. helm reads the question again just before it answers, and sends nothing when it changed.
@@ -43,9 +40,9 @@ When an agent waits on you, for a permission or a choice, its key turns red with
 2. **Pick your answer:** the issue's page shows the question's choices, one key each, with the numbers your screen shows: `1 Yes`, `2 Always`, `3 Auto mode`, `4 No`. Each choice carries the issue's name under it, and your screen shows that same issue, so you always know whose question you answer. Press the one you want.
 3. **See it land:** the key flashes `sent` and herdr shows a notification. If the question changed in the meantime, nothing is sent and the key reads `changed`.
 
-![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](docs/answer.svg?v=d6108e94)
+![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](docs/answer.svg?v=94af0439)
 
-A question helm cannot read, such as one that wants typed text, shows only `answer on screen`: that key brings the issue's tab to the front so you answer it there.
+A question the keys cannot hold, such as one that wants typed text, shows `answer on screen`: that key brings the issue's tab to the front so you answer it there.
 
 ## Install
 

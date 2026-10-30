@@ -1,8 +1,8 @@
 # Keypad flows
 
-How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own. The keys carry Dutch labels for navigation (`terug`, `meer`); this page uses them as they appear on the keypad.
+How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=e9ce80f7)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=f8422494)
 
 ## Your page
 
@@ -40,26 +40,35 @@ Every key shows an icon and a word for its issue, from its agent and its pull re
 
 A plan is a line in the agent's last output that matches `planPattern` in `config/keypad.json`; by default a line starting with `Single PR:` or `PR 1:`.
 
-A project key shows the most urgent status among its tabs, with up to two counts, such as "1 waiting, 1 go?". A white ring marks the project and the tab that are on screen.
+A project key takes the colour of its most urgent tab, with how many of its tabs need you in a badge. A white ring marks the project and the tab that are on screen.
 
 ## Navigation
 
 ```mermaid
 flowchart TD
-    allIssues["Herdr all issues key<br/>on your page"] -->|"press"| overview["All issues<br/>most urgent first"]
-    overview -->|"press an issue"| issue
-    overview -->|terug| projects
     key["Projects key<br/>on your page"] --> projects["Projects<br/>All issues, then one key per workspace"]
-    projects -->|"press All issues"| overview
-    projects -->|"press a project:<br/>herdr shows that workspace"| project["Project<br/>main tab, then issues"]
-    project -->|"press a tab:<br/>herdr shows that tab"| issue["Issue<br/>seven actions and terug"]
-    issue -->|"terug, from the overview"| overview
-    issue -->|terug| project
-    project -->|terug| projects
-    projects -->|back key| closed(["Folder closed"])
+    allIssues["All issues key<br/>on your page"] --> overview
+    projects <-->|"press All issues · back"| overview["All issues<br/>every issue, most urgent first"]
+    projects <-->|"press a project · back"| project["Project<br/>main tab, then issues"]
+    overview <-->|"press an issue · back"| issue["Issue<br/>seven actions and back"]
+    project <-->|"press a tab · back"| issue
+    projects -.->|"Logi's back key"| closed(["Menu closed"])
 ```
 
-When a level has more items than fit beside the way back, seven share a page with `meer`, which pages through the rest.
+- **Every arrow goes both ways:** press to go down, `back` to come up. Pressing a project or a tab also shows it in herdr; `back` on an issue returns to the page you came from.
+- **Each key opens the menu on its own page:** Projects always on your projects, wherever you were before; All issues on the overview.
+- **`back` always goes one level up,** so your projects are never more than two presses away. Only the projects page closes the menu, with Logi's own back key.
+- **When a page has more items than fit** beside `back`, seven share a page with `more`, which pages through the rest.
+
+### The overview
+
+All issues counts your issues across every project, such as "9 issues", with how many need you in a badge in the colour of the most urgent one. Main tabs are not issues, so they do not count. It sits on your page and first on the projects page; both open the overview, so you can go through every issue in detail.
+
+![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=7df1f5fc)
+
+The overview sorts by status: waiting, go?, CI failed, changes and done, which need you, then ready, working, review, draft and idle. Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. A main tab, or an issue shown beside other projects' issues, names its project, such as "4 search · project A".
+
+The key on your page opens the menu through a generic action of the Logi plugin API that is not documented for folders. If the menu does not open, press Projects and then All issues.
 
 ## The keypad and the screen together
 
@@ -82,15 +91,13 @@ sequenceDiagram
 
 - **On an issue page** the keypad follows the tab herdr shows, across projects too.
 - **On the projects, project and overview pages** it does not jump, because you are browsing there; it marks what is on screen with a white ring instead.
-- **The Projects key always opens on your projects,** wherever you were before. Only the All issues key opens it elsewhere: on the overview.
-- **`terug` always goes one level up:** from an issue to the overview or the project you came from, and from there to your projects. Only the projects page closes the menu, with Logi's back key.
 - **Only a change on the screen counts.** Right after a key press herdr may still show the previous tab for a moment; the keypad does not jump back to it.
 
 ## Picking a tab
 
 ```mermaid
 flowchart TD
-    press["Press a tab on a project page"] --> keys["Keys switch to that issue's page"]
+    press["Press a tab on a project page or the overview"] --> keys["Keys switch to that issue's page"]
     press --> focus["herdr tab focus"]
     focus --> window{"Is a herdr window open?"}
     window -->|yes| front["Bring iTerm to the front"]
@@ -101,7 +108,7 @@ The herdr server keeps running after iTerm closes, so statuses and actions work 
 
 ## The issue page
 
-The page shows the issue with its status, and its pull request number when it has one, seven actions and `terug`. The action that fits the issue's status lights up as a filled circle in its colour; an action that does nothing in that status is greyed out.
+The page shows the issue with its status, and its pull request number when it has one, seven actions and `back`. The action that fits the issue's status lights up as a filled circle in its colour; an action that does nothing in that status is greyed out.
 
 | Issue status | Lights up | Greyed out |
 |---|---|---|
@@ -121,7 +128,7 @@ The page shows the issue with its status, and its pull request number when it ha
 | `stop` | presses Esc: interrupts the agent |
 | `open PR` | opens the issue's pull request in your browser |
 | `editor` | opens the issue's worktree with `hopen` |
-| `terug` | back to the project, or to the overview when you came from there |
+| `back` | back to the project, or to the overview when you came from there |
 
 The actions, and when they light up or grey out, come from `config/keypad.json`; see [Setup details](setup.md) to change them.
 
@@ -129,11 +136,11 @@ The actions, and when they light up or grey out, come from `config/keypad.json`;
 
 While an agent waits on you, its page shows the question it asks, such as Claude Code's permission prompt, with one key per choice exactly as the screen lists them.
 
-![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](answer.svg?v=d6108e94)
+![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](answer.svg?v=94af0439)
 
 - **Each key sends its own choice.** A numbered choice is picked by the number the screen shows, which is not always its position: in Claude Code 2.1, `No` is choice 4, after `Yes, and switch to auto mode`. Choices without numbers, such as the folder-trust question, are reached with the arrow keys from the selected one, then Enter.
 - **Nothing is sent blind.** Just before sending, helm reads the question again; when the choices changed, it sends nothing and the key reads `changed`.
-- **A question helm cannot read** shows only `answer on screen`, which brings the issue's tab to the front so you answer it there.
+- **A question the keys cannot hold** shows `answer on screen`, which brings the issue's tab to the front so you answer it there: one helm cannot read, such as one that wants typed text, or one with more than seven choices.
 - **Every choice names its issue.** Each choice key carries the issue's name under it, the top-left key shows the issue and what it asks about, and the screen shows that same issue.
 - **Yes in green, No in red,** anything else neutral, so the answer reads at a glance.
 
@@ -158,25 +165,6 @@ flowchart LR
     openPr["Open PR"] --> openCmd["open<br/>the pull request in your browser"]
 ```
 
-## All issues
-
-A key for your normal keypad page, outside the folder, and the first key on the projects page. It reads how many issues you have across every project, such as "9 issues", with how many need you in a badge, in the colour of the most urgent one. Main tabs are not issues, so they do not count. Pressing it opens the menu on one overview of every issue, most urgent first, so you can look at each of them in detail.
-
-![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=3fe9d892)
-
-```mermaid
-flowchart TD
-    look["All issues: 9 issues, 2 need you"] --> press["Press it"]
-    press --> overview["The overview: every issue of every project<br/>waiting, go?, CI failed, changes, done,<br/>then ready, working, review, draft, idle"]
-    overview -->|"press an issue"| issue["Its page, and herdr shows it"]
-    issue -->|"terug"| overview
-    overview -->|"terug"| projects["Your projects"]
-```
-
-Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. A main tab, or an issue shown beside other projects' issues, names its project, such as "main · project B". `ready` does not count as needing you; it sorts right after the issues that do.
-
-The key opens the folder through a generic action of the Logi plugin API that is not documented for folders. If the menu does not open, the Projects key takes you to every issue through its project.
-
 ## What happens on its own
 
 One reader serves the whole plugin, so the folder and the All issues key always agree. It reads herdr every two seconds and pull requests once a minute.
@@ -199,6 +187,6 @@ flowchart TD
 
 - **Pull requests come from the GitHub CLI.** Per repo, helm asks for your own open pull requests with their checks and review decision, and your own merged ones; two calls a minute, whatever the number of issues. It matches them to an issue by the branch the issue's worktree is on, not by the tab's label, which can be stale. Without `gh`, or for a repo that is not on GitHub, issues simply have no pull request.
 - **A failed call keeps what helm knew,** so one GitHub hiccup does not blank the keys.
-- **A closed tab** drops the folder back to its project; a closed workspace back to the projects.
+- **A closed tab** drops the menu back to the page you came from; a closed workspace back to the projects.
 - **The folder may close on an app switch.** The Logi Plugin Service can close it when iTerm comes to the front. Pressing the Projects key opens it again, on your projects.
 

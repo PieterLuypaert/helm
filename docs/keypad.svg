@@ -84,10 +84,10 @@
 <text x="634.0" y="302" text-anchor="middle" font-size="9.5" fill="#ebf0ec">8 settings</text>
 <rect x="680" y="238" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(705.0 252.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/></g>
-<text x="718.0" y="302" text-anchor="middle" font-size="9.5" fill="#ebf0ec">meer 1/2</text>
+<text x="718.0" y="302" text-anchor="middle" font-size="9.5" fill="#ebf0ec">more 1/2</text>
 <rect x="764" y="238" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(789.0 252.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></g>
-<text x="802.0" y="302" text-anchor="middle" font-size="9.5" fill="#ebf0ec">terug</text>
+<text x="802.0" y="302" text-anchor="middle" font-size="9.5" fill="#ebf0ec">back</text>
 <text x="884" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">3. Issue: 7 checkout</text>
 <text x="884" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">the action that fits lights up</text>
 <rect x="884" y="70" width="76" height="76" rx="10" fill="#2b2d30"/>
@@ -117,7 +117,7 @@
 <text x="1006.0" y="302" text-anchor="middle" font-size="9.5" fill="#ebf0ec">editor</text>
 <rect x="1052" y="238" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(1077.0 252.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></g>
-<text x="1090.0" y="302" text-anchor="middle" font-size="9.5" fill="#ebf0ec">terug</text>
+<text x="1090.0" y="302" text-anchor="middle" font-size="9.5" fill="#ebf0ec">back</text>
 <text x="884" y="352" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">After a press, for 1.5 seconds</text>
 <rect x="884" y="364" width="76" height="76" rx="10" fill="#2b2d30"/>
 <circle cx="922.0" cy="391" r="18" fill="#99ffe4"/>

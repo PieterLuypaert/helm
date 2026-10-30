@@ -97,6 +97,5 @@ public class StatusTests
             new Project("w2", 2, "b", false, new[] { Tab("t4", 1, "CI failed"), Tab("t5", 2, "ready") }),
         }, false, "t1");
         Assert.Equal(new[] { "t3", "t4", "t1" }, snapshot.NeedsYou().Select(x => x.Tab.TabId));
-        Assert.Equal("t3", snapshot.MostUrgent().Tab.TabId);
     }
 }

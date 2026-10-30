@@ -7,7 +7,7 @@ namespace Loupedeck.HerdrPlugin
 
     // The keypad's herdr menu, three levels deep: every project (herdr workspace), with the overview of
     // all issues first; a project's main tab and issue tabs, or every issue at once; and the actions for
-    // the tab you picked. Each terug goes one level up, so the projects are never more than two presses
+    // the tab you picked. Each back key goes one level up, so the projects are never more than two presses
     // away. The keypad and the screen show the same issue: a key press moves herdr, and on an issue page
     // the keypad follows the tab herdr shows.
     public class IssuesFolder : PluginDynamicFolder
@@ -24,7 +24,7 @@ namespace Loupedeck.HerdrPlugin
         private const String AnswerPrefix = "ans:";
         private const String OnScreenParam = "on-screen";
 
-        // Nine keys: with more items than fit, seven items, "meer" and the way back share a page.
+        // Nine keys: with more items than fit, seven items, "more" and the way back share a page.
         private const Int32 Keys = 9;
 
         private static readonly TimeSpan FlashTime = TimeSpan.FromMilliseconds(1500);
@@ -115,7 +115,7 @@ namespace Loupedeck.HerdrPlugin
             {
                 var names = this.CurrentParams().Select(p => this.CreateCommandName(p)).ToList();
 
-                // Only the projects close the menu, with Logi's back key; every other page has terug.
+                // Only the projects close the menu, with Logi's own back key; every other page has ours.
                 if (this.Level() == 0)
                 {
                     names.Add(PluginDynamicFolder.NavigateUpActionName);
@@ -464,9 +464,15 @@ namespace Loupedeck.HerdrPlugin
                     if (tab?.Status == AgentStatus.Waiting)
                     {
                         // A waiting agent's page is its question: one key per choice, as its screen shows them.
+                        // The screen already shows the issue, so "answer on screen" only comes up when the keys
+                        // cannot hold the question: helm cannot read it, or it has more choices than fit.
                         var choices = tab.Question?.Options.Count ?? 0;
-                        names.AddRange(Enumerable.Range(0, Math.Min(choices, Keys - 3)).Select(i => AnswerPrefix + i));
-                        names.Add(OnScreenParam);
+                        var fits = choices > 0 && choices <= Keys - 2;
+                        names.AddRange(Enumerable.Range(0, fits ? choices : Math.Min(choices, Keys - 3)).Select(i => AnswerPrefix + i));
+                        if (!fits)
+                        {
+                            names.Add(OnScreenParam);
+                        }
                     }
                     else
                     {
@@ -484,7 +490,7 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
-        // The items on the current page, followed by "meer" when they do not all fit beside the way back.
+        // The items on the current page, followed by "more" when they do not all fit beside the way back.
         private List<String> Paged(List<String> items)
         {
             if (items.Count <= Keys - 1)
@@ -520,12 +526,11 @@ namespace Loupedeck.HerdrPlugin
                     case AllParam:
                         return StatusCommand.Look(this._snapshot);
                     case BackToProjectsParam:
-                        return new KeyLook("terug", Icons.Back, nav);
                     case BackToProjectParam:
-                        return new KeyLook("terug", Icons.Back, nav);
+                        return new KeyLook("back", Icons.Back, nav);
                     case MoreParam:
                         var count = this._all ? this._snapshot.AllTabs().Count : this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count + 1;
-                        return new KeyLook($"meer {this._page + 1}/{PageCount(count)}", Icons.Dots, nav);
+                        return new KeyLook($"more {this._page + 1}/{PageCount(count)}", Icons.Dots, nav);
                     case OnScreenParam:
                         return new KeyLook("answer on screen", Icons.Screen, nav);
                     case HeaderParam:
@@ -638,18 +643,6 @@ namespace Loupedeck.HerdrPlugin
             }
 
             return action.When != null && action.When.Contains(status) ? KeyStyle.Highlight : KeyStyle.Normal;
-        }
-
-        // "1 waiting, 1 CI failed": what a project's issues need, most urgent first, at most two parts.
-        private static String Summary(Project project)
-        {
-            var parts = new[] { AgentStatus.Waiting, AgentStatus.Go, AgentStatus.CiFailed, AgentStatus.Changes, AgentStatus.Done, AgentStatus.Ready, AgentStatus.Working }
-                .Select(s => (Status: s, Count: project.Count(s)))
-                .Where(x => x.Count > 0)
-                .Take(2)
-                .Select(x => $"{x.Count} {x.Status}")
-                .ToList();
-            return parts.Count > 0 ? String.Join(", ", parts) : AgentStatus.Idle;
         }
 
         private static BitmapColor? ParseHex(String hex)

@@ -34,15 +34,12 @@
 <g transform="translate(579.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#ff8080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></g>
 <text x="592.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">4 No · 6 dark</text>
 <text x="592.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">mode</text>
-<rect x="638" y="148" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(663.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10z"/><path d="M7 20h10"/><path d="M9 16v4"/><path d="M15 16v4"/></g>
-<text x="676.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">answer on</text>
-<text x="676.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">screen</text>
+<rect x="638" y="148" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="470" y="232" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="554" y="232" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="638" y="232" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(663.0 246.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></g>
-<text x="676.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">terug</text>
+<text x="676.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">back</text>
 <line x1="412" y1="186.0" x2="458" y2="186.0" stroke="#8b949e" stroke-width="1.5" marker-end="url(#a)"/>
 <text x="764" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">A question it cannot read</text>
 <text x="764" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">answer it on screen</text>
@@ -61,7 +58,7 @@
 <rect x="848" y="232" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="932" y="232" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(957.0 246.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></g>
-<text x="970.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">terug</text>
+<text x="970.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">back</text>
 <text x="20" y="338" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">Each key sends its own choice: the number the screen shows, or the arrow keys and Enter when the choices have no numbers.</text>
 <text x="20" y="353" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">Just before sending, helm reads the question again and sends nothing if it changed; the key then reads changed.</text>
 </svg>
