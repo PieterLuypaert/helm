@@ -2,7 +2,7 @@
 
 How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own. The keys carry Dutch labels for navigation (`terug`, `meer`, `toestaan`); this page uses them as they appear on the keypad.
 
-![The Herdr folder on the keypad: the status key, the projects page, a project, an issue, and what a key shows after a press](keypad.svg)
+![The keypad from your own page, through the Herdr folder's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg)
 
 ## One rule: the keypad and the screen show the same issue
 
@@ -148,7 +148,7 @@ flowchart TD
     any -->|yes| within{"Pressed within ten seconds<br/>of the last press?"}
     within -->|no| first["The most urgent issue:<br/>waiting, go?, CI failed, changes, then done"]
     within -->|yes| next["The next issue in that list"]
-    first --> show["herdr shows it, the folder opens on it,<br/>the key reads 1 of 3"]
+    first --> show["herdr shows it, the folder opens on it,<br/>the key shows where you are, such as 1 of 2"]
     next --> show
 ```
 

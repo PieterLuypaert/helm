@@ -84,13 +84,27 @@ EMPTY = dict(title="", empty=True)
 
 
 def flow():
-    """The keypad from the status key down to one issue, and what a key shows after a press."""
+    """The keypad from your own page down to one issue, and what a key shows after a press."""
     pic, top = Picture("The Herdr folder on the MX Keypad"), 70
-    pic.text(20, 40, "Status key")
-    pic.text(20, 56, "on your normal page", 11, "400")
-    pic.key(30, top + K + G, "2 need you", "1 ready", RED, "highlight")
+    step = 3 * K + 2 * G + 44   # one page of keys plus the gap for an arrow
 
-    px = 150
+    # 0. Your own page in Logi Options+: the Herdr folder key opens the folder.
+    x0 = 20
+    pic.text(x0, 40, "0. Your page")
+    pic.text(x0, 56, "your own keys in Logi Options+", 11, "400")
+    pic.grid(x0, top, [
+        dict(title="new issue", accent=OVERLAY),
+        dict(title="pick\nproject", accent=OVERLAY),
+        dict(title="2 need you", sub="1 ready", accent=RED, style="highlight"),
+        dict(title="lazygit", accent=OVERLAY),
+        dict(title="editor", accent=OVERLAY),
+        dict(title="Herdr", sub="opens the\nfolder", accent=ACCENT),
+        EMPTY, EMPTY, EMPTY,
+    ])
+    pic.text(x0, top + 3 * (K + G) + 14, "The red key is Herdr status: it jumps\nstraight to the most urgent issue (step 3).", 11, "400")
+
+    # 1. Projects.
+    px = x0 + step
     pic.text(px, 40, "1. Projects")
     pic.text(px, 56, "one key per workspace", 11, "400")
     pic.grid(px, top, [
@@ -101,7 +115,8 @@ def flow():
         dict(title="back", sub="closes", accent=OVERLAY),
     ])
 
-    qx = 420
+    # 2. A project: its main tab and its issues.
+    qx = px + step
     pic.text(qx, 40, "2. A project")
     pic.text(qx, 56, "main tab, then issues", 11, "400")
     pic.grid(qx, top, [
@@ -116,7 +131,8 @@ def flow():
         dict(title="terug", sub="projecten", accent=OVERLAY),
     ])
 
-    tx = 690
+    # 3. An issue: the action that fits lights up.
+    tx = qx + step
     pic.text(tx, 40, "3. Issue: 7 checkout")
     pic.text(tx, 56, "the action that fits lights up", 11, "400")
     pic.grid(tx, top, [
@@ -131,23 +147,21 @@ def flow():
         dict(title="terug", sub="project A", accent=OVERLAY),
     ])
 
-    fx = 950
-    pic.text(fx, 40, "After a press")
-    pic.text(fx, 56, "for 1.5 seconds", 11, "400")
-    pic.key(fx, top, "sent", None, GREEN, "highlight")
-    pic.key(fx, top + K + G, "waits on\nyou", None, RED, "highlight")
-    pic.key(fx, top + 2 * (K + G), "not now", None, OVERLAY, "highlight")
+    # What a key shows for a moment after a press, under the issue page.
+    fy = top + 3 * (K + G) + 30
+    pic.text(tx, fy, "After a press, for 1.5 seconds")
+    for i, (title, color) in enumerate([("sent", GREEN), ("waits on\nyou", RED), ("not now", OVERLAY)]):
+        pic.key(tx + i * (K + G), fy + 12, title, None, color, "highlight")
 
     mid = top + K + G + K / 2
-    pic.arrow(104, 142, mid)
-    pic.arrow(px + 3 * K + 2 * G + 6, qx - 8, mid)
-    pic.arrow(qx + 3 * K + 2 * G + 6, tx - 8, mid)
+    for x in (x0, px, qx):
+        pic.arrow(x + 3 * K + 2 * G + 6, x + step - 8, mid)
 
-    y = pic.legend(20, top + 3 * (K + G) + 36, [
+    y = pic.legend(20, fy + 12 + K + 34, [
         [(RED, "needs you"), (ACCENT, "your turn"), (TEAL, "ready to merge"), (YELLOW, "working"), (OVERLAY, "quiet"),
          (None, "white frame: what is on screen")],
     ])
-    pic.save("keypad.svg", 1040, y + 4)
+    pic.save("keypad.svg", tx + 3 * K + 2 * G + 20, y + 4)
 
 
 def statuses():
