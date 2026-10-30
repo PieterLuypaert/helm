@@ -48,6 +48,10 @@ namespace Loupedeck.HerdrPlugin
             this.DisplayName = "Herdr projects";
             this.Description = "Your herdr projects, their issues, and actions for the one you pick";
             this.GroupName = "Herdr";
+
+            // The folder places its own back keys. Logi reads this property, which defaults to adding a back key
+            // of its own on every page, next to ours.
+            this.Navigation = PluginDynamicFolderNavigation.None;
         }
 
         // The action name that opens this folder, for the All issues key.
