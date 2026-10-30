@@ -8,7 +8,7 @@
   // A line in an idle agent's output that marks a plan waiting for your go, as a regular expression.
   "planPattern": "^\\s*(Single PR:|PR 1:)",
 
-  // The issue page: one key per action, after the issue itself and before "terug". While the agent
+  // The issue page: one key per action, after the issue itself and before "back". While the agent
   // waits on you, the page shows its question instead: one key per choice, as its screen shows them.
   // type "prompt":  the text plus Enter, to the issue's agent.
   // type "keys":    key presses for the issue's agent, space separated (enter, esc, ctrl+c).
