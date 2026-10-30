@@ -2,7 +2,7 @@
 
 How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own. The keys carry Dutch labels for navigation (`terug`, `meer`); this page uses them as they appear on the keypad.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=56baa1e7)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=7ae7c521)
 
 ## Your page
 
@@ -11,7 +11,7 @@ The keypad starts on a page you set up yourself in Logi Options+, with your own 
 | Key | On the key | What it does | Where |
 |---|---|---|---|
 | Herdr projects | an orange stack, Projects | opens the herdr menu below, always on your projects | on the keypad |
-| Herdr status | a bell in the colour of what needs you, with the count in a badge | jumps to the most urgent issue | on the keypad and the screen |
+| Herdr all issues | a list, with how many need you in a badge in the colour of the most urgent | opens an overview of every issue, most urgent first | on the keypad |
 | Open herdr | a grey terminal, herdr, like an app key | opens herdr itself in iTerm: in front if it runs, else in a new iTerm window | on the screen |
 
 ## One rule: the keypad and the screen show the same issue
@@ -46,10 +46,12 @@ A project key shows the most urgent status among its tabs, with up to two counts
 
 ```mermaid
 flowchart TD
-    status["Herdr status key<br/>on your page"] -->|"press: the most urgent issue"| issue
+    allIssues["Herdr all issues key<br/>on your page"] -->|"press"| overview["All issues<br/>most urgent first"]
+    overview -->|"press an issue"| issue
     key["Projects key<br/>on your page"] --> projects["Projects<br/>one key per workspace"]
     projects -->|"press a project:<br/>herdr shows that workspace"| project["Project<br/>main tab, then issues"]
     project -->|"press a tab:<br/>herdr shows that tab"| issue["Issue<br/>seven actions and terug"]
+    issue -->|"terug, from the overview"| overview
     issue -->|terug| project
     project -->|terug| projects
     projects -->|back key| closed(["Folder closed"])
@@ -77,8 +79,8 @@ sequenceDiagram
 ```
 
 - **On an issue page** the keypad follows the tab herdr shows, across projects too.
-- **On the projects and project pages** it does not jump, because you are browsing there; it marks what is on screen with a white ring instead.
-- **The Projects key always opens on your projects,** wherever you were before. Only the status key opens the menu on an issue.
+- **On the projects, project and overview pages** it does not jump, because you are browsing there; it marks what is on screen with a white ring instead.
+- **The Projects key always opens on your projects,** wherever you were before. Only the All issues key opens it elsewhere: on the overview.
 - **Only a change on the screen counts.** Right after a key press herdr may still show the previous tab for a moment; the keypad does not jump back to it.
 
 ## Picking a tab
@@ -153,31 +155,28 @@ flowchart LR
     openPr["Open PR"] --> openCmd["open<br/>the pull request in your browser"]
 ```
 
-## The status key
+## All issues
 
-A key for your normal keypad page, outside the folder: how many issues need you across every project, and how many are ready to merge. It is filled with the colour of the most urgent status; with nothing waiting it reads "all clear".
+A key for your normal keypad page, outside the folder. It reads how many issues you have across every project, such as "9 issues", with how many need you in a badge, in the colour of the most urgent one. Pressing it opens the menu on one overview of every issue, most urgent first, so you can look at each of them in detail.
 
-![Walking through what needs you: the count, the most urgent issue, the next one, and an issue you handled dropping out](status-key.svg?v=f689e3ab)
+![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=5cda820b)
 
 ```mermaid
 flowchart TD
-    look["The status key: 3 need you, 1 ready"] --> press["Press it"]
-    press --> any{"Does an issue need you?"}
-    any -->|no| projects["The folder opens on the projects page"]
-    any -->|yes| within{"Pressed within ten seconds<br/>of the last press?"}
-    within -->|no| first["The most urgent issue:<br/>waiting, go?, CI failed, changes, then done"]
-    within -->|yes| next["The next issue in that list"]
-    first --> show["herdr shows it, the folder opens on it,<br/>the key shows where you are, such as 1 of 2"]
-    next --> show
+    look["All issues: 9 issues, 2 need you"] --> press["Press it"]
+    press --> overview["The overview: every issue of every project<br/>waiting, go?, CI failed, changes, done,<br/>then ready, working, review, draft, idle"]
+    overview -->|"press an issue"| issue["Its page, and herdr shows it"]
+    issue -->|"terug"| overview
+    overview -->|"Logi's back key"| closed["The menu closes"]
 ```
 
-An issue that no longer needs you drops out of the list, so pressing the key walks you through whatever is left. `ready` does not count as needing you; the key shows it beside the count instead.
+Within a status, issues keep the order of their projects and tabs. A main tab, or an issue shown beside other projects' issues, names its project, such as "main · project B". `ready` does not count as needing you; it sorts right after the issues that do.
 
-The key opens the folder through a generic action of the Logi plugin API that is not documented for folders. If the menu does not open, the jump still shows the issue in herdr, and the Projects key takes you to it through its project.
+The key opens the folder through a generic action of the Logi plugin API that is not documented for folders. If the menu does not open, the Projects key takes you to every issue through its project.
 
 ## What happens on its own
 
-One reader serves the whole plugin, so the folder and the status key always agree. It reads herdr every two seconds and pull requests once a minute.
+One reader serves the whole plugin, so the folder and the All issues key always agree. It reads herdr every two seconds and pull requests once a minute.
 
 ```mermaid
 flowchart TD
@@ -189,7 +188,7 @@ flowchart TD
     status --> changed{"Did anything change?"}
     changed -->|no| quiet["Nothing to redraw"]
     changed -->|yes| folder["Folder: follow the screen, drop closed tabs,<br/>redraw the keys that changed"]
-    changed -->|yes| statusKey["Status key: redraw its counts"]
+    changed -->|yes| allKey["All issues key: redraw its counts"]
     minute["Every minute, and for a new issue at once"] --> branch["Read each issue folder's real branch and GitHub repo"]
     branch --> gh["Per repo: gh pr list for your open<br/>and your merged pull requests"]
     gh --> status

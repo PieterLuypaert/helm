@@ -59,6 +59,20 @@ public class StatusTests
     }
 
     [Fact]
+    public void A_snapshot_lists_all_tabs_most_urgent_first_across_projects()
+    {
+        Issue Tab(String id, Int32 number, String status) =>
+            new(id, number, "w", "b", id, status, "p" + id, "/tmp", null, false, false);
+        var snapshot = new Snapshot(new[]
+        {
+            new Project("w1", 1, "a", true, new[] { Tab("t1", 1, "idle"), Tab("t2", 2, "working"), Tab("t3", 3, "waiting") }),
+            new Project("w2", 2, "b", false, new[] { Tab("t4", 1, "ready"), Tab("t5", 2, "go?") }),
+        }, false, "t1");
+        Assert.Equal(new[] { "t3", "t5", "t4", "t2", "t1" }, snapshot.AllTabs().Select(x => x.Tab.TabId));
+        Assert.Equal("b", snapshot.AllTabs()[1].Project.Name);
+    }
+
+    [Fact]
     public void A_snapshot_lists_what_needs_you_most_urgent_first()
     {
         Issue Tab(String id, Int32 number, String status) =>

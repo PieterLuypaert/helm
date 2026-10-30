@@ -139,14 +139,14 @@ def flow():
     pic.grid(x0, top, [
         dict(label="Spotify", icon="Music"),
         dict(label="Claude", icon="Sparkles"),
-        dict(label="2 need you, 1 ready", icon="BellRinging", color=RED, badge="2"),
+        dict(label="9 issues", icon="List", color=RED, badge="2"),
         dict(label="ChatGPT", icon="Chatbot"),
         dict(label="herdr", icon="Terminal", color=SUBTEXT),
         dict(label="Projects", icon="Stack", color=ACCENT),
         EMPTY, EMPTY, EMPTY,
     ])
     pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, each with its own job:\n" + "Projects opens the herdr menu on your projects.\n"
-             + "The terminal, herdr, opens herdr in iTerm.\n" + "The bell, Herdr status, counts what needs you\nand jumps to the most urgent issue (step 3).", 11, "400")
+             + "The terminal, herdr, opens herdr in iTerm.\n" + "The list, All issues, opens every issue at\nonce, most urgent first; the badge counts\nthose that need you.", 11, "400")
 
     px = x0 + step
     pic.text(px, 40, "1. Projects")
@@ -225,24 +225,49 @@ def statuses():
     pic.save("statuses.svg", 4 * slot * 2 + 50, top + K + 84)
 
 
-def status_key():
-    """Pressing the status key walks through what needs you, most urgent first."""
-    pic, top = Picture("Walking through what needs you"), 46
-    steps = [
-        ("2 need you, 1 ready", RED, "2", "what needs you"),
-        ("1 of 2 · 6 dark mode", RED, None, "the most urgent:\nherdr and the folder\njump to it"),
-        ("2 of 2 · 7 checkout", ACCENT, None, "press again within\n10 seconds: the next"),
-        ("1 need you, 1 ready", ACCENT, "1", "an issue you handled\ndrops out of the list"),
-    ]
-    gap = 150
-    for i, (label, color, badge, caption) in enumerate(steps):
-        x = 40 + i * gap
-        pic.key(x, top, label, "BellRinging", color, badge=badge)
-        pic.text(x + K / 2, top + K + 20, caption, 11, "400", "middle")
-        if i < len(steps) - 1:
-            pic.arrow(x + K + 10, x + gap - 10, top + K / 2, "press" if i < 2 else "later")
-    pic.text(40, 26, "The status key")
-    pic.save("status-key.svg", 40 + 3 * gap + K + 60, top + K + 70)
+def all_issues():
+    """The All issues key opens an overview of every issue across projects, most urgent first."""
+    pic, top = Picture("All your issues at once"), 64
+    pic.text(20, 40, "All issues")
+    pic.text(20, 56, "on your page", 11, "400")
+    pic.key(30, top + K + G, "9 issues", "List", RED, badge="2")
+
+    ox = 150
+    pic.text(ox, 40, "The overview")
+    pic.text(ox, 56, "every issue, most urgent first", 11, "400")
+    pic.grid(ox, top, [
+        issue("6 dark mode", "waiting"),
+        issue("7 checkout", "go?"),
+        issue("3 sign up", "ready"),
+        issue("4 search", "working"),
+        issue("main · project B", "working"),
+        dict(label="main · project A", icon="Home", color=OVERLAY),
+        issue("5 export", "idle"),
+        dict(label="meer 1/2", icon="Dots", color=SUBTEXT),
+        dict(label="back", icon="Back", color=SUBTEXT),
+    ])
+
+    ix = ox + 3 * K + 2 * G + 44
+    pic.text(ix, 40, "Its page: 6 dark mode")
+    pic.text(ix, 56, "terug returns to the overview", 11, "400")
+    pic.grid(ix, top, [
+        issue("6 dark mode · npm test", "waiting"),
+        dict(label="1 Yes · 6 dark mode", icon="Check", color=GREEN),
+        dict(label="2 Always · 6 dark mode", icon="Checks", color=GREEN),
+        dict(label="3 Auto mode · 6 dark mode", icon="Robot", color=SUBTEXT),
+        dict(label="4 No · 6 dark mode", icon="X", color=RED),
+        dict(label="answer on screen", icon="Screen", color=SUBTEXT),
+        EMPTY, EMPTY,
+        dict(label="terug", icon="Back", color=SUBTEXT),
+    ])
+
+    mid = top + K + G + K / 2
+    pic.arrow(30 + K + 10, ox - 10, mid, "press")
+    pic.arrow(ox + 3 * K + 2 * G + 6, ix - 8, mid, "pick one")
+    note = top + 3 * (K + G) + 24
+    pic.text(20, note, "A main tab, or an issue beside other projects' issues, says whose it is. The badge on the key counts the issues that need you:\n"
+                       "waiting, go?, CI failed, changes and done. Logi's back key closes the overview.", 12, "400")
+    pic.save("all-issues.svg", ix + 3 * K + 2 * G + 20, note + 30)
 
 
 def answer():
@@ -319,6 +344,6 @@ def stamp_links():
 
 flow()
 statuses()
-status_key()
+all_issues()
 answer()
 stamp_links()

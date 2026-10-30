@@ -24,7 +24,7 @@ namespace Loupedeck.HerdrPlugin
         // Most urgent first: what waits on you, then what is ready to merge, then the rest.
         private static readonly String[] Urgency = { Waiting, Go, CiFailed, Changes, Done, Ready, Working, Review, Draft, Idle, Merged, Closed, Unknown };
 
-        // What needs you now, in the order the status key walks through it.
+        // What needs you now: the All issues key counts these in its badge.
         private static readonly String[] Yours = { Waiting, Go, CiFailed, Changes, Done };
 
         // herdr's palette, plus a blue for ready. Each colour stands for what you do next: red answer or
