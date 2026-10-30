@@ -263,6 +263,17 @@ end tell";
             Run("/usr/bin/osascript", "-e", script);
         }
 
+        private static readonly Regex BundleIdLine = new("bundleID=\"([^\"]+)\"", RegexOptions.Compiled);
+
+        // The bundle id of the app in front, or null when it cannot be read.
+        public static String FrontmostBundleId()
+        {
+            var front = Run("/usr/bin/lsappinfo", "front")?.Trim();
+            var info = String.IsNullOrEmpty(front) ? null : Run("/usr/bin/lsappinfo", "info", "-only", "bundleid", front);
+            var match = BundleIdLine.Match(info ?? "");
+            return match.Success ? match.Groups[1].Value : null;
+        }
+
         public static void ActivateApp(String bundleId)
         {
             if (!String.IsNullOrWhiteSpace(bundleId))

@@ -19,7 +19,17 @@ namespace Loupedeck.HerdrPlugin
             }
             else
             {
-                HerdrClient.ActivateApp(config.TerminalBundleId);
+                BringToFront(config.TerminalBundleId);
+            }
+        }
+
+        // Activates the terminal only when another app is in front: switching apps can make Logi close
+        // the keypad's menu, and herdr already shows the tab when the terminal is in front.
+        private static void BringToFront(String bundleId)
+        {
+            if (!String.IsNullOrWhiteSpace(bundleId) && HerdrClient.FrontmostBundleId() != bundleId)
+            {
+                HerdrClient.ActivateApp(bundleId);
             }
         }
 
