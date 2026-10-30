@@ -39,7 +39,7 @@ namespace Loupedeck.HerdrPlugin
 
         public IssuesFolder()
         {
-            this.DisplayName = "Herdr issues";
+            this.DisplayName = "Herdr projects";
             this.Description = "Your herdr projects, their issues, and actions for the one you pick";
             this.GroupName = "Herdr";
         }
@@ -65,17 +65,22 @@ namespace Loupedeck.HerdrPlugin
 
         public override Boolean Activate()
         {
-            Boolean requested;
             lock (this._lock)
             {
                 this._active = true;
-                requested = this.ApplyNavigationRequest();
+
+                // The Projects key always opens on your projects. Only the status key opens the folder on
+                // an issue: it asks for that issue just before it opens the folder.
+                if (!this.ApplyNavigationRequest())
+                {
+                    this._projectId = null;
+                    this._tabId = null;
+                    this._page = 0;
+                }
             }
 
             HerdrState.Changed += this.OnChanged;
-
-            // Opening the folder lands on the tab on screen, unless the status key just picked one.
-            this.Update(HerdrState.Current, followScreen: !requested);
+            this.Update(HerdrState.Current, followScreen: false);
             return true;
         }
 
@@ -92,10 +97,10 @@ namespace Loupedeck.HerdrPlugin
 
         // The key that opens this folder, in herdr's accent: it opens the herdr menu on the keypad,
         // unlike Open herdr, which opens herdr itself on screen.
-        public override String GetButtonDisplayName(PluginImageSize imageSize) => "Issues";
+        public override String GetButtonDisplayName(PluginImageSize imageSize) => "Projects";
 
         public override BitmapImage GetButtonImage(PluginImageSize imageSize) =>
-            KeyArt.Draw(new KeyLook("Issues", Icons.Stack, AgentStatus.Accent), imageSize);
+            KeyArt.Draw(new KeyLook("Projects", Icons.Stack, AgentStatus.Accent), imageSize);
 
         public override IEnumerable<String> GetButtonPressActionNames(DeviceType deviceType)
         {
