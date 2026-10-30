@@ -19,8 +19,10 @@ namespace Loupedeck.HerdrPlugin
     public static class PullRequests
     {
         private static readonly Regex GitHubRemote = new(@"github\.com[:/]([^/\s]+/[^/\s]+?)(?:\.git)?/?$", RegexOptions.Compiled);
-        private static readonly String[] Failing = { "FAILURE", "ERROR", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED", "STARTUP_FAILURE" };
-        private static readonly String[] Passing = { "SUCCESS", "NEUTRAL", "SKIPPED" };
+        private static readonly String[] Failing = { "FAILURE", "ERROR", "TIMED_OUT", "ACTION_REQUIRED", "STARTUP_FAILURE" };
+
+        // A cancelled run is one a newer run took over from, or one somebody stopped: not a failure.
+        private static readonly String[] Passing = { "SUCCESS", "NEUTRAL", "SKIPPED", "CANCELLED" };
 
         // gh asks GitHub for every check of every open pull request, which takes longer than a herdr call.
         private static readonly TimeSpan GhTimeout = TimeSpan.FromSeconds(30);
@@ -238,7 +240,9 @@ namespace Loupedeck.HerdrPlugin
             return result;
         }
 
-        // One word for all checks: failing wins, then pending, then passing.
+        // One word for all checks: failing wins, then pending, then passing. GitHub lists every run of a
+        // check, so a run cancelled or failed before a newer one passed is still there; only the newest run
+        // of each check counts, as on GitHub's own page.
         public static String ChecksOf(JsonElement rollup)
         {
             if (rollup.ValueKind != JsonValueKind.Array)
@@ -246,8 +250,13 @@ namespace Loupedeck.HerdrPlugin
                 return "none";
             }
 
+            var newest = rollup.EnumerateArray()
+                .Select((c, i) => (Check: c, Name: Str(c, "name") ?? Str(c, "context"), Index: i))
+                .GroupBy(x => x.Name == null ? $"#{x.Index}" : $"{Str(x.Check, "workflowName")}|{x.Name}", x => x.Check)
+                .Select(g => g.OrderByDescending(c => Str(c, "startedAt") ?? Str(c, "completedAt") ?? Str(c, "createdAt") ?? "", StringComparer.Ordinal).First());
+
             var seen = new HashSet<String>();
-            foreach (var check in rollup.EnumerateArray())
+            foreach (var check in newest)
             {
                 var value = (Str(check, "conclusion") is { Length: > 0 } c ? c : Str(check, "state") ?? Str(check, "status") ?? "").ToUpperInvariant();
                 seen.Add(Failing.Contains(value) ? "failing" : Passing.Contains(value) ? "passing" : "pending");
