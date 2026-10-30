@@ -1,10 +1,10 @@
 # Helm
 
-The setup for my Logitech MX Keypad as the helm of [herdr](https://herdr.dev): a key per ticket tab, and the actions for the ticket you pick.
+The setup for my Logitech MX Keypad as the helm of [herdr](https://herdr.dev): a key per project, a key per ticket tab in it, and the actions for the ticket you pick.
 
 It holds three things:
 
-- **`plugin/`**: a Logi Actions plugin (C#, .NET 10) with one dynamic folder, **Herdr tickets**.
+- **`plugin/`**: a Logi Actions plugin (C#, .NET 10) with one dynamic folder, **Herdr**.
 - **`config/keypad.json`**: the actions on a ticket's page.
 - **`herdr/keys.toml`**: direct `ctrl+alt+shift` chords for the ticketflow scripts, so a plain keystroke key can run them.
 
@@ -16,13 +16,13 @@ It holds three things:
 
 It installs the .NET 10 SDK in `~/.dotnet` when missing (no sudo), builds the plugin and links it into the Logi Plugin Service, links `~/.config/herdr-keypad/config.json` to `config/keypad.json`, and writes `herdr/keys.toml` into herdr's `config.toml` between `helm: keypad chords` markers. It is safe to run again; run it after every pull.
 
-Then, once, in Logi Options+: select the keypad, open **Installed Plugins > Herdr** and drag **Herdr tickets** onto a key.
+Then, once, in Logi Options+: select the keypad, open **Installed Plugins > Herdr** and drag the **Herdr** folder onto a key.
 
 Needs Logi Options+ with Logi Plugin Service 6.4 or later, herdr, and the herdr-ticketflow scripts in `~/.local/bin` for the chords and the editor action.
 
 ## The folder
 
-The key opens the ticket page: every ticket tab of the herdr workspace you are in, in the order you opened them. A ticket tab is a tab named after a branch, or one whose agent runs in a worktree, which is what `hagent` makes. Each key shows the branch without its `feat/` prefix and without the leading words most tickets share, and a stripe in the agent's status colour:
+The folder has three levels on the keypad's nine keys. Every key carries a stripe in a status colour:
 
 | Stripe | Status |
 |---|---|
@@ -31,7 +31,11 @@ The key opens the ticket page: every ticket tab of the herdr workspace you are i
 | yellow | working |
 | grey | idle |
 
-Pressing a ticket focuses its tab in herdr, brings the terminal to the front and turns the folder into that ticket's page:
+**Projects.** One key per herdr workspace, in herdr's order, with a summary such as "1 wacht, 2 klaar". Its stripe is the most urgent status among its agents. Pressing one focuses that workspace in herdr and opens its page.
+
+**A project.** Its main tab first (the Claude in the main checkout, shown as "main"), then its ticket tabs in the order you opened them. A ticket tab is a tab named after a branch, or one whose agent runs in a worktree, which is what `hagent` makes. Each key shows the branch without its `feat/` prefix and without the leading words most tickets share. Pressing one focuses that tab, brings the terminal to the front and opens its actions.
+
+**A ticket.**
 
 | | | |
 |---|---|---|
@@ -39,7 +43,9 @@ Pressing a ticket focuses its tab in herdr, brings the terminal to the front and
 | review and fix | code review | commit |
 | stop | editor | terug |
 
-Every action goes to that ticket's agent through the herdr CLI, never to whatever pane happens to have focus. **terug** returns to the ticket page; the back key the service adds after the tickets closes the folder. The keys refresh every two seconds while the folder is open; a closed tab drops out on its own.
+Every action goes to that ticket's agent through the herdr CLI, never to whatever pane happens to have focus.
+
+**terug** goes up one level. On the projects page, the back key the service adds closes the folder. When a level has more items than fit beside the way back, seven share a page with **meer**, which pages through the rest. The keys refresh every two seconds while the folder is open; a closed tab or workspace drops you one level up on its own.
 
 ## Changing the actions
 
