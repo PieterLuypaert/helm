@@ -46,7 +46,7 @@ namespace Loupedeck.HerdrPlugin
             }
         }
 
-        // On your page: the number of issues large on a dark tile, over the list, in the same colour.
+        // On your page: the number of issues large on a black tile, over the list, in the same colour.
         public static KeyLook TileLook(Snapshot snapshot)
         {
             // Right after the plugin loads herdr has not been read yet: the list alone, not "offline", because

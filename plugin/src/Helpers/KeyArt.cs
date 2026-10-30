@@ -16,7 +16,7 @@ namespace Loupedeck.HerdrPlugin
         Dim,
 
         // A key on your own page, beside your app keys: a big icon, or a count over a small icon, in its
-        // colour on a dark grey tile. Logi writes the key's short label under it.
+        // colour on a black tile. Logi writes the key's short label under it.
         Tile,
     }
 
@@ -69,8 +69,8 @@ namespace Loupedeck.HerdrPlugin
             return builder.ToImage();
         }
 
-        // Dark grey, a step above the keypad's black, so a tile reads as one key like an app icon.
-        private static readonly BitmapColor TileGround = AgentStatus.Hex(0x1c1f23);
+        // Black, like the keypad around it.
+        private static readonly BitmapColor TileGround = AgentStatus.Hex(0x000000);
 
         private static void DrawTile(BitmapBuilder builder, KeyLook look, Int32 w, Int32 h)
         {
