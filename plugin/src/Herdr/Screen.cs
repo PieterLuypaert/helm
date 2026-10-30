@@ -22,5 +22,21 @@ namespace Loupedeck.HerdrPlugin
                 HerdrClient.ActivateApp(config.TerminalBundleId);
             }
         }
+
+        // Shows herdr itself, like opening an app: the terminal comes to the front when a herdr window is
+        // open, and otherwise a new iTerm window starts herdr. Asked for by a key, so it opens herdr even
+        // when openHerdrWhenClosed is off.
+        public static void OpenHerdr()
+        {
+            var config = KeypadConfig.Current;
+            if (config.TerminalBundleId == ItermBundleId && !HerdrClient.HasAttachedClient())
+            {
+                HerdrClient.OpenHerdrInIterm(ItermBundleId);
+            }
+            else
+            {
+                HerdrClient.ActivateApp(config.TerminalBundleId);
+            }
+        }
     }
 }

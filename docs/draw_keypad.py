@@ -91,17 +91,17 @@ def flow():
     # 0. Your own page in Logi Options+: the Herdr folder key opens the folder.
     x0 = 20
     pic.text(x0, 40, "0. Your page")
-    pic.text(x0, 56, "your own keys in Logi Options+", 11, "400")
+    pic.text(x0, 56, "your own apps and keys in Logi Options+", 11, "400")
     pic.grid(x0, top, [
-        dict(title="new issue", accent=OVERLAY),
-        dict(title="pick\nproject", accent=OVERLAY),
+        dict(title="Spotify", sub="app", accent=OVERLAY),
+        dict(title="Claude", sub="app", accent=OVERLAY),
         dict(title="2 need you", sub="1 ready", accent=RED, style="highlight"),
-        dict(title="lazygit", accent=OVERLAY),
-        dict(title="editor", accent=OVERLAY),
-        dict(title="Herdr", sub="opens the\nfolder", accent=ACCENT),
+        dict(title="ChatGPT", sub="app", accent=OVERLAY),
+        dict(title="herdr", sub="in iTerm", accent=SUBTEXT),
+        dict(title="Issues", sub="herdr menu", accent=ACCENT),
         EMPTY, EMPTY, EMPTY,
     ])
-    pic.text(x0, top + 3 * (K + G) + 14, "The red key is Herdr status: it jumps\nstraight to the most urgent issue (step 3).", 11, "400")
+    pic.text(x0, top + 3 * (K + G) + 14, "Three herdr keys, each with its own job:\n" + "Issues opens the herdr menu on the keypad.\n" + "herdr opens herdr itself in iTerm.\n" + "The red one, Herdr status, jumps straight\nto the most urgent issue (step 3).", 11, "400")
 
     # 1. Projects.
     px = x0 + step

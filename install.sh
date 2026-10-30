@@ -70,4 +70,4 @@ PY
 fi
 
 step "Done"
-echo "In Logi Options+, put the 'Herdr' folder (Installed Plugins > Herdr) on a keypad key."
+echo "In Logi Options+ (Installed Plugins > Herdr), put Herdr issues, Herdr status and Open herdr on keypad keys."

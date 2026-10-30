@@ -37,7 +37,7 @@ namespace Loupedeck.HerdrPlugin
 
         public IssuesFolder()
         {
-            this.DisplayName = "Herdr";
+            this.DisplayName = "Herdr issues";
             this.Description = "Your herdr projects, their issues, and actions for the one you pick";
             this.GroupName = "Herdr";
         }
@@ -88,7 +88,12 @@ namespace Loupedeck.HerdrPlugin
             return true;
         }
 
-        public override String GetButtonDisplayName(PluginImageSize imageSize) => "Herdr";
+        // The key that opens this folder, in herdr's accent: it opens the herdr menu on the keypad,
+        // unlike Open herdr, which opens herdr itself on screen.
+        public override String GetButtonDisplayName(PluginImageSize imageSize) => "Issues";
+
+        public override BitmapImage GetButtonImage(PluginImageSize imageSize) =>
+            KeyArt.Draw(new KeyLook("Issues", "herdr menu", AgentStatus.Accent), imageSize);
 
         public override IEnumerable<String> GetButtonPressActionNames(DeviceType deviceType)
         {
