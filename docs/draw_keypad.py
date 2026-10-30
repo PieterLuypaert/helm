@@ -1,12 +1,17 @@
-"""Draws the pictures in the docs: the keypad flow, what a key can say, and the status key walk.
+"""Draws the pictures in the docs: the keypad flow, what a key can say, the status key walk and
+answering a question.
 
 Run it after changing what the keys show: python3 docs/draw_keypad.py
 The example data is consistent across the pictures: the status key counts what the pages show.
+It also stamps each picture's link in the README and the docs with a hash of its content, so a
+changed picture gets a new URL and no browser or GitHub cache shows the old one.
 """
+import hashlib
 import html
 import os
+import re
 
-RED, ACCENT, YELLOW, GREEN, TEAL, BLUE = "#ff8080", "#f36a1b", "#ffc799", "#99ffe4", "#66ddcc", "#82aaff"
+RED, ACCENT, YELLOW, GREEN, BLUE = "#ff8080", "#f36a1b", "#ffc799", "#99ffe4", "#82aaff"
 OVERLAY, SUBTEXT, GROUND, TEXT = "#5c5c5c", "#afb6c2", "#24282d", "#ebf0ec"
 LABEL = "#8b949e"
 K, G = 70, 8          # key size and gap
@@ -267,7 +272,28 @@ def answer():
     pic.save("answer.svg", ux + 3 * K + 2 * G + 20, note + 30)
 
 
+def stamp_links():
+    """Points every link to a picture at its current content: name.svg?v=<hash>."""
+    root = os.path.dirname(HERE)
+    for doc in (os.path.join(root, "README.md"), os.path.join(HERE, "flows.md")):
+        text = open(doc).read()
+
+        def versioned(match):
+            name = match.group(2)
+            path = os.path.join(HERE, name)
+            if not os.path.exists(path):
+                return match.group(0)
+            digest = hashlib.sha1(open(path, "rb").read()).hexdigest()[:8]
+            return f"{match.group(1)}{name}?v={digest})"
+
+        stamped = re.sub(r"(\]\((?:docs/)?)([a-z-]+\.svg)(?:\?v=[0-9a-f]+)?\)", versioned, text)
+        if stamped != text:
+            open(doc, "w").write(stamped)
+            print(f"stamped picture links in {doc}")
+
+
 flow()
 statuses()
 status_key()
 answer()
+stamp_links()

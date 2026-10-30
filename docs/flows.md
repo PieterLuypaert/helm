@@ -2,7 +2,7 @@
 
 How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own. The keys carry Dutch labels for navigation (`terug`, `meer`); this page uses them as they appear on the keypad.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=40a4e13a)
 
 ## Your page
 
@@ -24,7 +24,7 @@ You still reach every project and every issue from the keypad; the rule only con
 
 Every key shows one word for its issue, from its agent and its pull request, in herdr's colours. The agent wins while it asks or works; after that the pull request speaks.
 
-![What a key can say](statuses.svg)
+![What a key can say](statuses.svg?v=6923af9b)
 
 | Colour | Status | Meaning |
 |---|---|---|
@@ -124,7 +124,7 @@ The actions, and when they light up or grey out, come from `config/keypad.json`;
 
 While an agent waits on you, its page shows the question it asks, such as Claude Code's permission prompt, with one key per choice exactly as the screen lists them.
 
-![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](answer.svg)
+![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](answer.svg?v=a7bf11fc)
 
 - **Each key sends its own choice.** A numbered choice is picked by the number the screen shows, which is not always its position: in Claude Code 2.1, `No` is choice 4, after `Yes, and switch to auto mode`. Choices without numbers, such as the folder-trust question, are reached with the arrow keys from the selected one, then Enter.
 - **Nothing is sent blind.** Just before sending, helm reads the question again; when the choices changed, it sends nothing and the key reads `changed`.
@@ -156,7 +156,7 @@ flowchart LR
 
 A key for your normal keypad page, outside the folder: how many issues need you across every project, and how many are ready to merge. It is filled with the colour of the most urgent status; with nothing waiting it reads "all clear".
 
-![Walking through what needs you: the count, the most urgent issue, the next one, and an issue you handled dropping out](status-key.svg)
+![Walking through what needs you: the count, the most urgent issue, the next one, and an issue you handled dropping out](status-key.svg?v=d6fbdb37)
 
 ```mermaid
 flowchart TD
