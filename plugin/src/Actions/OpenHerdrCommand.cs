@@ -16,7 +16,7 @@ namespace Loupedeck.HerdrPlugin
 
         // Drawn like an app key, a grey terminal rather than herdr's orange, so it does not look like the Issues key.
         protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize) =>
-            KeyArt.Draw(new IconKey(Icons.Terminal, AgentStatus.Subtext, "herdr"), imageSize);
+            KeyArt.Draw(new KeyLook("herdr", Icons.Terminal, AgentStatus.Subtext), imageSize);
 
         protected override void RunCommand(String actionParameter) => Task.Run(Screen.OpenHerdr);
     }

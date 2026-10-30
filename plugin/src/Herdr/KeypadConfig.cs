@@ -18,6 +18,9 @@ namespace Loupedeck.HerdrPlugin
         public String Type { get; set; }
         public String Value { get; set; }
         public String Color { get; set; }
+
+        // The key's icon by its name in Icons, such as "play"; by default one that fits the type.
+        public String Icon { get; set; }
         public List<String> When { get; set; } = new();
         public List<String> OnlyWhen { get; set; }
     }
@@ -39,13 +42,13 @@ namespace Loupedeck.HerdrPlugin
 
         public List<IssueAction> Actions { get; set; } = new()
         {
-            new() { Label = "go", Type = "prompt", Value = "go", Color = "#f36a1b", When = new() { "go?" } },
-            new() { Label = "review\nand fix", Type = "prompt", Value = "/review-and-fix", When = new() { "done" } },
-            new() { Label = "babysit\npr", Type = "prompt", Value = "/babysit-pr", When = new() { "CI failed", "changes" } },
-            new() { Label = "commit", Type = "prompt", Value = "Commit the work in several logical commits, each with its own conventional-commit message." },
-            new() { Label = "stop", Type = "keys", Value = "esc" },
-            new() { Label = "open PR", Type = "open-pr", When = new() { "ready" } },
-            new() { Label = "editor", Type = "shell", Value = "\"$HOME/.local/bin/hopen\" \"$ISSUE_CWD\"" },
+            new() { Label = "go", Type = "prompt", Value = "go", Color = "#f36a1b", Icon = "play", When = new() { "go?" } },
+            new() { Label = "review\nand fix", Type = "prompt", Value = "/review-and-fix", Icon = "tool", When = new() { "done" } },
+            new() { Label = "babysit\npr", Type = "prompt", Value = "/babysit-pr", Icon = "lifebuoy", When = new() { "CI failed", "changes" } },
+            new() { Label = "commit", Type = "prompt", Value = "Commit the work in several logical commits, each with its own conventional-commit message.", Icon = "commit" },
+            new() { Label = "stop", Type = "keys", Value = "esc", Icon = "stop" },
+            new() { Label = "open PR", Type = "open-pr", Icon = "pull-request", When = new() { "ready" } },
+            new() { Label = "editor", Type = "shell", Value = "\"$HOME/.local/bin/hopen\" \"$ISSUE_CWD\"", Icon = "code" },
         };
 
         private static DateTime _loadedStamp = DateTime.MinValue;

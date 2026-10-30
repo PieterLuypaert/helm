@@ -22,7 +22,7 @@ namespace Loupedeck.HerdrPlugin
         }
 
         protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
-            this.Look(HerdrState.Current).Label;
+            this.Look(HerdrState.Current).Title;
 
         protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize) =>
             KeyArt.Draw(this.Look(HerdrState.Current), imageSize);
@@ -81,11 +81,11 @@ namespace Loupedeck.HerdrPlugin
 
         // A bell: ringing with a count while issues need you, plain when only ready work waits, quiet when
         // nothing does, crossed out when herdr is offline.
-        private IconKey Look(Snapshot snapshot)
+        private KeyLook Look(Snapshot snapshot)
         {
             if (snapshot.Offline)
             {
-                return new IconKey(Icons.BellOff, AgentStatus.Red, "herdr offline");
+                return new KeyLook("herdr offline", Icons.BellOff, AgentStatus.Red);
             }
 
             var list = snapshot.NeedsYou();
@@ -99,7 +99,7 @@ namespace Loupedeck.HerdrPlugin
                     var position = list.FindIndex(x => x.Tab.TabId == this._cycleTabId);
                     if (position >= 0)
                     {
-                        return new IconKey(Icons.BellRinging, AgentStatus.Color(list[position].Tab.Status), $"{position + 1} of {list.Count}");
+                        return new KeyLook($"{position + 1} of {list.Count} · {list[position].Tab.ShortName}", Icons.BellRinging, AgentStatus.Color(list[position].Tab.Status));
                     }
                 }
             }
@@ -107,16 +107,16 @@ namespace Loupedeck.HerdrPlugin
             if (list.Count > 0)
             {
                 var color = AgentStatus.Color(list[0].Tab.Status);
-                return new IconKey(Icons.BellRinging, color, ready > 0 ? $"{ready} ready" : "need you", list.Count.ToString(), color);
+                return new KeyLook(ready > 0 ? $"{list.Count} need you, {ready} ready" : $"{list.Count} need you", Icons.BellRinging, color, Badge: list.Count.ToString());
             }
 
             if (ready > 0)
             {
-                return new IconKey(Icons.Bell, AgentStatus.Blue, "ready", ready.ToString(), AgentStatus.Blue);
+                return new KeyLook($"{ready} ready", Icons.Bell, AgentStatus.Blue, Badge: ready.ToString());
             }
 
             var working = snapshot.Count(AgentStatus.Working);
-            return new IconKey(Icons.Bell, working > 0 ? AgentStatus.Yellow : AgentStatus.Overlay, working > 0 ? $"{working} working" : "all clear");
+            return new KeyLook(working > 0 ? $"{working} working" : "all clear", Icons.Bell, working > 0 ? AgentStatus.Yellow : AgentStatus.Overlay);
         }
     }
 
