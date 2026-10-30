@@ -21,17 +21,21 @@
 <text x="505.0" y="122" text-anchor="middle" font-size="9.5" fill="#ff8080">npm test</text>
 <rect x="548" y="64" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="548" y="64" width="70" height="6" rx="3" fill="#99ffe4"/>
-<text x="583.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">1 Yes</text>
+<text x="583.0" y="88" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">1 Yes</text>
+<text x="583.0" y="122" text-anchor="middle" font-size="9.5" fill="#99ffe4">6 dark mode</text>
 <rect x="626" y="64" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="626" y="64" width="70" height="6" rx="3" fill="#99ffe4"/>
-<text x="661.0" y="94" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">2 Always</text>
+<text x="661.0" y="88" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">2 Always</text>
+<text x="661.0" y="122" text-anchor="middle" font-size="9.5" fill="#99ffe4">6 dark mode</text>
 <rect x="470" y="142" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="470" y="142" width="70" height="6" rx="3" fill="#afb6c2"/>
-<text x="505.0" y="166" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">3 Auto</text>
-<text x="505.0" y="179" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">mode</text>
+<text x="505.0" y="160" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">3 Auto</text>
+<text x="505.0" y="173" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">mode</text>
+<text x="505.0" y="200" text-anchor="middle" font-size="9.5" fill="#afb6c2">6 dark mode</text>
 <rect x="548" y="142" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="548" y="142" width="70" height="6" rx="3" fill="#ff8080"/>
-<text x="583.0" y="172" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">4 No</text>
+<text x="583.0" y="166" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">4 No</text>
+<text x="583.0" y="200" text-anchor="middle" font-size="9.5" fill="#ff8080">6 dark mode</text>
 <rect x="626" y="142" width="70" height="70" rx="8" fill="#24282d"/>
 <rect x="626" y="142" width="70" height="6" rx="3" fill="#afb6c2"/>
 <text x="661.0" y="166" text-anchor="middle" font-size="11" font-weight="600" fill="#ebf0ec">answer on</text>
