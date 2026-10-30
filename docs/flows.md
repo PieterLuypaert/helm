@@ -41,6 +41,8 @@ Every key shows one icon per colour for its issue, from its agent and its pull r
 | yellow | `working` | the agent is busy |
 | grey | `review`, `draft`, `idle`, `merged`, `closed` | nothing for you: a review or a draft, nothing going on, or nothing left to do |
 
+Once the agent rests, the pull request speaks in this order: `merged` or `closed`; failing checks; requested changes; the agent's own `done`; a draft; then `ready` when it is approved with passing checks, else `review`. So a draft reads `draft` even when it is approved, and a failing check shows even on a draft. helm reads the pull requests once a minute, so a change on GitHub, such as setting a draft back to ready, shows within a minute.
+
 A plan is a line in the agent's last 60 lines of output that matches `planPattern` in `config/keypad.json`; by default a line starting with `Single PR:` or `PR 1:`.
 
 A project key is a white folder with how many issues the project has, such as `project A · 7 issues`. A badge says how many of its tabs need you, in the colour of the most urgent one.
@@ -68,7 +70,7 @@ flowchart TD
 
 All issues counts your issues across every project, such as "9 issues", with how many need you in a badge in the colour of the most urgent one. Main tabs are not issues, so they do not count. It sits on your page and opens the overview, so you can go through every issue in detail.
 
-![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=b0928ccc)
+![The All issues key opens an overview of every issue, most urgent first; press one to open its page](all-issues.svg?v=f4b710ca)
 
 The overview sorts by status: waiting, go?, CI failed, changes and done, which need you, then ready, working, review, draft and idle. Within a status, issues keep the order of their projects and tabs. Main tabs come last, unless they need you. The order is set when you open the overview and holds while you page through it and visit its issues, so keys do not move under your fingers; a closed tab drops out and a new one joins at the end. Open it again for a fresh order. A main tab goes by its project's name, and an issue shown beside other projects' issues names its project, such as "4 search · project A".
 
@@ -104,7 +106,7 @@ flowchart TD
     press["Press a tab on a project page or the overview"] --> keys["Keys switch to that issue's page"]
     press --> focus["herdr tab focus"]
     focus --> window{"Is a herdr window open?"}
-    window -->|yes| front["Bring iTerm to the front"]
+    window -->|yes| front["Bring iTerm to the front,<br/>unless it is in front already"]
     window -->|no| open["Open a new iTerm window and run herdr<br/>(openHerdrWhenClosed)"]
 ```
 
@@ -150,7 +152,7 @@ While an agent waits on you, its page shows the question it asks, such as Claude
 
 - **Each key sends its own choice.** A numbered choice is picked by the number the screen shows, which is not always its position: in Claude Code 2.1, `No` is choice 4, after `Yes, and switch to auto mode`. Choices without numbers, such as the folder-trust question, are reached with the arrow keys from the selected one, then Enter.
 - **Nothing is sent blind.** Just before sending, helm reads the question again; when the choices changed, it sends nothing, the key reads `changed`, and the keys show the new choices on the next read.
-- **A question the keys cannot hold** shows `answer on screen`, which brings the issue's tab to the front so you answer it there: one helm cannot read, such as one that wants typed text, or one with more than seven choices.
+- **A question the keys cannot hold** shows `answer on screen`, which brings the issue's tab to the front so you answer it there: one helm cannot read, such as one that wants typed text, or one with more than six choices.
 - **Every choice names its issue.** Each choice key carries the issue's name under it, the top-left key shows the issue and what it asks about, and the screen shows that same issue.
 - **Yes in green, No in red,** anything else neutral, so the answer reads at a glance.
 

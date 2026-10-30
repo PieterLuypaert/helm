@@ -9,8 +9,8 @@
   "planPattern": "^\\s*(Single PR:|PR 1:)",
 
   // The issue page: a key for each action that fits the issue now, after the issue itself and before
-  // "back". While the agent waits on you, the page shows its question instead: one key per choice, as
-  // its screen shows them.
+  // the key one level up. While the agent waits on you, the page shows its question instead: one key
+  // per choice, as its screen shows them.
   // type "prompt":  the text plus Enter, to the issue's agent.
   // type "keys":    key presses for the issue's agent, space separated (enter, esc, ctrl+c).
   // type "shell":   a command run in the issue's worktree, with $ISSUE_CWD set.

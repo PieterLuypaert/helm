@@ -1,10 +1,10 @@
-"""Draws the pictures in the docs: the keypad flow, what a key can say, the status key walk and
-answering a question.
+"""Draws the pictures in the docs: the keypad flow, what a key can say, the overview of all issues
+and answering a question.
 
 Run it after changing what the keys show: python3 docs/draw_keypad.py
 Every key is drawn as on the keypad: an icon, with the label Logi writes under it. The icons come
 from plugin/src/Helpers/Icons.cs, the same ones the plugin draws, so a picture cannot drift from a key.
-The example data is consistent across the pictures: the status key counts what the pages show.
+The example data is consistent across the pictures: the issues key counts what the pages show.
 The script also stamps each picture's link in the README and the docs with a hash of its content,
 so a changed picture gets a new URL and no browser or GitHub cache shows the old one.
 """
@@ -285,7 +285,7 @@ def all_issues():
     pic.arrow(ox + 3 * K + 2 * G + 6, ix - 8, mid, "pick one")
     note = top + 3 * (K + G) + 24
     pic.text(20, note, "The key counts issue tabs, not main tabs; the badge counts what needs you: waiting, go?, CI failed, changes and done.\n"
-                       "Main tabs come last, on the next page, unless they need you. back on the overview goes to your projects.", 12, "400")
+                       "Main tabs come last, on the next page, unless they need you. projects, the last key, goes to your projects.", 12, "400")
     pic.save("all-issues.svg", ix + 3 * K + 2 * G + 20, note + 30)
 
 

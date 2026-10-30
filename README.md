@@ -59,7 +59,7 @@ Needs macOS, Logi Options+ with Logi Plugin Service 6.4 or later, herdr, iTerm2 
 The issue page's actions live in `config/keypad.json`, which the plugin reads again on every save:
 
 ```json
-{ "label": "go", "type": "prompt", "value": "go", "color": "#f36a1b", "when": ["go?"] }
+{ "label": "go", "type": "prompt", "value": "go", "color": "#f36a1b", "when": ["go?"], "onlyWhen": ["go?", "idle", "done"] }
 ```
 
 ## More
