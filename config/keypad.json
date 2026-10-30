@@ -9,11 +9,14 @@
   // type "prompt": the text plus Enter, to the ticket's agent.
   // type "keys":   key presses for the ticket's agent, space separated (enter, esc, ctrl+c).
   // type "shell":  a command run in the ticket's worktree, with $TICKET_CWD set.
-  // color: the stripe on top of the key, as #RRGGBB.
+  // color: the stripe on top of the key, as #RRGGBB (herdr's palette: #ff8080 red, #f36a1b accent).
+  // when: the ticket statuses in which the key lights up, so the action that fits stands out.
+  // onlyWhen: the statuses in which the key works at all; it is greyed out in the others.
+  // Statuses are the quarterdeck's: waiting, go?, done, working, idle.
   "actions": [
-    { "label": "go", "type": "prompt", "value": "go", "color": "#FF8A3D" },
-    { "label": "toestaan", "type": "keys", "value": "enter", "color": "#E5484D" },
-    { "label": "review\nand fix", "type": "prompt", "value": "/review-and-fix" },
+    { "label": "go", "type": "prompt", "value": "go", "color": "#f36a1b", "when": ["go?"] },
+    { "label": "toestaan", "type": "keys", "value": "enter", "color": "#ff8080", "when": ["waiting"], "onlyWhen": ["waiting"] },
+    { "label": "review\nand fix", "type": "prompt", "value": "/review-and-fix", "when": ["done"] },
     { "label": "code\nreview", "type": "prompt", "value": "/code-review" },
     { "label": "commit", "type": "prompt", "value": "Commit the work in several logical commits, each with its own conventional-commit message." },
     { "label": "stop", "type": "keys", "value": "esc" },

@@ -7,13 +7,17 @@ namespace Loupedeck.HerdrPlugin
 
     // One action on the ticket page. Type is "prompt" (text plus Enter to the ticket's agent),
     // "keys" (key presses, space separated, such as "esc" or "enter") or "shell" (a command run
-    // in the ticket's folder, with $TICKET_CWD set).
+    // in the ticket's folder, with $TICKET_CWD set). When lists the ticket statuses in which the key
+    // lights up; OnlyWhen, when set, the statuses in which it works at all (it is greyed out otherwise).
+    // Statuses are the quarterdeck's: waiting, go?, done, working, idle.
     public sealed class TicketAction
     {
         public String Label { get; set; }
         public String Type { get; set; }
         public String Value { get; set; }
         public String Color { get; set; }
+        public List<String> When { get; set; } = new();
+        public List<String> OnlyWhen { get; set; }
     }
 
     public sealed class KeypadConfig
@@ -30,9 +34,9 @@ namespace Loupedeck.HerdrPlugin
 
         public List<TicketAction> Actions { get; set; } = new()
         {
-            new() { Label = "go", Type = "prompt", Value = "go", Color = "#FF8A3D" },
-            new() { Label = "toestaan", Type = "keys", Value = "enter", Color = "#E5484D" },
-            new() { Label = "review\nand fix", Type = "prompt", Value = "/review-and-fix" },
+            new() { Label = "go", Type = "prompt", Value = "go", Color = "#f36a1b", When = new() { "go?" } },
+            new() { Label = "toestaan", Type = "keys", Value = "enter", Color = "#ff8080", When = new() { "waiting" }, OnlyWhen = new() { "waiting" } },
+            new() { Label = "review\nand fix", Type = "prompt", Value = "/review-and-fix", When = new() { "done" } },
             new() { Label = "code\nreview", Type = "prompt", Value = "/code-review" },
             new() { Label = "commit", Type = "prompt", Value = "Commit the work in several logical commits, each with its own conventional-commit message." },
             new() { Label = "stop", Type = "keys", Value = "esc" },
