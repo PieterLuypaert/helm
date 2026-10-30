@@ -22,6 +22,8 @@ Needs Logi Options+ with Logi Plugin Service 6.4 or later, herdr, and the herdr-
 
 ## The folder
 
+Diagrams of every flow, from navigation to what the plugin does on its own, are in [docs/flows.md](docs/flows.md).
+
 The folder has three levels on the keypad's nine keys. Every key carries a stripe in a status colour:
 
 | Stripe | Status |
