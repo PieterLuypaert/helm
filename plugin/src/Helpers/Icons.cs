@@ -118,6 +118,9 @@ namespace Loupedeck.HerdrPlugin
         // Tabler: circle-dot
         public const String Dot = "<path d=\"M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0\"/><path d=\"M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0\"/>";
 
+        // Tabler: list-details
+        public const String List = "<path d=\"M13 5h8\"/><path d=\"M13 9h5\"/><path d=\"M13 15h8\"/><path d=\"M13 19h5\"/><path d=\"M3 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z\"/><path d=\"M3 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z\"/>";
+
         // A ship's wheel, drawn for helm in Tabler's style.
         public const String Helm = "<circle cx=\"12\" cy=\"12\" r=\"6.2\"/><circle cx=\"12\" cy=\"12\" r=\"2.2\"/><path d=\"M14.20 12.00L21.60 12.00 M13.56 13.56L18.79 18.79 M12.00 14.20L12.00 21.60 M10.44 13.56L5.21 18.79 M9.80 12.00L2.40 12.00 M10.44 10.44L5.21 5.21 M12.00 9.80L12.00 2.40 M13.56 10.44L18.79 5.21\"/>";
 

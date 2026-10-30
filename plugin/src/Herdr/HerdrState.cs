@@ -39,6 +39,14 @@ namespace Loupedeck.HerdrPlugin
 
         public (Project Project, Issue Tab) MostUrgent() => this.NeedsYou().FirstOrDefault();
 
+        // Every tab with an agent, across all projects, most urgent first; the first project and tab win a tie.
+        public List<(Project Project, Issue Tab)> AllTabs() =>
+            this.Projects.SelectMany(p => p.Tabs.Select(t => (Project: p, Tab: t)))
+                .OrderBy(x => AgentStatus.Rank(x.Tab.Status))
+                .ThenBy(x => x.Project.Number)
+                .ThenBy(x => x.Tab.Number)
+                .ToList();
+
         public Int32 Count(String status) => this.Projects.Sum(p => p.Count(status));
 
         public Boolean Equals(Snapshot other) =>
@@ -48,7 +56,7 @@ namespace Loupedeck.HerdrPlugin
         public override Int32 GetHashCode() => HashCode.Combine(this.Offline, this.FocusedTabId, this.Projects.Count);
     }
 
-    // Reads herdr every two seconds for the whole plugin, so the folder and the status key always
+    // Reads herdr every two seconds for the whole plugin, so the folder and the All issues key always
     // agree, and tells them when anything changed.
     public static class HerdrState
     {
@@ -86,6 +94,9 @@ namespace Loupedeck.HerdrPlugin
                 _timer = null;
             }
         }
+
+        // Asks the folder to open on the overview of all issues.
+        public const String AllIssues = "*all*";
 
         public static void RequestNavigation(String workspaceId, String tabId)
         {
