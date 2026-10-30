@@ -12,67 +12,68 @@
 <text x="150" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">The overview</text>
 <text x="150" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">every issue, most urgent first</text>
 <rect x="150" y="64" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(175.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#ff8080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/></g>
-<text x="188.0" y="117" text-anchor="middle" font-size="9.5" fill="#ebf0ec">6 dark mode ·</text>
-<text x="188.0" y="128" text-anchor="middle" font-size="9.5" fill="#ebf0ec">project A</text>
+<g transform="translate(175.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></g>
+<text x="188.0" y="128" text-anchor="middle" font-size="9.5" fill="#ebf0ec">leave menu</text>
 <rect x="234" y="64" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(259.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#f36a1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 11.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 17.5l1.5 1.5l2.5 -2.5"/><path d="M11 6l9 0"/><path d="M11 12l9 0"/><path d="M11 18l9 0"/></g>
-<text x="272.0" y="117" text-anchor="middle" font-size="9.5" fill="#ebf0ec">7 checkout ·</text>
+<g transform="translate(259.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#ff8080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/></g>
+<text x="272.0" y="117" text-anchor="middle" font-size="9.5" fill="#ebf0ec">6 dark mode ·</text>
 <text x="272.0" y="128" text-anchor="middle" font-size="9.5" fill="#ebf0ec">project A</text>
 <rect x="318" y="64" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(343.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#82aaff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M7 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M7 8l0 8"/><path d="M7 8a4 4 0 0 0 4 4h4"/></g>
-<text x="356.0" y="117" text-anchor="middle" font-size="9.5" fill="#ebf0ec">3 sign up ·</text>
+<g transform="translate(343.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#f36a1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 11.5l1.5 1.5l2.5 -2.5"/><path d="M3.5 17.5l1.5 1.5l2.5 -2.5"/><path d="M11 6l9 0"/><path d="M11 12l9 0"/><path d="M11 18l9 0"/></g>
+<text x="356.0" y="117" text-anchor="middle" font-size="9.5" fill="#ebf0ec">7 checkout ·</text>
 <text x="356.0" y="128" text-anchor="middle" font-size="9.5" fill="#ebf0ec">project A</text>
 <rect x="150" y="148" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(175.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#ffc799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9"/></g>
-<text x="188.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">4 search ·</text>
+<g transform="translate(175.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#82aaff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M7 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M7 8l0 8"/><path d="M7 8a4 4 0 0 0 4 4h4"/></g>
+<text x="188.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">3 sign up ·</text>
 <text x="188.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">project A</text>
 <rect x="234" y="148" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(259.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#ffc799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9"/></g>
-<text x="272.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">2 api docs ·</text>
-<text x="272.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">project B</text>
+<text x="272.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">4 search ·</text>
+<text x="272.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">project A</text>
 <rect x="318" y="148" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(343.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#5c5c5c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h6l-6 8h6"/><path d="M14 4h6l-6 8h6"/></g>
-<text x="356.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">5 export ·</text>
-<text x="356.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">project A</text>
+<g transform="translate(343.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#ffc799" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9"/></g>
+<text x="356.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">2 api docs ·</text>
+<text x="356.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">project B</text>
 <rect x="150" y="232" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(175.0 246.0) scale(1.0833333333333333)" fill="none" stroke="#5c5c5c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h6l-6 8h6"/><path d="M14 4h6l-6 8h6"/></g>
-<text x="188.0" y="285" text-anchor="middle" font-size="9.5" fill="#ebf0ec">8 settings ·</text>
+<text x="188.0" y="285" text-anchor="middle" font-size="9.5" fill="#ebf0ec">5 export ·</text>
 <text x="188.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">project A</text>
 <rect x="234" y="232" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(259.0 246.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/></g>
 <text x="272.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">more 1/2</text>
 <rect x="318" y="232" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(343.0 246.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></g>
-<text x="356.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">back</text>
+<g transform="translate(343.0 246.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l-8 4l8 4l8 -4l-8 -4"/><path d="M4 12l8 4l8 -4"/><path d="M4 16l8 4l8 -4"/></g>
+<text x="356.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">projects</text>
 <text x="438" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">Its page: 6 dark mode</text>
-<text x="438" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">back returns to the overview</text>
+<text x="438" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">all issues returns to the overview</text>
 <rect x="438" y="64" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(463.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#ff8080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/></g>
-<text x="476.0" y="117" text-anchor="middle" font-size="9.5" fill="#ebf0ec">6 dark mode ·</text>
-<text x="476.0" y="128" text-anchor="middle" font-size="9.5" fill="#ebf0ec">npm test</text>
+<g transform="translate(463.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></g>
+<text x="476.0" y="128" text-anchor="middle" font-size="9.5" fill="#ebf0ec">leave menu</text>
 <rect x="522" y="64" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(547.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#99ffe4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></g>
-<text x="560.0" y="117" text-anchor="middle" font-size="9.5" fill="#ebf0ec">1 Yes · 6 dark</text>
-<text x="560.0" y="128" text-anchor="middle" font-size="9.5" fill="#ebf0ec">mode</text>
+<g transform="translate(547.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#ff8080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/></g>
+<text x="560.0" y="117" text-anchor="middle" font-size="9.5" fill="#ebf0ec">6 dark mode ·</text>
+<text x="560.0" y="128" text-anchor="middle" font-size="9.5" fill="#ebf0ec">npm test</text>
 <rect x="606" y="64" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(631.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#99ffe4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12l5 5l10 -10"/><path d="M2 12l5 5m5 -5l5 -5"/></g>
-<text x="644.0" y="117" text-anchor="middle" font-size="9.5" fill="#ebf0ec">2 Always · 6</text>
-<text x="644.0" y="128" text-anchor="middle" font-size="9.5" fill="#ebf0ec">dark mode</text>
+<g transform="translate(631.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#99ffe4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></g>
+<text x="644.0" y="117" text-anchor="middle" font-size="9.5" fill="#ebf0ec">1 Yes · 6 dark</text>
+<text x="644.0" y="128" text-anchor="middle" font-size="9.5" fill="#ebf0ec">mode</text>
 <rect x="438" y="148" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(463.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"/><path d="M12 2v2"/><path d="M9 12v9"/><path d="M15 12v9"/><path d="M5 16l4 -2"/><path d="M15 14l4 2"/><path d="M9 18h6"/><path d="M10 8v.01"/><path d="M14 8v.01"/></g>
-<text x="476.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">3 Auto mode ·</text>
-<text x="476.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">6 dark mode</text>
+<g transform="translate(463.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#99ffe4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12l5 5l10 -10"/><path d="M2 12l5 5m5 -5l5 -5"/></g>
+<text x="476.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">2 Always · 6</text>
+<text x="476.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">dark mode</text>
 <rect x="522" y="148" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(547.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#ff8080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></g>
-<text x="560.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">4 No · 6 dark</text>
-<text x="560.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">mode</text>
-<rect x="606" y="148" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+<g transform="translate(547.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"/><path d="M12 2v2"/><path d="M9 12v9"/><path d="M15 12v9"/><path d="M5 16l4 -2"/><path d="M15 14l4 2"/><path d="M9 18h6"/><path d="M10 8v.01"/><path d="M14 8v.01"/></g>
+<text x="560.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">3 Auto mode ·</text>
+<text x="560.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">6 dark mode</text>
+<rect x="606" y="148" width="76" height="76" rx="10" fill="#2b2d30"/>
+<g transform="translate(631.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#ff8080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></g>
+<text x="644.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">4 No · 6 dark</text>
+<text x="644.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">mode</text>
 <rect x="438" y="232" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="522" y="232" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="606" y="232" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(631.0 246.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></g>
-<text x="644.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">back</text>
+<g transform="translate(631.0 246.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h8"/><path d="M13 9h5"/><path d="M13 15h8"/><path d="M13 19h5"/><path d="M3 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M3 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/></g>
+<text x="644.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">all issues</text>
 <line x1="116" y1="186.0" x2="140" y2="186.0" stroke="#8b949e" stroke-width="1.5" marker-end="url(#a)"/>
 <text x="128.0" y="178.0" font-size="11" font-weight="400" fill="#8b949e" text-anchor="middle">press</text>
 <line x1="400" y1="186.0" x2="430" y2="186.0" stroke="#8b949e" stroke-width="1.5" marker-end="url(#a)"/>

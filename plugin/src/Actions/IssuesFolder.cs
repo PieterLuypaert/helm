@@ -24,8 +24,10 @@ namespace Loupedeck.HerdrPlugin
         private const String AnswerPrefix = "ans:";
         private const String OnScreenParam = "on-screen";
 
-        // Nine keys: with more items than fit, seven items, "more" and the way back share a page.
-        private const Int32 Keys = 9;
+        // The keypad has nine keys, and Logi puts its own back key, which leaves the menu, on the first of
+        // them on every page, so eight are ours. The last of ours goes one level up; with more items than
+        // fit, six items and "more" share a page before it.
+        private const Int32 Keys = 8;
 
         private static readonly TimeSpan FlashTime = TimeSpan.FromMilliseconds(1500);
 
@@ -129,17 +131,14 @@ namespace Loupedeck.HerdrPlugin
         {
             lock (this._lock)
             {
-                // Every page below the projects has our own back key. The projects page gets Logi's own back
-                // key, which Logi adds there by itself and which closes the menu; the folder cannot close
-                // itself (Close() does nothing on the MX Keypad). While herdr is offline the menu still
-                // needs a way out, so the folder asks for Logi's key there.
-                var names = this.CurrentParams().Select(p => this.CreateCommandName(p)).ToList();
-                if (this._snapshot.Offline && this.Level() != 0)
+                // Logi may ask before the menu opens: read herdr's latest state rather than an old one.
+                if (!this._active)
                 {
-                    names.Add(PluginDynamicFolder.NavigateUpActionName);
+                    this._snapshot = HerdrState.Current;
                 }
 
-                return names;
+                // Logi adds its own back key on the first key of every page; it leaves the menu.
+                return this.CurrentParams().Select(p => this.CreateCommandName(p)).ToList();
             }
         }
 
@@ -586,8 +585,10 @@ namespace Loupedeck.HerdrPlugin
                         // A zero-width space: an empty title would make Logi write the folder's name there.
                         return new KeyLook("\u200B", Icons.None, AgentStatus.Overlay);
                     case BackToProjectsParam:
+                        // One level up, named after where it goes, so it does not read as a second back arrow.
+                        return new KeyLook("projects", Icons.Stack, nav);
                     case BackToProjectParam:
-                        return new KeyLook("back", Icons.Back, nav);
+                        return this._all ? new KeyLook("all issues", Icons.List, nav) : new KeyLook(this.SelectedProject()?.Name ?? "project", Icons.Folder, nav);
                     case MoreParam:
                         var count = this._all ? this.OverviewOrder().Count : this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count;
                         return new KeyLook($"more {this._page + 1}/{PageCount(count)}", Icons.Dots, nav);

@@ -130,6 +130,13 @@ def wrap(label, width=14):
 
 
 EMPTY = dict(empty=True)
+# Logi's own back key, which it puts on the first key of every page of the menu: it leaves the menu.
+LOGI = dict(label="leave menu", icon="Back", color=SUBTEXT)
+
+
+def up(label, icon):
+    """The menu's last key: one level up, named after where it goes."""
+    return dict(label=label, icon=icon, color=SUBTEXT)
 # One icon per colour, as the plugin draws them (AgentStatus.Icon).
 STATUS = {
     "waiting": ("Alert", RED), "CI failed": ("Alert", RED), "changes": ("Alert", RED), "go?": ("Plan", ACCENT),
@@ -167,37 +174,38 @@ def flow():
     pic.text(px, 40, "1. Projects")
     pic.text(px, 56, "one key per project", 11, "400")
     pic.grid(px, top, [
+        LOGI,
         dict(label="project A · 7 issues", icon="Folder", badge="2", badge_color=RED),
         dict(label="project B · 1 issue", icon="Folder"),
         dict(label="project C", icon="Folder"),
         EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        dict(label="back", icon="Back", color=SUBTEXT),
     ])
 
     qx = px + step
     pic.text(qx, 40, "2. A project")
     pic.text(qx, 56, "main tab, then issues", 11, "400")
     pic.grid(qx, top, [
+        LOGI,
         dict(label="main", icon="Home", color=OVERLAY),
         issue("3 sign up", "ready"),
         issue("4 search", "working"),
         issue("5 export", "idle"),
         issue("6 dark mode", "waiting"),
         issue("7 checkout", "go?"),
-        issue("8 settings", "idle"),
         dict(label="more 1/2", icon="Dots", color=SUBTEXT),
-        dict(label="back", icon="Back", color=SUBTEXT),
+        up("projects", "Stack"),
     ])
 
     tx = qx + step
     pic.text(tx, 40, "3. Issue: 7 checkout")
     pic.text(tx, 56, "only the actions that fit", 11, "400")
     pic.grid(tx, top, [
+        LOGI,
         issue("7 checkout · go?", "go?"),
         dict(label="go", icon="Play", color=ACCENT, style="highlight"),
         dict(label="editor", icon="Code"),
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        dict(label="back", icon="Back", color=SUBTEXT),
+        EMPTY, EMPTY, EMPTY, EMPTY,
+        up("project A", "Folder"),
     ])
 
     fy = top + 3 * (K + G) + 30
@@ -247,28 +255,29 @@ def all_issues():
     pic.text(ox, 40, "The overview")
     pic.text(ox, 56, "every issue, most urgent first", 11, "400")
     pic.grid(ox, top, [
+        LOGI,
         issue("6 dark mode · project A", "waiting"),
         issue("7 checkout · project A", "go?"),
         issue("3 sign up · project A", "ready"),
         issue("4 search · project A", "working"),
         issue("2 api docs · project B", "working"),
         issue("5 export · project A", "idle"),
-        issue("8 settings · project A", "idle"),
         dict(label="more 1/2", icon="Dots", color=SUBTEXT),
-        dict(label="back", icon="Back", color=SUBTEXT),
+        up("projects", "Stack"),
     ])
 
     ix = ox + 3 * K + 2 * G + 44
     pic.text(ix, 40, "Its page: 6 dark mode")
-    pic.text(ix, 56, "back returns to the overview", 11, "400")
+    pic.text(ix, 56, "all issues returns to the overview", 11, "400")
     pic.grid(ix, top, [
+        LOGI,
         issue("6 dark mode · npm test", "waiting"),
         dict(label="1 Yes · 6 dark mode", icon="Check", color=GREEN),
         dict(label="2 Always · 6 dark mode", icon="Checks", color=GREEN),
         dict(label="3 Auto mode · 6 dark mode", icon="Robot", color=SUBTEXT),
         dict(label="4 No · 6 dark mode", icon="X", color=RED),
-        EMPTY, EMPTY, EMPTY,
-        dict(label="back", icon="Back", color=SUBTEXT),
+        EMPTY, EMPTY,
+        up("all issues", "List"),
     ])
 
     mid = top + K + G + K / 2
@@ -305,13 +314,14 @@ def answer():
     pic.text(kx, 40, "On the keypad")
     pic.text(kx, 56, "the same choices, one key each", 11, "400")
     pic.grid(kx, top, [
+        LOGI,
         issue("6 dark mode · npm test", "waiting"),
         dict(label="1 Yes · 6 dark mode", icon="Check", color=GREEN),
         dict(label="2 Always · 6 dark mode", icon="Checks", color=GREEN),
         dict(label="3 Auto mode · 6 dark mode", icon="Robot", color=SUBTEXT),
         dict(label="4 No · 6 dark mode", icon="X", color=RED),
-        EMPTY, EMPTY, EMPTY,
-        dict(label="back", icon="Back", color=SUBTEXT),
+        EMPTY, EMPTY,
+        up("project A", "Folder"),
     ])
     pic.arrow(bx + bw + 12, kx - 12, top + bh / 2)
 
@@ -319,10 +329,11 @@ def answer():
     pic.text(ux, 40, "A question it cannot read")
     pic.text(ux, 56, "answer it on screen", 11, "400")
     pic.grid(ux, top, [
+        LOGI,
         issue("6 dark mode", "waiting"),
         dict(label="answer on screen", icon="Screen", color=SUBTEXT),
-        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        dict(label="back", icon="Back", color=SUBTEXT),
+        EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+        up("project A", "Folder"),
     ])
 
     note = top + bh + 30
