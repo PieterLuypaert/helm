@@ -4,6 +4,8 @@ Turns a Logitech MX Keypad into the helm of [herdr](https://herdr.dev): see whic
 
 An issue here is a herdr tab whose agent works on one branch, the way `hagent` opens them. The plugin reads herdr, not GitHub: it does not fetch GitHub issues.
 
+**[How it works](docs/flows.md)** walks through every flow with diagrams: the pages, the keys, answering a question and what the plugin does on its own. **[Setup details](docs/setup.md)** has every config field.
+
 ![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](docs/keypad.svg?v=40a4e13a)
 
 ## What it does
