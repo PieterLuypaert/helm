@@ -171,8 +171,8 @@ def flow():
         issue("6 dark mode", "waiting"),
         issue("7 checkout", "go?", framed=True),
         issue("8 settings", "idle"),
-        dict(label="meer 1/2", icon="Dots", color=SUBTEXT),
-        dict(label="terug", icon="Back", color=SUBTEXT),
+        dict(label="more 1/2", icon="Dots", color=SUBTEXT),
+        dict(label="back", icon="Back", color=SUBTEXT),
     ])
 
     tx = qx + step
@@ -187,7 +187,7 @@ def flow():
         dict(label="stop", icon="Stop"),
         dict(label="open PR", icon="PullRequest", style="dim"),
         dict(label="editor", icon="Code"),
-        dict(label="terug", icon="Back", color=SUBTEXT),
+        dict(label="back", icon="Back", color=SUBTEXT),
     ])
 
     fy = top + 3 * (K + G) + 30
@@ -244,22 +244,21 @@ def all_issues():
         issue("2 api docs · project B", "working"),
         issue("5 export · project A", "idle"),
         issue("8 settings · project A", "idle"),
-        dict(label="meer 1/2", icon="Dots", color=SUBTEXT),
-        dict(label="terug", icon="Back", color=SUBTEXT),
+        dict(label="more 1/2", icon="Dots", color=SUBTEXT),
+        dict(label="back", icon="Back", color=SUBTEXT),
     ])
 
     ix = ox + 3 * K + 2 * G + 44
     pic.text(ix, 40, "Its page: 6 dark mode")
-    pic.text(ix, 56, "terug returns to the overview", 11, "400")
+    pic.text(ix, 56, "back returns to the overview", 11, "400")
     pic.grid(ix, top, [
         issue("6 dark mode · npm test", "waiting"),
         dict(label="1 Yes · 6 dark mode", icon="Check", color=GREEN),
         dict(label="2 Always · 6 dark mode", icon="Checks", color=GREEN),
         dict(label="3 Auto mode · 6 dark mode", icon="Robot", color=SUBTEXT),
         dict(label="4 No · 6 dark mode", icon="X", color=RED),
-        dict(label="answer on screen", icon="Screen", color=SUBTEXT),
-        EMPTY, EMPTY,
-        dict(label="terug", icon="Back", color=SUBTEXT),
+        EMPTY, EMPTY, EMPTY,
+        dict(label="back", icon="Back", color=SUBTEXT),
     ])
 
     mid = top + K + G + K / 2
@@ -267,7 +266,7 @@ def all_issues():
     pic.arrow(ox + 3 * K + 2 * G + 6, ix - 8, mid, "pick one")
     note = top + 3 * (K + G) + 24
     pic.text(20, note, "The key counts issue tabs, not main tabs; the badge counts what needs you: waiting, go?, CI failed, changes and done.\n"
-                       "Main tabs come last, on the next page, unless they need you. terug on the overview goes to your projects.", 12, "400")
+                       "Main tabs come last, on the next page, unless they need you. back on the overview goes to your projects.", 12, "400")
     pic.save("all-issues.svg", ix + 3 * K + 2 * G + 20, note + 30)
 
 
@@ -301,9 +300,8 @@ def answer():
         dict(label="2 Always · 6 dark mode", icon="Checks", color=GREEN),
         dict(label="3 Auto mode · 6 dark mode", icon="Robot", color=SUBTEXT),
         dict(label="4 No · 6 dark mode", icon="X", color=RED),
-        dict(label="answer on screen", icon="Screen", color=SUBTEXT),
-        EMPTY, EMPTY,
-        dict(label="terug", icon="Back", color=SUBTEXT),
+        EMPTY, EMPTY, EMPTY,
+        dict(label="back", icon="Back", color=SUBTEXT),
     ])
     pic.arrow(bx + bw + 12, kx - 12, top + bh / 2)
 
@@ -314,7 +312,7 @@ def answer():
         issue("6 dark mode", "waiting"),
         dict(label="answer on screen", icon="Screen", color=SUBTEXT),
         EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-        dict(label="terug", icon="Back", color=SUBTEXT),
+        dict(label="back", icon="Back", color=SUBTEXT),
     ])
 
     note = top + bh + 30

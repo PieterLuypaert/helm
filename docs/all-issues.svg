@@ -40,12 +40,12 @@
 <text x="188.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">project A</text>
 <rect x="234" y="232" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(259.0 246.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/></g>
-<text x="272.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">meer 1/2</text>
+<text x="272.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">more 1/2</text>
 <rect x="318" y="232" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(343.0 246.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></g>
-<text x="356.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">terug</text>
+<text x="356.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">back</text>
 <text x="438" y="40" font-size="13" font-weight="600" fill="#8b949e" text-anchor="start">Its page: 6 dark mode</text>
-<text x="438" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">terug returns to the overview</text>
+<text x="438" y="56" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">back returns to the overview</text>
 <rect x="438" y="64" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(463.0 78.0) scale(1.0833333333333333)" fill="none" stroke="#ff8080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M14 18h-1l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v4.5"/><path d="M19 22v.01"/><path d="M19 19a2.003 2.003 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483"/></g>
 <text x="476.0" y="117" text-anchor="middle" font-size="9.5" fill="#ebf0ec">6 dark mode ·</text>
@@ -66,19 +66,16 @@
 <g transform="translate(547.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#ff8080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></g>
 <text x="560.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">4 No · 6 dark</text>
 <text x="560.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">mode</text>
-<rect x="606" y="148" width="76" height="76" rx="10" fill="#2b2d30"/>
-<g transform="translate(631.0 162.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10z"/><path d="M7 20h10"/><path d="M9 16v4"/><path d="M15 16v4"/></g>
-<text x="644.0" y="201" text-anchor="middle" font-size="9.5" fill="#ebf0ec">answer on</text>
-<text x="644.0" y="212" text-anchor="middle" font-size="9.5" fill="#ebf0ec">screen</text>
+<rect x="606" y="148" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="438" y="232" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="522" y="232" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="606" y="232" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(631.0 246.0) scale(1.0833333333333333)" fill="none" stroke="#afb6c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4"/><path d="M5 10h11a4 4 0 1 1 0 8h-1"/></g>
-<text x="644.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">terug</text>
+<text x="644.0" y="296" text-anchor="middle" font-size="9.5" fill="#ebf0ec">back</text>
 <line x1="116" y1="186.0" x2="140" y2="186.0" stroke="#8b949e" stroke-width="1.5" marker-end="url(#a)"/>
 <text x="128.0" y="178.0" font-size="11" font-weight="400" fill="#8b949e" text-anchor="middle">press</text>
 <line x1="400" y1="186.0" x2="430" y2="186.0" stroke="#8b949e" stroke-width="1.5" marker-end="url(#a)"/>
 <text x="415.0" y="178.0" font-size="11" font-weight="400" fill="#8b949e" text-anchor="middle">pick one</text>
 <text x="20" y="340" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">The key counts issue tabs, not main tabs; the badge counts what needs you: waiting, go?, CI failed, changes and done.</text>
-<text x="20" y="355" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">Main tabs come last, on the next page, unless they need you. terug on the overview goes to your projects.</text>
+<text x="20" y="355" font-size="12" font-weight="400" fill="#8b949e" text-anchor="start">Main tabs come last, on the next page, unless they need you. back on the overview goes to your projects.</text>
 </svg>
