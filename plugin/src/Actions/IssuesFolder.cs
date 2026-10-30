@@ -639,9 +639,10 @@ namespace Loupedeck.HerdrPlugin
                     // The main tab keeps its house while it rests; any other state shows like an issue's.
                     var icon = tab.IsMain && tab.Status == AgentStatus.Idle ? Icons.Home : AgentStatus.Icon(tab.Status);
 
-                    // In the overview of all issues, a main tab or a tab beside other projects' says whose it is.
+                    // In the overview of all issues, a main tab goes by its project's name, and an issue beside
+                    // other projects' issues says whose it is.
                     var several = this._snapshot.Projects.Count(p => p.Tabs.Any(t => !t.IsMain)) > 1;
-                    var label = this._all && (tab.IsMain || several) ? $"{tab.ShortName} · {owner.Name}" : tab.ShortName;
+                    var label = !this._all ? tab.ShortName : tab.IsMain ? owner.Name : several ? $"{tab.ShortName} · {owner.Name}" : tab.ShortName;
                     return new KeyLook(label, icon, AgentStatus.Color(tab.Status), Framed: tab.TabId == focus);
                 }
 
