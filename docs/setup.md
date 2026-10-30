@@ -57,7 +57,7 @@ cd plugin/tests
 DOTNET_ROOT="$HOME/.dotnet" PATH="$HOME/.dotnet:$PATH" dotnet test
 ```
 
-The picture in the README is drawn by a script; run it after changing what the keys show:
+The pictures in the README and the docs are drawn by a script; run it after changing what the keys show:
 
 ```bash
 python3 docs/draw_keypad.py

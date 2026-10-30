@@ -14,7 +14,11 @@ An issue here is a herdr tab whose agent works on one branch, the way `hagent` o
 - **Actions** such as go, review, babysit and commit go to that issue's agent. The one that fits lights up, and every press is confirmed on the key and in herdr.
 - **The keypad follows the screen.** Switch tabs in herdr and the keypad's issue page moves along.
 
-Keys use herdr's colours: red when an agent waits on you or checks fail, orange for a plan waiting for your go or finished work, teal when a pull request is ready to merge, yellow while an agent works, grey for the rest. A plan counts when the agent's output has a line starting with `Single PR:` or `PR 1:`; change `planPattern` in the config to match your own format.
+Every key says in one word how its issue is doing, in herdr's colours:
+
+![What a key can say: waiting, go?, working and done come from the agent; CI failed, changes, review and ready from the pull request](docs/statuses.svg)
+
+A plan counts when the agent's output has a line starting with `Single PR:` or `PR 1:`; change `planPattern` in the config to match your own format.
 
 ## Install
 
