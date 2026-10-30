@@ -18,9 +18,9 @@ namespace Loupedeck.HerdrPlugin
     }
 
     // How one key looks. Logi Options+ shows Title as the key's label under its image, so the image
-    // itself is the icon alone. Framed marks the project or tab on screen; Badge is a count at the top right;
-    // Count, on a tile, is a number drawn large over a small icon.
-    public readonly record struct KeyLook(String Title, String Icon, BitmapColor Accent, KeyStyle Style = KeyStyle.Normal, Boolean Framed = false, String Badge = null, String Count = null);
+    // itself is the icon alone. Badge is a count at the top right; Count, on a tile, is a number drawn large
+    // over a small icon.
+    public readonly record struct KeyLook(String Title, String Icon, BitmapColor Accent, KeyStyle Style = KeyStyle.Normal, String Badge = null, String Count = null);
 
     // Draws every key the plugin shows. In the menu: an icon on a clear background, with no text in the
     // image, because Logi already writes the label under it. On your own page: a tile, like an app icon.
@@ -46,16 +46,8 @@ namespace Loupedeck.HerdrPlugin
                 builder.FillCircle(cx, cy, w * 0.46f, look.Accent);
             }
 
-            if (look.Framed)
-            {
-                for (var i = 0; i < 3; i++)
-                {
-                    builder.DrawCircle(cx, cy, w * 0.48f - i, AgentStatus.Text);
-                }
-            }
-
             var color = highlight ? AgentStatus.Ground : look.Accent;
-            var size = (Int32)(w * (highlight || look.Framed ? 0.5f : 0.64f));
+            var size = (Int32)(w * (highlight ? 0.5f : 0.64f));
             var icon = Icons.Render(look.Icon ?? Icons.Dot, color, size);
             if (icon != null)
             {

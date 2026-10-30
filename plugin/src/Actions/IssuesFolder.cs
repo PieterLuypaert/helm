@@ -581,7 +581,6 @@ namespace Loupedeck.HerdrPlugin
                     return flash.Look;
                 }
 
-                var focus = this._snapshot.FocusedTabId;
                 var nav = AgentStatus.Subtext;
                 switch (param)
                 {
@@ -623,9 +622,7 @@ namespace Loupedeck.HerdrPlugin
                     }
 
                     var needsYou = project.Tabs.Count(t => AgentStatus.NeedsYou(t.Status));
-                    return new KeyLook(project.Name, Icons.Folder, AgentStatus.Color(project.Status),
-                        Framed: focus != null && project.Tabs.Any(t => t.TabId == focus),
-                        Badge: needsYou > 0 ? needsYou.ToString() : null);
+                    return new KeyLook(project.Name, Icons.Folder, AgentStatus.Color(project.Status), Badge: needsYou > 0 ? needsYou.ToString() : null);
                 }
 
                 if (param.StartsWith(TabPrefix))
@@ -643,7 +640,7 @@ namespace Loupedeck.HerdrPlugin
                     // other projects' issues says whose it is.
                     var several = this._snapshot.Projects.Count(p => p.Tabs.Any(t => !t.IsMain)) > 1;
                     var label = !this._all ? tab.ShortName : tab.IsMain ? owner.Name : several ? $"{tab.ShortName} · {owner.Name}" : tab.ShortName;
-                    return new KeyLook(label, icon, AgentStatus.Color(tab.Status), Framed: tab.TabId == focus);
+                    return new KeyLook(label, icon, AgentStatus.Color(tab.Status));
                 }
 
                 if (FolderKeys.TryParseKeyed(param, AnswerPrefix, out var choiceIndex, out var askingId))
