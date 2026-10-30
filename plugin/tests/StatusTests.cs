@@ -103,6 +103,16 @@ public class StatusTests
     }
 
     [Fact]
+    public void Empty_keys_keep_back_on_the_last_key()
+    {
+        var page = FolderKeys.Fill(new[] { "header", "act:0" }, 8, "empty:").Append("back").ToList();
+        Assert.Equal(9, page.Count);
+        Assert.Equal("back", page[8]);
+        Assert.Equal(new[] { "empty:0", "empty:5" }, new[] { page[2], page[7] });
+        Assert.Equal(8, FolderKeys.Fill(Enumerable.Range(0, 8).Select(i => "k" + i).ToList(), 8, "empty:").Count);
+    }
+
+    [Fact]
     public void The_overview_keeps_its_order_drops_closed_tabs_and_adds_new_ones_last()
     {
         Assert.Equal(new[] { "b", "a" }, FolderKeys.KeepOrder(null, new[] { "b", "a" }));

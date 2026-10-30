@@ -16,7 +16,7 @@ namespace Loupedeck.HerdrPlugin
         private const String TabPrefix = "tab:";
         private const String ActionPrefix = "act:";
         private const String HeaderParam = "header";
-        private const String AllParam = "all";
+        private const String EmptyPrefix = "empty:";
         private const String BackToProjectParam = "back:project";
         private const String BackToProjectsParam = "back:projects";
         private const String OfflineParam = "offline";
@@ -174,16 +174,6 @@ namespace Loupedeck.HerdrPlugin
 
                 this.Navigate(id, null);
                 Task.Run(() => HerdrClient.FocusWorkspace(id));
-            }
-            else if (actionParameter == AllParam)
-            {
-                lock (this._lock)
-                {
-                    this._all = true;
-                    this._overviewOrder = null;
-                }
-
-                this.Navigate(null, null);
             }
             else if (actionParameter.StartsWith(TabPrefix))
             {
@@ -537,17 +527,19 @@ namespace Loupedeck.HerdrPlugin
                         names.AddRange(Enumerable.Range(0, actions.Count).Where(i => Fits(actions[i], tab)).Take(Keys - 2).Select(i => FolderKeys.Keyed(ActionPrefix, i, tab.TabId)));
                     }
 
-                    names.Add(BackToProjectParam);
-                    return names;
+                    return WithBack(names, BackToProjectParam);
                 case 1 when this._all:
-                    return this.Paged(this.OverviewOrder().Select(id => TabPrefix + id).ToList()).Append(BackToProjectsParam).ToList();
+                    return WithBack(this.Paged(this.OverviewOrder().Select(id => TabPrefix + id).ToList()), BackToProjectsParam);
                 case 1:
                     var tabs = this.SelectedProject()?.Tabs ?? Array.Empty<Issue>();
-                    return this.Paged(tabs.Select(t => TabPrefix + t.TabId).ToList()).Append(BackToProjectsParam).ToList();
+                    return WithBack(this.Paged(tabs.Select(t => TabPrefix + t.TabId).ToList()), BackToProjectsParam);
                 default:
-                    return this.Paged(this._snapshot.Projects.Select(p => ProjectPrefix + p.WorkspaceId).Prepend(AllParam).ToList());
+                    // Your projects alone; Logi adds its own back key. The overview has its own key on your page.
+                    return this.Paged(this._snapshot.Projects.Select(p => ProjectPrefix + p.WorkspaceId).ToList());
             }
         }
+
+        private static List<String> WithBack(List<String> keys, String back) => FolderKeys.Fill(keys, Keys - 1, EmptyPrefix).Append(back).ToList();
 
         // Every tab in the overview's fixed order. Call under the lock.
         private List<String> OverviewOrder()
@@ -565,8 +557,10 @@ namespace Loupedeck.HerdrPlugin
                 return items;
             }
 
+            // The last page fills up with empty keys, so more stays on the same key on every page.
             this._page %= PageCount(items.Count);
-            return items.Skip(this._page * (Keys - 2)).Take(Keys - 2).Append(MoreParam).ToList();
+            var page = items.Skip(this._page * (Keys - 2)).Take(Keys - 2).ToList();
+            return FolderKeys.Fill(page, Keys - 2, EmptyPrefix + "m").Append(MoreParam).ToList();
         }
 
         private static Int32 PageCount(Int32 items) => items <= Keys - 1 ? 1 : (items + Keys - 3) / (Keys - 2);
@@ -588,13 +582,14 @@ namespace Loupedeck.HerdrPlugin
                         return new KeyLook("", Icons.Dot, AgentStatus.Overlay);
                     case OfflineParam:
                         return new KeyLook("herdr offline", Icons.Offline, AgentStatus.Red);
-                    case AllParam:
-                        return StatusCommand.Look(this._snapshot);
+                    case var empty when empty.StartsWith(EmptyPrefix):
+                        // A zero-width space: an empty title would make Logi write the folder's name there.
+                        return new KeyLook("\u200B", Icons.None, AgentStatus.Overlay);
                     case BackToProjectsParam:
                     case BackToProjectParam:
                         return new KeyLook("back", Icons.Back, nav);
                     case MoreParam:
-                        var count = this._all ? this.OverviewOrder().Count : this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count + 1;
+                        var count = this._all ? this.OverviewOrder().Count : this.Level() == 1 ? this.SelectedProject()?.Tabs.Count ?? 0 : this._snapshot.Projects.Count;
                         return new KeyLook($"more {this._page + 1}/{PageCount(count)}", Icons.Dots, nav);
                     case OnScreenParam:
                         return new KeyLook("answer on screen", Icons.Screen, nav);
@@ -621,8 +616,14 @@ namespace Loupedeck.HerdrPlugin
                         return new KeyLook("", Icons.Dot, AgentStatus.Overlay);
                     }
 
-                    var needsYou = project.Tabs.Count(t => AgentStatus.NeedsYou(t.Status));
-                    return new KeyLook(project.Name, Icons.Folder, AgentStatus.Color(project.Status), Badge: needsYou > 0 ? needsYou.ToString() : null);
+                    // Every project the same white folder, with how many issues it holds; the badge alone, in
+                    // the colour of its most urgent one, says what needs you.
+                    var needsYou = project.Tabs.Where(t => AgentStatus.NeedsYou(t.Status)).ToList();
+                    var issues = project.Tabs.Count(t => !t.IsMain);
+                    var title = issues switch { 0 => project.Name, 1 => $"{project.Name} · 1 issue", _ => $"{project.Name} · {issues} issues" };
+                    return new KeyLook(title, Icons.Folder, AgentStatus.Text,
+                        Badge: needsYou.Count > 0 ? needsYou.Count.ToString() : null,
+                        BadgeColor: needsYou.Count > 0 ? AgentStatus.Color(AgentStatus.MostUrgent(needsYou.Select(t => t.Status))) : null);
                 }
 
                 if (param.StartsWith(TabPrefix))
