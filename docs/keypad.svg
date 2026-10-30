@@ -23,12 +23,12 @@
 <text x="142.0" y="218" text-anchor="middle" font-size="9.5" fill="#ebf0ec">herdr</text>
 <rect x="188" y="154" width="76" height="76" rx="10" fill="#2b2d30"/>
 <g transform="translate(213.0 168.0) scale(1.0833333333333333)" fill="none" stroke="#f36a1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l-8 4l8 4l8 -4l-8 -4"/><path d="M4 12l8 4l8 -4"/><path d="M4 16l8 4l8 -4"/></g>
-<text x="226.0" y="218" text-anchor="middle" font-size="9.5" fill="#ebf0ec">Issues</text>
+<text x="226.0" y="218" text-anchor="middle" font-size="9.5" fill="#ebf0ec">Projects</text>
 <rect x="20" y="238" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="104" y="238" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <rect x="188" y="238" width="76" height="76" rx="10" fill="none" stroke="#8b949e" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
 <text x="20" y="336" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">Three herdr keys, each with its own job:</text>
-<text x="20" y="350" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">Issues opens the herdr menu on the keypad.</text>
+<text x="20" y="350" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">Projects opens the herdr menu on your projects.</text>
 <text x="20" y="364" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">The terminal, herdr, opens herdr in iTerm.</text>
 <text x="20" y="378" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">The bell, Herdr status, counts what needs you</text>
 <text x="20" y="392" font-size="11" font-weight="400" fill="#8b949e" text-anchor="start">and jumps to the most urgent issue (step 3).</text>

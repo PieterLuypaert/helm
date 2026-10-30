@@ -4,7 +4,7 @@ namespace Loupedeck.HerdrPlugin
     using System.Threading.Tasks;
 
     // An app key for herdr itself: it opens herdr on screen, in iTerm, the way your other app keys open
-    // their apps. The Issues key opens the herdr menu on the keypad instead.
+    // their apps. The Projects key opens the herdr menu on the keypad instead.
     public class OpenHerdrCommand : PluginDynamicCommand
     {
         public OpenHerdrCommand()
@@ -14,7 +14,7 @@ namespace Loupedeck.HerdrPlugin
 
         protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) => "herdr";
 
-        // Drawn like an app key, a grey terminal rather than herdr's orange, so it does not look like the Issues key.
+        // Drawn like an app key, a grey terminal rather than herdr's orange, so it does not look like the Projects key.
         protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize) =>
             KeyArt.Draw(new KeyLook("herdr", Icons.Terminal, AgentStatus.Subtext), imageSize);
 
