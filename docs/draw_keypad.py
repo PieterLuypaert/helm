@@ -39,7 +39,7 @@ class Picture:
     def __init__(self, title):
         self.title, self.parts = title, []
 
-    def key(self, x, y, label="", icon=None, color=TEXT, style="normal", framed=False, badge=None, empty=False, count=None):
+    def key(self, x, y, label="", icon=None, color=TEXT, style="normal", badge=None, empty=False, count=None):
         """A key as the keypad shows it: the icon, and under it the label Logi writes. A tile, on your own
         page, is a big icon or a count over a small icon on black, with a short label under it."""
         p = self.parts
@@ -72,9 +72,7 @@ class Picture:
             ink = GROUND
         elif style == "dim":
             ink = OVERLAY
-        if framed:
-            p.append(f'<circle cx="{cx}" cy="{cy}" r="19" fill="none" stroke="{TEXT}" stroke-width="2"/>')
-        size = 20 if style == "highlight" or framed else 26
+        size = 20 if style == "highlight" else 26
         if icon:
             p.append(f'<g transform="translate({cx - size / 2} {cy - size / 2}) scale({size / 24})" fill="none" stroke="{ink}" '
                      f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{ICONS[icon]}</g>')
@@ -104,10 +102,7 @@ class Picture:
         for row in rows:
             cx = x
             for color, text in row:
-                if color:
-                    self.parts.append(f'<rect x="{cx}" y="{y - 10}" width="12" height="12" rx="3" fill="{color}"/>')
-                else:
-                    self.parts.append(f'<circle cx="{cx + 7}" cy="{y - 4}" r="6" fill="none" stroke="{LABEL}" stroke-width="2"/>')
+                self.parts.append(f'<rect x="{cx}" y="{y - 10}" width="12" height="12" rx="3" fill="{color}"/>')
                 self.text(cx + 20, y, text, 12, "400")
                 cx += 20 + len(text) * 6.6 + 34
             y += 22
@@ -173,7 +168,7 @@ def flow():
     pic.text(px, 56, "all issues, then one key per workspace", 11, "400")
     pic.grid(px, top, [
         dict(label="9 issues", icon="List", color=RED, badge="2"),
-        dict(label="project A", icon="Folder", color=RED, framed=True, badge="2"),
+        dict(label="project A", icon="Folder", color=RED, badge="2"),
         dict(label="project B", icon="Folder", color=YELLOW),
         dict(label="project C", icon="Folder", color=OVERLAY),
         EMPTY, EMPTY, EMPTY, EMPTY,
@@ -189,7 +184,7 @@ def flow():
         issue("4 search", "working"),
         issue("5 export", "idle"),
         issue("6 dark mode", "waiting"),
-        issue("7 checkout", "go?", framed=True),
+        issue("7 checkout", "go?"),
         issue("8 settings", "idle"),
         dict(label="more 1/2", icon="Dots", color=SUBTEXT),
         dict(label="back", icon="Back", color=SUBTEXT),
@@ -217,7 +212,7 @@ def flow():
 
     y = pic.legend(20, fy + 12 + K + 34, [
         [(RED, "answer or fix"), (ACCENT, "decide"), (GREEN, "look at the result"), (BLUE, "merge"), (YELLOW, "working"),
-         (OVERLAY, "quiet"), (None, "white ring: on screen")],
+         (OVERLAY, "quiet")],
     ])
     pic.save("keypad.svg", tx + 3 * K + 2 * G + 20, y + 4)
 

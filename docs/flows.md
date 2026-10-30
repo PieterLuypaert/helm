@@ -2,7 +2,7 @@
 
 How the keypad works with herdr: the pages, what each key does, and what the plugin does on its own.
 
-![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=56fe621b)
+![The keypad from your own page with its three herdr keys, through the herdr menu's projects and a project, to one issue's actions, and what a key shows after a press](keypad.svg?v=e9e13577)
 
 ## Your page
 
@@ -43,7 +43,7 @@ Every key shows one icon per colour for its issue, from its agent and its pull r
 
 A plan is a line in the agent's last output that matches `planPattern` in `config/keypad.json`; by default a line starting with `Single PR:` or `PR 1:`.
 
-A project key takes the colour of its most urgent tab, with how many of its tabs need you in a badge. A white ring marks the project and the tab that are on screen.
+A project key takes the colour of its most urgent tab, with how many of its tabs need you in a badge.
 
 ## Navigation
 
@@ -93,7 +93,7 @@ sequenceDiagram
 ```
 
 - **On an issue page** the keypad follows the tab herdr shows, across projects too.
-- **On the projects, project and overview pages** it does not jump, because you are browsing there; it marks what is on screen with a white ring instead.
+- **On the projects, project and overview pages** it does not jump, because you are browsing there.
 - **Only a change on the screen counts.** Right after a key press herdr may still show the previous tab for a moment; the keypad does not jump back to it.
 
 ## Picking a tab
