@@ -4,6 +4,7 @@ namespace Loupedeck.HerdrPlugin
     using System.Collections.Generic;
     using System.IO;
     using System.Text.Json;
+    using System.Threading;
 
     // One action on the issue page. Type is "prompt" (text plus Enter to the issue's agent),
     // "keys" (key presses, space separated, such as "esc" or "enter") or "shell" (a command run
@@ -52,7 +53,11 @@ namespace Loupedeck.HerdrPlugin
         };
 
         private static DateTime _loadedStamp = DateTime.MinValue;
+        private static Int32 _version;
         private static KeypadConfig _cached = new();
+
+        // Goes up every time the file is read again, so the keys know to redraw.
+        public static Int32 Version => Volatile.Read(ref _version);
 
         // Reads the config file again whenever it changed, so edits apply without a rebuild.
         public static KeypadConfig Current
@@ -72,9 +77,11 @@ namespace Loupedeck.HerdrPlugin
                     var stamp = target.LastWriteTimeUtc;
                     if (stamp != _loadedStamp)
                     {
+                        // Marked as read before parsing: a broken file is reported once, not on every key.
+                        _loadedStamp = stamp;
+                        Interlocked.Increment(ref _version);
                         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, ReadCommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true };
                         _cached = JsonSerializer.Deserialize<KeypadConfig>(File.ReadAllText(Path), options) ?? new KeypadConfig();
-                        _loadedStamp = stamp;
                     }
                 }
                 catch (Exception ex)
