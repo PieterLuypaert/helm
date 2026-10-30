@@ -52,4 +52,28 @@ public class PullRequestTests
         Assert.Equal("feat/slice-5-archive", PullRequests.BranchFor("main", "feat/slice-5-archive"));
         Assert.Equal("", PullRequests.BranchFor(null, "1"));
     }
+
+    [Fact]
+    public void Only_the_newest_run_of_each_check_counts()
+    {
+        using var doc = System.Text.Json.JsonDocument.Parse("""
+            [
+              { "workflowName": "API - CI PR", "name": "API CI Gate", "conclusion": "FAILURE", "startedAt": "2026-10-30T13:02:41Z" },
+              { "workflowName": "API - CI PR", "name": "API CI Gate", "conclusion": "SUCCESS", "startedAt": "2026-10-30T13:21:05Z" },
+              { "workflowName": "Docs Guards", "name": "Docs Guards", "conclusion": "CANCELLED", "startedAt": "2026-10-30T13:02:03Z" },
+              { "workflowName": "Docs Guards", "name": "Docs Guards", "conclusion": "SUCCESS", "startedAt": "2026-10-30T13:02:39Z" },
+              { "workflowName": "API - CI PR", "name": "run-phpunit", "conclusion": "CANCELLED", "startedAt": "2026-10-30T13:02:04Z" },
+              { "context": "ci/legacy", "state": "SUCCESS" }
+            ]
+            """);
+        Assert.Equal("passing", PullRequests.ChecksOf(doc.RootElement));
+
+        using var failing = System.Text.Json.JsonDocument.Parse("""
+            [
+              { "workflowName": "API - CI PR", "name": "API CI Gate", "conclusion": "SUCCESS", "startedAt": "2026-10-30T13:02:41Z" },
+              { "workflowName": "API - CI PR", "name": "API CI Gate", "conclusion": "FAILURE", "startedAt": "2026-10-30T13:21:05Z" }
+            ]
+            """);
+        Assert.Equal("failing", PullRequests.ChecksOf(failing.RootElement));
+    }
 }
