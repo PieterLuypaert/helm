@@ -76,4 +76,43 @@ public class PullRequestTests
             """);
         Assert.Equal("failing", PullRequests.ChecksOf(failing.RootElement));
     }
+
+    [Fact]
+    public void A_closed_pull_request_reads_closed()
+    {
+        var (branch, pr) = PullRequests.Parse("""[{ "number": 9, "state": "CLOSED", "headRefName": "feat/x", "headRefOid": "abc" }]""")[0];
+        Assert.Equal("feat/x", branch);
+        Assert.Equal("abc", pr.HeadOid);
+        Assert.Equal(AgentStatus.Closed, AgentStatus.From("idle", false, pr));
+    }
+
+    [Fact]
+    public void A_failed_call_keeps_the_pull_requests_helm_knew()
+    {
+        var previous = new Dictionary<String, PrInfo>
+        {
+            ["feat/open"] = new(1, null, "OPEN", false, "", "passing", "o1"),
+            ["feat/merged"] = new(2, null, "MERGED", false, "", "none", "m1"),
+        };
+        const String open = """[{ "number": 3, "state": "OPEN", "headRefName": "feat/new" }]""";
+
+        var closedFailed = PullRequests.ForRepo(open, null, previous);
+        Assert.Equal(new[] { "feat/merged", "feat/new" }, closedFailed.Keys.OrderBy(k => k));
+
+        var openFailed = PullRequests.ForRepo(null, "[]", previous);
+        Assert.Equal(new[] { "feat/merged", "feat/open" }, openFailed.Keys.OrderBy(k => k));
+
+        var bothFine = PullRequests.ForRepo(open, """[{ "number": 4, "state": "CLOSED", "headRefName": "feat/new" }]""", previous);
+        Assert.Equal("OPEN", bothFine["feat/new"].State);
+    }
+
+    [Fact]
+    public void A_merged_pull_request_only_belongs_to_a_worktree_still_on_its_commit()
+    {
+        var merged = new PrInfo(2, null, "MERGED", false, "", "none", "m1");
+        Assert.True(PullRequests.Belongs(merged, "m1"));
+        Assert.False(PullRequests.Belongs(merged, "n2"));
+        Assert.True(PullRequests.Belongs(merged, null));
+        Assert.True(PullRequests.Belongs(new PrInfo(1, null, "OPEN", false, "", "passing", "o1"), "n2"));
+    }
 }

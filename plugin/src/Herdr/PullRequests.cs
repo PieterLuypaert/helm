@@ -11,8 +11,8 @@ namespace Loupedeck.HerdrPlugin
 
     // An issue's pull request as GitHub reports it. State is OPEN, MERGED or CLOSED; Checks is
     // passing, failing, pending or none; ReviewDecision is APPROVED, CHANGES_REQUESTED,
-    // REVIEW_REQUIRED or empty.
-    public sealed record PrInfo(Int32 Number, String Url, String State, Boolean IsDraft, String ReviewDecision, String Checks);
+    // REVIEW_REQUIRED or empty. HeadOid is the commit the pull request's branch pointed at.
+    public sealed record PrInfo(Int32 Number, String Url, String State, Boolean IsDraft, String ReviewDecision, String Checks, String HeadOid = null);
 
     // Reads your pull requests through the GitHub CLI, once a minute, for the repos your issue tabs
     // work in. Without gh, or without a GitHub remote, an issue simply has no pull request.
@@ -29,11 +29,14 @@ namespace Loupedeck.HerdrPlugin
 
         private static readonly Object Gate = new();
         private static Dictionary<String, String> _tracked = new();
-        private static Dictionary<String, (String Branch, String Repo)> _checkouts = new();
+        private static Dictionary<String, (String Branch, String Repo, String Head)> _checkouts = new();
         private static Dictionary<String, Dictionary<String, PrInfo>> _byRepo = new();
         private static Timer _timer;
         private static Boolean _running;
         private static Int32 _refreshing;
+
+        // Set when a read was asked for while one ran: that one started before the new tabs, so one more follows.
+        private static Int32 _again;
 
         // Raised when a pull request changed, so the keys can show it.
         public static event Action Changed;
@@ -91,7 +94,7 @@ namespace Loupedeck.HerdrPlugin
 
             if (hasNew)
             {
-                Task.Run(Refresh);
+                Task.Run(() => Refresh(forNewTabs: true));
             }
         }
 
@@ -106,18 +109,43 @@ namespace Loupedeck.HerdrPlugin
             {
                 return _checkouts.TryGetValue(cwd, out var checkout) && checkout.Branch.Length > 0
                     && _byRepo.TryGetValue(checkout.Repo, out var prs) && prs.TryGetValue(checkout.Branch, out var pr)
+                    && Belongs(pr, checkout.Head)
                     ? pr
                     : null;
             }
         }
 
-        public static void Refresh()
+        public static void Refresh() => Refresh(forNewTabs: false);
+
+        private static void Refresh(Boolean forNewTabs)
         {
             if (Interlocked.Exchange(ref _refreshing, 1) == 1)
             {
+                if (forNewTabs)
+                {
+                    Interlocked.Exchange(ref _again, 1);
+                }
+
                 return;
             }
 
+            try
+            {
+                do
+                {
+                    Interlocked.Exchange(ref _again, 0);
+                    RefreshOnce();
+                }
+                while (Volatile.Read(ref _again) == 1 && IsRunning);
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _refreshing, 0);
+            }
+        }
+
+        private static void RefreshOnce()
+        {
             try
             {
                 var gh = GhBinary;
@@ -134,14 +162,15 @@ namespace Loupedeck.HerdrPlugin
 
                 // The real branch of each worktree: a tab's label can be stale. A worktree removed under a
                 // running agent has no branch to read.
-                var checkouts = new Dictionary<String, (String Branch, String Repo)>();
+                var checkouts = new Dictionary<String, (String Branch, String Repo, String Head)>();
                 foreach (var (cwd, label) in tracked.Where(t => Directory.Exists(t.Key)))
                 {
                     var branch = BranchFor(HerdrClient.RunTool(cwd, "/usr/bin/git", "-C", cwd, "branch", "--show-current").Output, label);
                     var repo = RepoSlug(HerdrClient.RunTool(cwd, "/usr/bin/git", "-C", cwd, "remote", "get-url", "origin").Output ?? "");
+                    var head = HerdrClient.RunTool(cwd, "/usr/bin/git", "-C", cwd, "rev-parse", "HEAD").Output?.Trim();
                     if (repo != null)
                     {
-                        checkouts[cwd] = (branch, repo);
+                        checkouts[cwd] = (branch, repo, String.IsNullOrEmpty(head) ? null : head);
                     }
                 }
 
@@ -150,28 +179,23 @@ namespace Loupedeck.HerdrPlugin
                 {
                     // Only your own pull requests: a team repo has more open ones than any limit holds.
                     var open = HerdrClient.RunTool(null, GhTimeout, gh, "pr", "list", "--repo", repo, "--author", "@me", "--state", "open", "--limit", "50",
-                        "--json", "number,url,state,headRefName,isDraft,reviewDecision,statusCheckRollup");
-                    var merged = HerdrClient.RunTool(null, GhTimeout, gh, "pr", "list", "--repo", repo, "--author", "@me", "--state", "merged", "--limit", "30",
-                        "--json", "number,url,state,headRefName");
-                    if (!open.Ok)
-                    {
-                        PluginLog.Warning($"gh pr list for {repo} failed: {open.Error}");
-                        lock (Gate)
-                        {
-                            // Keep what we knew rather than blank the keys on one failed call.
-                            byRepo[repo] = _byRepo.GetValueOrDefault(repo) ?? new Dictionary<String, PrInfo>();
-                        }
+                        "--json", "number,url,state,headRefName,headRefOid,isDraft,reviewDecision,statusCheckRollup");
 
-                        continue;
+                    // Closed includes merged.
+                    var done = HerdrClient.RunTool(null, GhTimeout, gh, "pr", "list", "--repo", repo, "--author", "@me", "--state", "closed", "--limit", "30",
+                        "--json", "number,url,state,headRefName,headRefOid");
+                    foreach (var failed in new[] { open, done }.Where(r => !r.Ok))
+                    {
+                        PluginLog.Warning($"gh pr list for {repo} failed: {failed.Error}");
                     }
 
-                    var prs = new Dictionary<String, PrInfo>();
-                    foreach (var (branch, pr) in Parse(open.Output).Concat(merged.Ok ? Parse(merged.Output) : Enumerable.Empty<(String, PrInfo)>()))
+                    Dictionary<String, PrInfo> previous;
+                    lock (Gate)
                     {
-                        prs.TryAdd(branch, pr);
+                        previous = _byRepo.GetValueOrDefault(repo);
                     }
 
-                    byRepo[repo] = prs;
+                    byRepo[repo] = ForRepo(open.Ok ? open.Output : null, done.Ok ? done.Output : null, previous);
                 }
 
                 Boolean changed;
@@ -192,10 +216,6 @@ namespace Loupedeck.HerdrPlugin
             {
                 PluginLog.Error(ex, "Reading pull requests failed");
             }
-            finally
-            {
-                Interlocked.Exchange(ref _refreshing, 0);
-            }
         }
 
         // The branch an issue's pull request is on: the one its worktree has checked out, since a tab's name
@@ -211,6 +231,34 @@ namespace Loupedeck.HerdrPlugin
 
             return label != null && label.Contains('/') ? label : current;
         }
+
+        // A repo's pull requests by branch, open ones first, from gh's open and closed lists; null for a list
+        // whose call failed. A failed call keeps what helm knew rather than blank the keys: a failed open
+        // list keeps everything, a failed closed list the closed and merged pull requests.
+        public static Dictionary<String, PrInfo> ForRepo(String openJson, String closedJson, IReadOnlyDictionary<String, PrInfo> previous)
+        {
+            if (openJson == null)
+            {
+                return previous?.ToDictionary(p => p.Key, p => p.Value) ?? new Dictionary<String, PrInfo>();
+            }
+
+            var closed = closedJson != null
+                ? Parse(closedJson)
+                : (previous ?? new Dictionary<String, PrInfo>()).Where(p => p.Value.State != "OPEN").Select(p => (p.Key, p.Value)).ToList();
+            var prs = new Dictionary<String, PrInfo>();
+            foreach (var (branch, pr) in Parse(openJson).Concat(closed))
+            {
+                prs.TryAdd(branch, pr);
+            }
+
+            return prs;
+        }
+
+        // Whether a pull request is the one for a worktree at this commit. An open one always is. A merged
+        // or closed one only while the worktree still points at its last commit: new commits on the same
+        // branch name are new work, not the old pull request.
+        public static Boolean Belongs(PrInfo pr, String head) =>
+            pr.State == "OPEN" || pr.HeadOid == null || head == null || pr.HeadOid == head;
 
         // "owner/name" from a GitHub remote URL, or null for any other remote.
         public static String RepoSlug(String remoteUrl)
@@ -234,7 +282,8 @@ namespace Loupedeck.HerdrPlugin
                         Str(pr, "state") ?? "OPEN",
                         pr.TryGetProperty("isDraft", out var d) && d.ValueKind == JsonValueKind.True,
                         Str(pr, "reviewDecision") ?? "",
-                        pr.TryGetProperty("statusCheckRollup", out var roll) ? ChecksOf(roll) : "none")));
+                        pr.TryGetProperty("statusCheckRollup", out var roll) ? ChecksOf(roll) : "none",
+                        Str(pr, "headRefOid"))));
             }
 
             return result;
