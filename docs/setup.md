@@ -58,6 +58,8 @@ cd plugin/tests
 DOTNET_ROOT="$HOME/.dotnet" PATH="$HOME/.dotnet:$PATH" dotnet test
 ```
 
+GitHub runs the same tests on Linux for every push and pull request (`.github/workflows/test.yml`); a failing test turns the check red.
+
 The pictures in the README and the docs are drawn by a script; run it after changing what the keys show:
 
 ```bash

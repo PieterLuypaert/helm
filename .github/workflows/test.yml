@@ -1,0 +1,24 @@
+# Runs the plugin's tests on every push and pull request. The tests build the plugin with
+# HelmSkipLink=true, so they need no Logi Plugin Service and run on Linux.
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run the tests
+        run: dotnet test plugin/tests -p:HelmSkipLink=true --logger "console;verbosity=normal"
