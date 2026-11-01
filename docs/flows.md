@@ -151,7 +151,7 @@ While an agent waits on you, its page shows the question it asks, such as Claude
 ![Answering a question: Claude's choices on screen, the same choices on the keypad, and a question helm cannot read](answer.svg?v=135d83fa)
 
 - **Each key sends its own choice.** A numbered choice is picked by the number the screen shows, which is not always its position: in Claude Code 2.1, `No` is choice 4, after `Yes, and switch to auto mode`. Choices without numbers, such as the folder-trust question, are reached with the arrow keys from the selected one, then Enter.
-- **Nothing is sent blind.** Just before sending, helm reads the question again; when the choices changed, it sends nothing, the key reads `changed`, and the keys show the new choices on the next read.
+- **Nothing is sent blind.** Just before sending, helm reads the question again; when it changed, its title, the command it is about or its choices, it sends nothing, the key reads `changed`, and the keys show the new question on the next read. Claude often asks twice in a row with the same choices, so the command counts too. After an answer, helm reads the next question afresh.
 - **A question the keys cannot hold** shows `answer on screen`, which brings the issue's tab to the front so you answer it there: one helm cannot read, such as one that wants typed text, or one with more than six choices.
 - **Every choice names its issue.** Each choice key carries the issue's name under it, the top-left key shows the issue and what it asks about, and the screen shows that same issue.
 - **Yes in green, No in red,** anything else neutral, so the answer reads at a glance.
