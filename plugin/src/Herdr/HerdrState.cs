@@ -1,7 +1,6 @@
 namespace Loupedeck.HerdrPlugin
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
@@ -68,10 +67,8 @@ namespace Loupedeck.HerdrPlugin
         private static String _planPattern;
 
         private static readonly Object Gate = new();
-        private static readonly Dictionary<String, (Int64 Seq, Boolean HasPlan)> Plans = new();
+        private static readonly ScreenReads Screens = new(HerdrClient.TryReadRecent);
 
-        // Read by the poll and cleared by an answer that found the question changed.
-        private static readonly ConcurrentDictionary<String, (Int64 Seq, Question Question)> Asked = new();
         private static Snapshot _current = Snapshot.Empty;
         private static Timer _timer;
         private static Int32 _refreshing;
@@ -219,15 +216,7 @@ namespace Loupedeck.HerdrPlugin
                 }).ToList(),
             }).ToList();
 
-            foreach (var gone in Plans.Keys.Where(k => !seen.Contains(k)).ToList())
-            {
-                Plans.Remove(gone);
-            }
-
-            foreach (var gone in Asked.Keys.Where(k => !seen.Contains(k)).ToList())
-            {
-                Asked.TryRemove(gone, out _);
-            }
+            Screens.Keep(seen);
 
             var focused = withStatus.SelectMany(p => p.Tabs).FirstOrDefault(t => t.Focused)?.TabId;
             return new Snapshot(withStatus, false, focused);
@@ -238,32 +227,13 @@ namespace Loupedeck.HerdrPlugin
         {
             if (paneId != null)
             {
-                Asked.TryRemove(paneId, out _);
+                Screens.ForgetQuestion(paneId);
             }
         }
 
-        // Reads the question a waiting agent asks, once per state change: its choices go on the keys. A
-        // screen that shows no question yet, such as one still drawing, is read again on the next poll.
-        private static Question QuestionOf(Issue tab)
-        {
-            if (tab.PaneId == null || tab.Status != "blocked")
-            {
-                return null;
-            }
-
-            if (Asked.TryGetValue(tab.PaneId, out var cached) && cached.Seq == tab.StateSeq)
-            {
-                return cached.Question;
-            }
-
-            var question = Questions.Parse(HerdrClient.ReadRecent(tab.PaneId, 40));
-            if (question != null)
-            {
-                Asked[tab.PaneId] = (tab.StateSeq, question);
-            }
-
-            return question;
-        }
+        // The question a waiting agent asks: its choices go on the keys.
+        private static Question QuestionOf(Issue tab) =>
+            tab.PaneId == null || tab.Status != "blocked" ? null : Screens.QuestionOf(tab.PaneId, tab.StateSeq);
 
         // Compiles the configured plan pattern once; a pattern that does not compile falls back to the default.
         private static void UsePlanPattern(String pattern)
@@ -285,28 +255,11 @@ namespace Loupedeck.HerdrPlugin
             }
 
             _planPattern = pattern;
-            Plans.Clear();
+            Screens.ForgetPlans();
         }
 
-        // How far back a plan's first line may sit: a long plan, or the prompt box under it, pushes it up.
-        private const Int32 PlanLines = 60;
-
-        // Reads an idle or finished agent's last lines once per state change, to see whether a plan waits.
-        private static Boolean HasPlan(Issue tab)
-        {
-            if (tab.PaneId == null || tab.Status is "blocked" or "working")
-            {
-                return false;
-            }
-
-            if (Plans.TryGetValue(tab.PaneId, out var cached) && cached.Seq == tab.StateSeq)
-            {
-                return cached.HasPlan;
-            }
-
-            var hasPlan = _planLine.IsMatch(HerdrClient.ReadRecent(tab.PaneId, PlanLines));
-            Plans[tab.PaneId] = (tab.StateSeq, hasPlan);
-            return hasPlan;
-        }
+        // Whether an idle or finished agent's last lines show a plan waiting for go.
+        private static Boolean HasPlan(Issue tab) =>
+            tab.PaneId != null && tab.Status is not ("blocked" or "working") && Screens.HasPlan(tab.PaneId, tab.StateSeq, _planLine);
     }
 }
