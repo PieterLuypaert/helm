@@ -1,0 +1,48 @@
+{
+  "id": "cli:workspace:list",
+  "result": {
+    "type": "workspace_list",
+    "workspaces": [
+      {
+        "active_tab_id": "wW:t0",
+        "agent_status": "idle",
+        "focused": true,
+        "label": "project-a",
+        "number": 1,
+        "pane_count": 10,
+        "tab_count": 8,
+        "workspace_id": "wW"
+      },
+      {
+        "active_tab_id": "wR:t1",
+        "agent_status": "idle",
+        "focused": false,
+        "label": "project-b",
+        "number": 2,
+        "pane_count": 2,
+        "tab_count": 1,
+        "workspace_id": "wR"
+      },
+      {
+        "active_tab_id": "wP:t1",
+        "agent_status": "idle",
+        "focused": false,
+        "label": "project-c",
+        "number": 3,
+        "pane_count": 2,
+        "tab_count": 1,
+        "workspace_id": "wP"
+      },
+      {
+        "active_tab_id": "wX:t1",
+        "agent_status": "unknown",
+        "focused": false,
+        "label": "project-d",
+        "number": 4,
+        "pane_count": 1,
+        "tab_count": 1,
+        "workspace_id": "wX"
+      }
+    ]
+  }
+}
