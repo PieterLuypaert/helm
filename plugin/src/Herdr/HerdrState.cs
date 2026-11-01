@@ -100,6 +100,18 @@ namespace Loupedeck.HerdrPlugin
             {
                 _timer ??= new Timer(_ => Refresh(), null, 0, 2000);
             }
+
+            ThreadPool.QueueUserWorkItem(_ => WarnOnUntestedVersion());
+        }
+
+        // A herdr update may rename a field the plugin reads; the log says so when herdr is not the tested version.
+        private static void WarnOnUntestedVersion()
+        {
+            var version = HerdrClient.Version();
+            if (version != null && version != HerdrClient.TestedVersion)
+            {
+                PluginLog.Warning($"herdr {version}; the plugin is tested against herdr {HerdrClient.TestedVersion}. If the keys look wrong, capture herdr's output again with plugin/tests/fixtures/herdr/capture.py and run the tests.");
+            }
         }
 
         public static void Stop()
