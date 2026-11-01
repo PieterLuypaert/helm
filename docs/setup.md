@@ -60,6 +60,14 @@ DOTNET_ROOT="$HOME/.dotnet" PATH="$HOME/.dotnet:$PATH" dotnet test
 
 GitHub runs the same tests on Linux for every push and pull request (`.github/workflows/test.yml`); a failing test turns the check red.
 
+The tests also read herdr's real output, captured from herdr 0.9.4 in `plugin/tests/fixtures/herdr`. After a herdr update, capture it again and run the tests; the plugin log warns when herdr is another version than the tested one:
+
+```bash
+python3 plugin/tests/fixtures/herdr/capture.py
+```
+
+The script replaces project names, branch words, paths, terminal titles and session ids with generic ones, so its files can be committed.
+
 The pictures in the README and the docs are drawn by a script; run it after changing what the keys show:
 
 ```bash
