@@ -13,6 +13,8 @@ public class KeypadTests
             new[] { "3 invite accept", "9 cancel move", "4 existing clients" },
             IssueNames.Shorten(new[] { "feat/group-records-slice-3-invite-and-accept-members", "feat/group-records-slice-9-cancel-move-and-delete-group-sessions-and-series", "feat/group-records-slice-4-existing-clients-and-member-email" }));
         Assert.Equal(new[] { "login timeout" }, IssueNames.Shorten(new[] { "fix/login-timeout-on-mobile" }));
+        Assert.Equal(new[] { "3 sign up", "4 search" }, IssueNames.Shorten(new[] { "feat/shop-slice-3-sign-up", "feat/shop-slice-4-search" }));
+        Assert.Equal(new[] { "7 checkout flow", "3 sign up" }, IssueNames.Shorten(new[] { "feat/7-checkout-flow", "feat/3-sign-up" }));
     }
 
     [Fact]

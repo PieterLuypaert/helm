@@ -28,7 +28,9 @@ namespace Loupedeck.HerdrPlugin
                 }
             }
 
-            Boolean IsCommon(String token) => branches.Count >= 2 && counts.GetValueOrDefault(token) * 2 >= branches.Count;
+            // Shared means held by at least two branches and by at least half of them: with two branches, a
+            // word held by one of them is not shared, or every word would be and the names would lose all.
+            Boolean IsCommon(String token) => counts.GetValueOrDefault(token) >= 2 && counts.GetValueOrDefault(token) * 2 >= branches.Count;
 
             return tokens.Select(t =>
             {
