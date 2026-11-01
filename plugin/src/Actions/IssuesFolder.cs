@@ -258,6 +258,9 @@ namespace Loupedeck.HerdrPlugin
 
                 PluginLog.Info($"Answer {label} on {tab.Branch}");
                 var result = HerdrClient.SendKeys(tab.PaneId, now.KeysFor(choice).ToArray());
+
+                // The next question may come with the same agent state: read it afresh, never this one again.
+                HerdrState.ForgetQuestion(tab.PaneId);
                 this.Flash(param, result.Ok
                     ? new KeyLook("sent", Icons.Check, AgentStatus.Green, KeyStyle.Highlight)
                     : new KeyLook(result.ShortReason, Icons.X, AgentStatus.Red, KeyStyle.Highlight));

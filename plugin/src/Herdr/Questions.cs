@@ -17,8 +17,10 @@ namespace Loupedeck.HerdrPlugin
 
         public Boolean Numbered => this.Options.All(o => o.Number != null);
 
-        // The choices as they read, to check the question did not change before answering it.
-        public String Signature => String.Join("|", this.Options.Select(o => $"{o.Number}:{o.Text}"));
+        // The question as it reads, to check it did not change before answering it: its title, the command
+        // or path it is about, and its choices. Claude often asks twice in a row with the same choices, so
+        // the choices alone cannot tell one question from the next.
+        public String Signature => String.Join("|", this.Options.Select(o => $"{o.Number}:{o.Text}").Prepend(this.Detail ?? "").Prepend(this.Title ?? ""));
 
         // The keys that pick a choice: its digit when the choices are numbered, which picks it at once;
         // otherwise the arrow keys from the selected choice to it, then Enter.

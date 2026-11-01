@@ -60,6 +60,16 @@ public class QuestionTests
         Assert.Equal(before.Signature, Questions.Parse(Fixture("trust-second-selected.txt")).Signature);
     }
 
+    [Fact]
+    public void The_same_choices_about_another_command_are_another_question()
+    {
+        var shown = Questions.Parse(Fixture("permission-numbered.txt"));
+        var next = Questions.Parse(Fixture("permission-numbered.txt").Replace("touch helm-probe.txt", "rm -rf build"));
+        Assert.Equal(shown.Options.Select(o => o.Text), next.Options.Select(o => o.Text));
+        Assert.Equal("rm -rf build", next.Detail);
+        Assert.NotEqual(shown.Signature, next.Signature);
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("❯ just a prompt line\n\nsome output")]
