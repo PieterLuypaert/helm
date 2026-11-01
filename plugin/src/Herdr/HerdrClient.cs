@@ -215,8 +215,11 @@ namespace Loupedeck.HerdrPlugin
             RunChecked(null, HerdrBinary, new[] { "agent", "send-keys", paneId }.Concat(keys).ToArray());
 
         // The agent's last lines, to spot a plan waiting for go; empty when unreadable.
-        public static String ReadRecent(String paneId, Int32 lines) =>
-            Run(HerdrBinary, "agent", "read", paneId, "--source", "recent", "--lines", lines.ToString()) ?? "";
+        public static String ReadRecent(String paneId, Int32 lines) => TryReadRecent(paneId, lines) ?? "";
+
+        // The same, or null when the read failed, so a failed read is not taken for an empty screen.
+        public static String TryReadRecent(String paneId, Int32 lines) =>
+            Run(HerdrBinary, "agent", "read", paneId, "--source", "recent", "--lines", lines.ToString());
 
         // A short notification in herdr itself, so the screen confirms what the keypad did.
         public static void Notify(String title, String body) =>
