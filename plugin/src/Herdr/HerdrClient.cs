@@ -67,6 +67,13 @@ namespace Loupedeck.HerdrPlugin
 
         private static readonly Regex PortSuffix = new(@"\s+:\d+$", RegexOptions.Compiled);
 
+        // The herdr version whose output the tests read, in plugin/tests/fixtures/herdr. Another version may
+        // have changed a field the plugin reads.
+        public const String TestedVersion = "0.9.4";
+
+        // herdr's version, such as "0.9.4", or null when it cannot be read.
+        public static String Version() => Run(HerdrBinary, "--version")?.Trim().Split(' ').LastOrDefault();
+
         public static String HerdrBinary
         {
             get
@@ -94,6 +101,13 @@ namespace Loupedeck.HerdrPlugin
                 return null;
             }
 
+            return ParseProjects(workspacesJson, tabsJson, agentsJson);
+        }
+
+        // The projects in the output of herdr's workspace, tab and agent lists, or null when it does not
+        // parse. Tests feed it herdr's real output, captured in plugin/tests/fixtures/herdr.
+        public static List<Project> ParseProjects(String workspacesJson, String tabsJson, String agentsJson)
+        {
             try
             {
                 var agentsByTab = new Dictionary<String, JsonElement>();
