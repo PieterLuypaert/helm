@@ -27,9 +27,17 @@ if [ ! -d /Applications/Utilities/LogiPluginService.app ]; then
   echo "warning: Logi Plugin Service not found. Install Logi Options+ first, then run this again." >&2
 fi
 mkdir -p "$HOME/Library/Application Support/Logi/LogiPluginService/Plugins"
-# The build links bin/ into the Logi Plugin Service and asks it to reload the plugin.
-dotnet build "$repo/plugin/src/HerdrPlugin.csproj" -nologo -v minimal | grep -E "error|warning CS|Created plugin link|reload" || true
-[ -f "$repo/plugin/bin/Debug/bin/HerdrPlugin.dll" ] || { echo "build failed" >&2; exit 1; }
+# The build links bin/ into the Logi Plugin Service and asks it to reload the plugin. A failed build
+# stops here, by its own exit code: the plugin from an earlier build may still be in bin/.
+build_log=$(mktemp)
+if ! dotnet build "$repo/plugin/src/HerdrPlugin.csproj" -nologo -v minimal >"$build_log" 2>&1; then
+  grep -E "error|FAILED" "$build_log" >&2 || cat "$build_log" >&2
+  rm -f "$build_log"
+  echo "build failed; the keypad keeps the plugin from the last build that worked" >&2
+  exit 1
+fi
+grep -E "warning CS|Created plugin link|reload" "$build_log" || true
+rm -f "$build_log"
 
 step "Action config at $action_config"
 mkdir -p "$(dirname "$action_config")"
