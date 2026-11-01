@@ -1,0 +1,220 @@
+{
+  "id": "cli:agent:list",
+  "result": {
+    "agents": [
+      {
+        "agent": "claude",
+        "agent_session": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "00000000-0000-0000-0000-000000000000"
+        },
+        "agent_status": "idle",
+        "cwd": "/home/dev/project-a",
+        "focused": false,
+        "foreground_cwd": "/home/dev/project-a",
+        "pane_id": "wW:p1",
+        "revision": 1,
+        "state_change_seq": 11,
+        "tab_id": "wW:t1",
+        "terminal_id": "term_00000000000000",
+        "terminal_title": "✳ Claude Code",
+        "terminal_title_stripped": "Claude Code",
+        "workspace_id": "wW"
+      },
+      {
+        "agent": "claude",
+        "agent_session": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "00000000-0000-0000-0000-000000000001"
+        },
+        "agent_status": "idle",
+        "cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-3-delta-and-echo-foxtrot-wt5",
+        "focused": false,
+        "foreground_cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-3-delta-and-echo-foxtrot-wt5",
+        "pane_id": "wW:p1Q",
+        "revision": 1,
+        "state_change_seq": 12,
+        "tab_id": "wW:tQ",
+        "terminal_id": "term_00000000000001",
+        "terminal_title": "✳ Claude Code",
+        "terminal_title_stripped": "Claude Code",
+        "workspace_id": "wW"
+      },
+      {
+        "agent": "claude",
+        "agent_session": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "00000000-0000-0000-0000-000000000002"
+        },
+        "agent_status": "idle",
+        "completion_seq": 28,
+        "cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-4-golf-hotel-and-india-juliet-wt2",
+        "focused": false,
+        "foreground_cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-4-golf-hotel-and-india-juliet-wt2",
+        "pane_id": "wW:p1R",
+        "revision": 1,
+        "state_change_seq": 28,
+        "tab_id": "wW:tR",
+        "terminal_id": "term_00000000000002",
+        "terminal_title": "✳ Claude Code",
+        "terminal_title_stripped": "Claude Code",
+        "workspace_id": "wW"
+      },
+      {
+        "agent": "claude",
+        "agent_session": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "00000000-0000-0000-0000-000000000003"
+        },
+        "agent_status": "idle",
+        "cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-5-kilo-lima-mike-wt6",
+        "focused": false,
+        "foreground_cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-5-kilo-lima-mike-wt6",
+        "pane_id": "wW:p1S",
+        "revision": 1,
+        "state_change_seq": 14,
+        "tab_id": "wW:tS",
+        "terminal_id": "term_00000000000003",
+        "terminal_title": "✳ Claude Code",
+        "terminal_title_stripped": "Claude Code",
+        "workspace_id": "wW"
+      },
+      {
+        "agent": "claude",
+        "agent_session": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "00000000-0000-0000-0000-000000000004"
+        },
+        "agent_status": "idle",
+        "cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-6-november-a-alpha-oscar-wt7",
+        "focused": false,
+        "foreground_cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-6-november-a-alpha-oscar-wt7",
+        "pane_id": "wW:p1T",
+        "revision": 1,
+        "state_change_seq": 15,
+        "tab_id": "wW:tT",
+        "terminal_id": "term_00000000000004",
+        "terminal_title": "✳ Claude Code",
+        "terminal_title_stripped": "Claude Code",
+        "workspace_id": "wW"
+      },
+      {
+        "agent": "claude",
+        "agent_session": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "00000000-0000-0000-0000-000000000005"
+        },
+        "agent_status": "idle",
+        "cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-7-papa-per-india-wt9",
+        "focused": false,
+        "foreground_cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-7-papa-per-india-wt9",
+        "pane_id": "wW:p1W",
+        "revision": 1,
+        "state_change_seq": 16,
+        "tab_id": "wW:tW",
+        "terminal_id": "term_00000000000005",
+        "terminal_title": "✳ Claude Code",
+        "terminal_title_stripped": "Claude Code",
+        "workspace_id": "wW"
+      },
+      {
+        "agent": "claude",
+        "agent_session": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "00000000-0000-0000-0000-000000000006"
+        },
+        "agent_status": "idle",
+        "cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-8-quebec-india-in-the-oscar-wt10",
+        "focused": false,
+        "foreground_cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-8-quebec-india-in-the-oscar-wt10",
+        "pane_id": "wW:p1Y",
+        "revision": 1,
+        "state_change_seq": 17,
+        "tab_id": "wW:tX",
+        "terminal_id": "term_00000000000006",
+        "terminal_title": "✳ Claude Code",
+        "terminal_title_stripped": "Claude Code",
+        "workspace_id": "wW"
+      },
+      {
+        "agent": "claude",
+        "agent_session": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "00000000-0000-0000-0000-000000000007"
+        },
+        "agent_status": "idle",
+        "completion_seq": 32,
+        "cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-9-romeo-sierra-and-tango-alpha-uniform-and-victor-wt8",
+        "focused": true,
+        "foreground_cwd": "/home/dev/project-a/.claude/worktrees/feat-alpha-bravo-charlie-9-romeo-sierra-and-tango-alpha-uniform-and-victor-wt8",
+        "pane_id": "wW:p21",
+        "revision": 1,
+        "state_change_seq": 32,
+        "tab_id": "wW:t0",
+        "terminal_id": "term_00000000000007",
+        "terminal_title": "✳ Claude Code",
+        "terminal_title_stripped": "Claude Code",
+        "workspace_id": "wW"
+      },
+      {
+        "agent": "claude",
+        "agent_session": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "00000000-0000-0000-0000-000000000008"
+        },
+        "agent_status": "idle",
+        "cwd": "/home/dev/project-b",
+        "focused": false,
+        "foreground_cwd": "/home/dev/project-b",
+        "pane_id": "wR:p1",
+        "revision": 1,
+        "state_change_seq": 19,
+        "tab_id": "wR:t1",
+        "terminal_id": "term_00000000000008",
+        "terminal_title": "✳ Claude Code",
+        "terminal_title_stripped": "Claude Code",
+        "workspace_id": "wR"
+      },
+      {
+        "agent": "claude",
+        "agent_session": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "00000000-0000-0000-0000-000000000009"
+        },
+        "agent_status": "idle",
+        "cwd": "/home/dev/project-c",
+        "focused": false,
+        "foreground_cwd": "/home/dev/project-c",
+        "pane_id": "wP:p1",
+        "revision": 1,
+        "state_change_seq": 20,
+        "tab_id": "wP:t1",
+        "terminal_id": "term_00000000000009",
+        "terminal_title": "✳ Claude Code",
+        "terminal_title_stripped": "Claude Code",
+        "workspace_id": "wP"
+      }
+    ],
+    "type": "agent_list"
+  }
+}
